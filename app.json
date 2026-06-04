@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "zeremi",
-    "slug": "zeremi",
+    "name": "brikday",
+    "slug": "brikday",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "zeremi",
+    "scheme": "brikday",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.priyanshu0007.zeremi"
+      "bundleIdentifier": "com.priyanshu0007.brikday"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +19,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.priyanshu0007.zeremi"
+      "package": "com.priyanshu0007.brikday"
     },
     "web": {
       "output": "static",
