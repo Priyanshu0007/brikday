@@ -1,98 +1,223 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React from 'react';
+import { StyleSheet, View, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { observer } from '@legendapp/state/react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { appState$ } from '@/state/store';
+import { BRUTALIST_THEME } from '@/ui/theme';
+import { Typography } from '@/ui/Typography';
+import { OnboardingScreen } from '@/components/screens/OnboardingScreen';
+import { LoginScreen } from '@/components/screens/LoginScreen';
+import { HabitsScreen } from '@/components/screens/HabitsScreen';
+import { VaultScreen } from '@/components/screens/VaultScreen';
+import { BlueprintScreen } from '@/components/screens/BlueprintScreen';
+import { SettingsScreen } from '@/components/screens/SettingsScreen';
+import { PressableScale } from 'pressto';
+import * as Haptics from 'expo-haptics';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+const DashboardHeader = observer(() => {
+  const user = appState$.user.get();
+  
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <View style={styles.header}>
+      <View style={styles.headerTitleRow}>
+        <Typography variant="h2" uppercase style={styles.headerLogo}>
+          BRICKDAY
+        </Typography>
+        <View style={styles.streakBadge}>
+          <Typography variant="mono" style={styles.streakText}>
+            🔥 {user.streak}D STREAK
+          </Typography>
+        </View>
+      </View>
+      <Typography variant="caption" style={styles.headerSub}>
+        {`OPERATOR: ${user.username.toUpperCase()} // STATUS: ONLINE`}
+      </Typography>
+    </View>
   );
-}
+});
 
-export default function HomeScreen() {
+const AppDashboard = observer(() => {
+  const activeTab = appState$.activeTab.get();
+
+  const renderActiveScreen = () => {
+    switch (activeTab) {
+      case 'engine':
+        return <HabitsScreen />;
+      case 'vault':
+        return <VaultScreen />;
+      case 'blueprint':
+        return <BlueprintScreen />;
+      case 'settings':
+        return <SettingsScreen />;
+      default:
+        return <HabitsScreen />;
+    }
+  };
+
+  const handleTabPress = (tabId: typeof activeTab) => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {
+      // Ignore haptics fail on web
+    }
+    appState$.activeTab.set(tabId);
+  };
+
+  const tabs = [
+    { id: 'engine', label: 'ENGINE', icon: '⚡' },
+    { id: 'vault', label: 'VAULT', icon: '🪙' },
+    { id: 'blueprint', label: 'BLUEPRINT', icon: '🧱' },
+    { id: 'settings', label: 'CONTROL', icon: '⚙️' },
+  ] as const;
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Brikday
-          </ThemedText>
-        </ThemedView>
+    <SafeAreaView style={styles.dashboardContainer}>
+      <StatusBar barStyle="dark-content" />
+      
+      {/* Header */}
+      <DashboardHeader />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+      {/* Screen Area */}
+      <View style={styles.screenArea}>
+        {renderActiveScreen()}
+      </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      {/* Stark Neo-Brutalist Tab Bar */}
+      <View style={styles.tabBar}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <PressableScale
+              key={tab.id}
+              onPress={() => handleTabPress(tab.id)}
+              style={[
+                styles.tabButton,
+                isActive && styles.tabButtonActive,
+              ]}
+              activeScale={0.93}
+            >
+              <Typography variant="mono" style={styles.tabIcon}>
+                {tab.icon}
+              </Typography>
+              <Typography
+                variant="caption"
+                style={[styles.tabLabel, isActive && styles.tabLabelActive]}
+              >
+                {tab.label}
+              </Typography>
+            </PressableScale>
+          );
+        })}
+      </View>
+    </SafeAreaView>
   );
-}
+});
+
+export default observer(function HomeScreen() {
+  const status = appState$.status.get();
+
+  const renderContent = () => {
+    switch (status) {
+      case 'onboarding':
+        return <OnboardingScreen />;
+      case 'login':
+        return <LoginScreen />;
+      case 'authenticated':
+      default:
+        return <AppDashboard />;
+    }
+  };
+
+  return (
+    <GestureHandlerRootView style={styles.root}>
+      {renderContent()}
+    </GestureHandlerRootView>
+  );
+});
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: BRUTALIST_THEME.colors.background,
+  },
+  dashboardContainer: {
+    flex: 1,
+    backgroundColor: BRUTALIST_THEME.colors.background,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'android' ? 36 : 12,
+    paddingBottom: 12,
+    borderBottomWidth: BRUTALIST_THEME.borderWidth,
+    borderColor: BRUTALIST_THEME.colors.border,
+    backgroundColor: '#FFFFFF',
+  },
+  headerTitleRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  safeArea: {
+  headerLogo: {
+    fontSize: 26,
+    lineHeight: 30,
+    letterSpacing: -0.5,
+  },
+  streakBadge: {
+    backgroundColor: BRUTALIST_THEME.colors.warning,
+    borderWidth: 2,
+    borderColor: BRUTALIST_THEME.colors.border,
+    borderRadius: BRUTALIST_THEME.borderRadius,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  streakText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  headerSub: {
+    marginTop: 2,
+    fontSize: 9,
+    fontFamily: BRUTALIST_THEME.fonts.mono,
+  },
+  screenArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    backgroundColor: BRUTALIST_THEME.colors.paper,
   },
-  heroSection: {
-    alignItems: 'center',
+  tabBar: {
+    flexDirection: 'row',
+    height: 72,
+    borderTopWidth: BRUTALIST_THEME.borderWidth,
+    borderColor: BRUTALIST_THEME.colors.border,
+    backgroundColor: '#FFFFFF',
+    paddingBottom: Platform.OS === 'ios' ? 12 : 4,
+    paddingTop: 8,
+  },
+  tabButton: {
+    flex: 1,
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    borderRadius: BRUTALIST_THEME.borderRadius,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    paddingVertical: 4,
   },
-  title: {
-    textAlign: 'center',
+  tabButtonActive: {
+    backgroundColor: BRUTALIST_THEME.colors.paper,
+    borderWidth: 2,
+    borderColor: BRUTALIST_THEME.colors.border,
   },
-  code: {
-    textTransform: 'uppercase',
+  tabIcon: {
+    fontSize: 20,
+    marginBottom: 2,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  tabLabel: {
+    fontSize: 9,
+    fontFamily: BRUTALIST_THEME.fonts.heading,
+    fontWeight: 'bold',
+    color: BRUTALIST_THEME.colors.textMuted,
+  },
+  tabLabelActive: {
+    color: BRUTALIST_THEME.colors.text,
   },
 });
