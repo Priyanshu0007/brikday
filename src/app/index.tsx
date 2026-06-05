@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { StyleSheet, View, Platform, StatusBar } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appState$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
@@ -38,6 +39,7 @@ const DashboardHeader = observer(() => {
 
 const AppDashboard = observer(() => {
   const activeTab = appState$.activeTab.get();
+  const insets = useSafeAreaInsets();
 
   const renderActiveScreen = () => {
     switch (activeTab) {
@@ -71,7 +73,7 @@ const AppDashboard = observer(() => {
   ] as const;
 
   return (
-    <SafeAreaView style={styles.dashboardContainer}>
+    <SafeAreaView style={styles.dashboardContainer} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" />
       
       {/* Header */}
@@ -83,7 +85,7 @@ const AppDashboard = observer(() => {
       </View>
 
       {/* Stark Neo-Brutalist Tab Bar */}
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -185,12 +187,11 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    height: 72,
     borderTopWidth: BRUTALIST_THEME.borderWidth,
     borderColor: BRUTALIST_THEME.colors.border,
     backgroundColor: '#FFFFFF',
-    paddingBottom: Platform.OS === 'ios' ? 12 : 4,
-    paddingTop: 8,
+    paddingTop: 10,
+    paddingHorizontal: 12,
   },
   tabButton: {
     flex: 1,
@@ -200,7 +201,8 @@ const styles = StyleSheet.create({
     borderRadius: BRUTALIST_THEME.borderRadius,
     borderWidth: 2,
     borderColor: 'transparent',
-    paddingVertical: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
   },
   tabButtonActive: {
     backgroundColor: BRUTALIST_THEME.colors.paper,

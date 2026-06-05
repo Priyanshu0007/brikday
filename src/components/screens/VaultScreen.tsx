@@ -9,75 +9,100 @@ import Animated, {
   useAnimatedStyle,
   runOnJS,
 } from 'react-native-reanimated';
-import { appState$, appActions, VaultGoal } from '@/state/store';
+import { appState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 
 // Chunky draggable slider component inside the goal cards
-const ChunkySlider = observer(({ goal }: { goal: VaultGoal }) => {
+const ChunkySlider = observer(({ goalId }: { goalId: string }) => {
+  const goal$ = appState$.vaultGoals.find((g) => g.id.get() === goalId);
+  if (!goal$) return null;
+
+  // Fine-grained observable tracking: observer will re-render ONLY when these specific fields change
+  const saved = goal$.saved.get();
+  const target = goal$.target.get();
+  const title = goal$.title.get();
+
   const [trackWidth, setTrackWidth] = useState(0);
   const activeX = useSharedValue(0);
   const startX = useSharedValue(0);
 
-  const calculateProgress = () => {
-    if (goal.target <= 0) return 0;
-    return goal.saved / goal.target;
-  };
+  // JS-thread ref for drag state — reliable for useEffect guards (unlike shared values read cross-thread)
+  const isDraggingRef = React.useRef(false);
 
-  // Sync position on layout
+  const progress = target > 0 ? saved / target : 0;
+  const percentage = Math.round(progress * 100);
+
+  // Sync slider position on layout measure
   const handleLayout = (e: any) => {
     const width = e.nativeEvent.layout.width;
     setTrackWidth(width);
-    const progress = calculateProgress();
-    activeX.value = progress * width;
+    if (!isDraggingRef.current) {
+      activeX.value = (target > 0 ? saved / target : 0) * width;
+    }
   };
 
-  const updateStateValue = (prog: number) => {
-    const newSaved = Math.round(prog * goal.target);
-    appActions.updateVaultGoal(goal.id, newSaved);
+  // Keep shared value in sync when state updates externally (NOT from our own drag)
+  React.useEffect(() => {
+    if (trackWidth > 0 && !isDraggingRef.current) {
+      activeX.value = progress * trackWidth;
+    }
+  }, [saved, target, trackWidth]);
+
+  const updateSaved = (newSaved: number) => {
+    appActions.updateVaultGoal(goalId, newSaved);
   };
+
+  const setDragging = (value: boolean) => {
+    isDraggingRef.current = value;
+  };
+
+  const lastUpdatedSaved = useSharedValue(saved);
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
+      runOnJS(setDragging)(true);
       startX.value = activeX.value;
+      lastUpdatedSaved.value = saved;
     })
     .onUpdate((event) => {
       if (trackWidth <= 0) return;
       const nextX = startX.value + event.translationX;
-      // Clamp between 0 and trackWidth
       const clampedX = Math.max(0, Math.min(trackWidth, nextX));
       activeX.value = clampedX;
 
-      const progress = clampedX / trackWidth;
-      runOnJS(updateStateValue)(progress);
+      const newSaved = Math.round((clampedX / trackWidth) * target);
+
+      // Only bridge to JS thread when the rounded value actually changes
+      if (newSaved !== lastUpdatedSaved.value) {
+        lastUpdatedSaved.value = newSaved;
+        runOnJS(updateSaved)(newSaved);
+      }
+    })
+    .onEnd(() => {
+      runOnJS(setDragging)(false);
     });
 
-  const fillStyle = useAnimatedStyle(() => {
-    return {
-      width: activeX.value,
-    };
-  });
+  const fillStyle = useAnimatedStyle(() => ({
+    width: activeX.value,
+  }));
 
-  const thumbStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: activeX.value - 12 }],
-    };
-  });
-
-  const percentage = Math.round(calculateProgress() * 100);
+  const thumbStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: activeX.value - 12 }],
+  }));
 
   return (
     <View style={styles.sliderContainer}>
       <View style={styles.sliderHeader}>
-        <Typography variant="bodyBold">{goal.title}</Typography>
+        <Typography variant="bodyBold">{title}</Typography>
         <Typography variant="mono" style={styles.percentBadge}>
           {percentage}%
         </Typography>
       </View>
 
       <Typography variant="caption" style={styles.savedCaption}>
-        ${goal.saved.toLocaleString()} / ${goal.target.toLocaleString()} SAVED (FULL PAY)
+        ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED (FULL PAY)
       </Typography>
 
       {/* Slider track wrapper */}
@@ -101,16 +126,28 @@ const ChunkySlider = observer(({ goal }: { goal: VaultGoal }) => {
   );
 });
 
+// Memoized card wrapper — prevents gesture handler recreation on parent re-render
+const GoalCard = React.memo(({ goalId }: { goalId: string }) => (
+  <BrutalistCard style={styles.cardSpacing} backgroundColor="#FFFFFF">
+    <ChunkySlider goalId={goalId} />
+  </BrutalistCard>
+));
+
 export const VaultScreen = observer(function VaultScreen() {
   const goals = appState$.vaultGoals.get();
 
-  const renderGoalItem = ({ item }: { item: VaultGoal }) => {
-    return (
-      <BrutalistCard style={styles.cardSpacing} backgroundColor="#FFFFFF">
-        <ChunkySlider goal={item} />
-      </BrutalistCard>
-    );
-  };
+  // Stable ID array — only recomputes when goals are added/removed, NOT on saved changes
+  const goalIds = React.useMemo(
+    () => goals.map((g) => g.id),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [goals.length],
+  );
+
+  // Stable render function — never recreated
+  const renderGoalItem = React.useCallback(
+    ({ item }: { item: string }) => <GoalCard goalId={item} />,
+    [],
+  );
 
   return (
     <View style={styles.container}>
@@ -126,9 +163,9 @@ export const VaultScreen = observer(function VaultScreen() {
 
       {/* Goal Cards List */}
       <LegendList
-        data={goals}
+        data={goalIds}
         renderItem={renderGoalItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item}
         contentContainerStyle={styles.listContent}
         style={styles.list}
       />
