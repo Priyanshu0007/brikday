@@ -18,7 +18,7 @@ export function Typography({
   ...props
 }: TypographyProps) {
   const isHeading = ['h1', 'h2', 'h3'].includes(variant);
-  const textTransform = uppercase || (isHeading && uppercase !== false) ? 'uppercase' : undefined;
+  const textTransform = (uppercase || (isHeading && uppercase !== false) ? 'uppercase' : undefined) as TextStyle['textTransform'];
 
   const fontStyle = StyleSheet.flatten([
     styles.base,

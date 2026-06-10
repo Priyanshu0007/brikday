@@ -7,11 +7,20 @@ export interface Habit {
   neglected: boolean;
 }
 
+export interface SavingTransaction {
+  id: string;
+  amount: number;
+  source: string;
+  comment: string;
+  date: number; // timestamp
+}
+
 export interface VaultGoal {
   id: string;
   title: string;
   target: number;
   saved: number;
+  transactions?: SavingTransaction[];
 }
 
 export interface Project {
@@ -51,9 +60,34 @@ export const appState$ = observable<AppState>({
     { id: 'h4', title: '1 HOUR LEETCODE / SHADERS', completed: false, neglected: false },
   ],
   vaultGoals: [
-    { id: 'v1', title: 'M3 MacBook Pro (Full Pay)', target: 3500, saved: 2100 }, // 60%
-    { id: 'v2', title: 'iPad Pro OLED', target: 1500, saved: 300 }, // 20%
-    { id: 'v3', title: 'Land Purchase Fund', target: 50000, saved: 5000 }, // 10%
+    {
+      id: 'v1',
+      title: 'M3 MacBook Pro (Full Pay)',
+      target: 3500,
+      saved: 2100,
+      transactions: [
+        { id: 't1_1', amount: 1500, source: 'Freelance Design', comment: 'Initial layout project milestone pay', date: Date.now() - 86400000 * 5 },
+        { id: 't1_2', amount: 600, source: 'Consulting Bonus', comment: 'Extra code review bonus hours', date: Date.now() - 86400000 * 2 },
+      ],
+    },
+    {
+      id: 'v2',
+      title: 'iPad Pro OLED',
+      target: 1500,
+      saved: 300,
+      transactions: [
+        { id: 't2_1', amount: 300, source: 'eBay Sale', comment: 'Sold my old second-gen iPad Pro', date: Date.now() - 86400000 * 8 },
+      ],
+    },
+    {
+      id: 'v3',
+      title: 'Land Purchase Fund',
+      target: 50000,
+      saved: 5000,
+      transactions: [
+        { id: 't3_1', amount: 5000, source: 'HSA Reinvestment', comment: 'Transferred quarterly dividend gains', date: Date.now() - 86400000 * 12 },
+      ],
+    },
   ],
   blueprintProjects: [
     { id: 'p1', title: 'VeloCity Transit App', category: 'WORK', neglected: false },
@@ -99,6 +133,23 @@ export const appActions = {
       goal.saved.set(saved);
     }
   },
+  addSavingTransaction(goalId: string, amount: number, source: string, comment: string) {
+    const goal = appState$.vaultGoals.find((g) => g.id.get() === goalId);
+    if (goal) {
+      const currentTxns = goal.transactions.get() || [];
+      const newTransaction: SavingTransaction = {
+        id: `t_${Date.now()}`,
+        amount,
+        source: source.trim(),
+        comment: comment.trim(),
+        date: Date.now(),
+      };
+      
+      goal.transactions.set([...currentTxns, newTransaction]);
+      
+      goal.saved.set(goal.saved.get() + amount);
+    }
+  },
   addVaultGoal(title: string, target: number) {
     if (!title.trim() || target <= 0) return;
     const newGoal: VaultGoal = {
@@ -106,6 +157,7 @@ export const appActions = {
       title: title.toUpperCase(),
       target,
       saved: 0,
+      transactions: [],
     };
     appState$.vaultGoals.push(newGoal);
   },

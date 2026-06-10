@@ -1,140 +1,106 @@
 "use no memo";
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  runOnJS,
-} from 'react-native-reanimated';
-import { appState$, appActions } from '@/state/store';
+import { appState$, appActions, SavingTransaction } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
+import { BrutalistButton } from '@/ui/BrutalistButton';
+import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
+import { BrutalistInput } from '@/ui/BrutalistInput';
 
-// Chunky draggable slider component inside the goal cards
-const ChunkySlider = observer(({ goalId }: { goalId: string }) => {
+const GoalCard = observer(({
+  goalId,
+  onAddSaving,
+  onViewTransactions,
+}: {
+  goalId: string;
+  onAddSaving: (id: string) => void;
+  onViewTransactions: (id: string) => void;
+}) => {
   const goal$ = appState$.vaultGoals.find((g) => g.id.get() === goalId);
   if (!goal$) return null;
 
-  // Fine-grained observable tracking: observer will re-render ONLY when these specific fields change
   const saved = goal$.saved.get();
   const target = goal$.target.get();
   const title = goal$.title.get();
 
-  const [trackWidth, setTrackWidth] = useState(0);
-  const activeX = useSharedValue(0);
-  const startX = useSharedValue(0);
-
-  // JS-thread ref for drag state — reliable for useEffect guards (unlike shared values read cross-thread)
-  const isDraggingRef = React.useRef(false);
-
   const progress = target > 0 ? saved / target : 0;
   const percentage = Math.round(progress * 100);
 
-  // Sync slider position on layout measure
-  const handleLayout = (e: any) => {
-    const width = e.nativeEvent.layout.width;
-    setTrackWidth(width);
-    if (!isDraggingRef.current) {
-      activeX.value = (target > 0 ? saved / target : 0) * width;
-    }
-  };
-
-  // Keep shared value in sync when state updates externally (NOT from our own drag)
-  React.useEffect(() => {
-    if (trackWidth > 0 && !isDraggingRef.current) {
-      activeX.value = progress * trackWidth;
-    }
-  }, [saved, target, trackWidth]);
-
-  const updateSaved = (newSaved: number) => {
-    appActions.updateVaultGoal(goalId, newSaved);
-  };
-
-  const setDragging = (value: boolean) => {
-    isDraggingRef.current = value;
-  };
-
-  const lastUpdatedSaved = useSharedValue(saved);
-
-  const panGesture = Gesture.Pan()
-    .onStart(() => {
-      runOnJS(setDragging)(true);
-      startX.value = activeX.value;
-      lastUpdatedSaved.value = saved;
-    })
-    .onUpdate((event) => {
-      if (trackWidth <= 0) return;
-      const nextX = startX.value + event.translationX;
-      const clampedX = Math.max(0, Math.min(trackWidth, nextX));
-      activeX.value = clampedX;
-
-      const newSaved = Math.round((clampedX / trackWidth) * target);
-
-      // Only bridge to JS thread when the rounded value actually changes
-      if (newSaved !== lastUpdatedSaved.value) {
-        lastUpdatedSaved.value = newSaved;
-        runOnJS(updateSaved)(newSaved);
-      }
-    })
-    .onEnd(() => {
-      runOnJS(setDragging)(false);
-    });
-
-  const fillStyle = useAnimatedStyle(() => ({
-    width: activeX.value,
-  }));
-
-  const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: activeX.value - 12 }],
-  }));
-
   return (
-    <View style={styles.sliderContainer}>
-      <View style={styles.sliderHeader}>
-        <Typography variant="bodyBold">{title}</Typography>
-        <Typography variant="mono" style={styles.percentBadge}>
-          {percentage}%
-        </Typography>
-      </View>
-
-      <Typography variant="caption" style={styles.savedCaption}>
-        ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED (FULL PAY)
-      </Typography>
-
-      {/* Slider track wrapper */}
-      <GestureDetector gesture={panGesture}>
-        <View style={styles.trackContainer} onLayout={handleLayout}>
-          {/* Main track */}
-          <View style={styles.track}>
-            {/* Animated Progress Fill */}
-            <Animated.View style={[styles.progressFill, fillStyle]} />
-          </View>
-
-          {/* Chunky Drag handle */}
-          <Animated.View style={[styles.thumb, thumbStyle]} />
+    <BrutalistCard style={styles.cardSpacing} backgroundColor="#FFFFFF">
+      <View style={styles.sliderContainer}>
+        <View style={styles.sliderHeader}>
+          <Typography variant="bodyBold">{title}</Typography>
+          <Typography variant="mono" style={styles.percentBadge}>
+            {percentage}%
+          </Typography>
         </View>
-      </GestureDetector>
 
-      <Typography variant="caption" style={styles.sliderHint}>
-        ◀ DRAG HANDLE TO ALLOCATE CAPITAL ▶
-      </Typography>
-    </View>
+        <Typography variant="caption" style={styles.savedCaption}>
+          ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED (FULL PAY)
+        </Typography>
+
+        {/* Static Progress Bar */}
+        <View style={styles.staticTrackContainer}>
+          <View style={styles.track}>
+            <View style={[styles.progressFill, { width: `${Math.min(percentage, 100)}%` }]} />
+          </View>
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.buttonRow}>
+          <View style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => onAddSaving(goalId)}
+              backgroundColor={BRUTALIST_THEME.colors.success}
+              size="sm"
+            >
+              <Typography
+                variant="bodyBold"
+                style={styles.buttonText}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                + ADD SAVING
+              </Typography>
+            </BrutalistButton>
+          </View>
+          <View style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => onViewTransactions(goalId)}
+              backgroundColor={BRUTALIST_THEME.colors.warning}
+              size="sm"
+            >
+              <Typography
+                variant="bodyBold"
+                style={styles.buttonText}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                HISTORY
+              </Typography>
+            </BrutalistButton>
+          </View>
+        </View>
+      </View>
+    </BrutalistCard>
   );
 });
 
-// Memoized card wrapper — prevents gesture handler recreation on parent re-render
-const GoalCard = React.memo(({ goalId }: { goalId: string }) => (
-  <BrutalistCard style={styles.cardSpacing} backgroundColor="#FFFFFF">
-    <ChunkySlider goalId={goalId} />
-  </BrutalistCard>
-));
-
 export const VaultScreen = observer(function VaultScreen() {
   const goals = appState$.vaultGoals.get();
+
+  const [addSavingVisible, setAddSavingVisible] = useState(false);
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
+
+  const [amountInput, setAmountInput] = useState('');
+  const [sourceInput, setSourceInput] = useState('');
+  const [commentInput, setCommentInput] = useState('');
 
   // Stable ID array — only recomputes when goals are added/removed, NOT on saved changes
   const goalIds = React.useMemo(
@@ -143,11 +109,48 @@ export const VaultScreen = observer(function VaultScreen() {
     [goals.length],
   );
 
+  const handleAddSavingPress = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    setAmountInput('');
+    setSourceInput('');
+    setCommentInput('');
+    setAddSavingVisible(true);
+  };
+
+  const handleViewTransactionsPress = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    setHistoryVisible(true);
+  };
+
+  const handleSaveTransactionSubmit = () => {
+    if (!selectedGoalId) return;
+    const parsedAmount = parseFloat(amountInput);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      Alert.alert('Invalid Input', 'Please enter a valid positive savings amount.');
+      return;
+    }
+    appActions.addSavingTransaction(
+      selectedGoalId,
+      parsedAmount,
+      sourceInput || 'Manual Savings',
+      commentInput || ''
+    );
+    setAddSavingVisible(false);
+  };
+
   // Stable render function — never recreated
   const renderGoalItem = React.useCallback(
-    ({ item }: { item: string }) => <GoalCard goalId={item} />,
+    ({ item }: { item: string }) => (
+      <GoalCard
+        goalId={item}
+        onAddSaving={handleAddSavingPress}
+        onViewTransactions={handleViewTransactionsPress}
+      />
+    ),
     [],
   );
+
+  const selectedGoal = goals.find((g) => g.id === selectedGoalId);
 
   return (
     <View style={styles.container}>
@@ -169,6 +172,89 @@ export const VaultScreen = observer(function VaultScreen() {
         contentContainerStyle={styles.listContent}
         style={styles.list}
       />
+
+      {/* Add Saving Bottom Sheet */}
+      {selectedGoal && (
+        <BrutalistBottomSheet
+          visible={addSavingVisible}
+          onClose={() => setAddSavingVisible(false)}
+          title={`SAVE FOR ${selectedGoal.title}`}
+        >
+          <ScrollView contentContainerStyle={styles.formContent} keyboardShouldPersistTaps="handled">
+            <BrutalistInput
+              label="Amount ($)"
+              placeholder="e.g. 500"
+              keyboardType="numeric"
+              value={amountInput}
+              onChangeText={setAmountInput}
+            />
+            <BrutalistInput
+              label="Saved From"
+              placeholder="e.g. Freelance project, Salary bonus"
+              value={sourceInput}
+              onChangeText={setSourceInput}
+            />
+            <BrutalistInput
+              label="Comments"
+              placeholder="Any additional notes"
+              value={commentInput}
+              onChangeText={setCommentInput}
+            />
+            
+            <BrutalistButton
+              onPress={handleSaveTransactionSubmit}
+              backgroundColor={BRUTALIST_THEME.colors.success}
+              style={styles.submitBtn}
+            >
+              CONFIRM SAVINGS
+            </BrutalistButton>
+          </ScrollView>
+        </BrutalistBottomSheet>
+      )}
+
+      {/* History Bottom Sheet */}
+      {selectedGoal && (
+        <BrutalistBottomSheet
+          visible={historyVisible}
+          onClose={() => setHistoryVisible(false)}
+          title={`${selectedGoal.title} HISTORY`}
+        >
+          <ScrollView contentContainerStyle={styles.historyListContent}>
+            {(!selectedGoal.transactions || selectedGoal.transactions.length === 0) ? (
+              <View style={styles.emptyContainer}>
+                <Typography variant="body" style={styles.emptyText}>
+                  NO TRANSACTIONS LOGGED FOR THIS ACQUISITION.
+                </Typography>
+              </View>
+            ) : (
+              selectedGoal.transactions.map((tx: SavingTransaction) => (
+                <View key={tx.id} style={styles.txnItem}>
+                  <View style={styles.txnHeader}>
+                    <Typography variant="bodyBold" style={styles.txnAmount}>
+                      +${tx.amount.toLocaleString()}
+                    </Typography>
+                    <Typography variant="mono" style={styles.txnDate}>
+                      {new Date(tx.date).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </Typography>
+                  </View>
+                  <Typography variant="mono" style={styles.txnSource}>
+                    FROM: {tx.source}
+                  </Typography>
+                  {tx.comment ? (
+                    <Typography variant="caption" style={styles.txnComment}>
+                      "{tx.comment}"
+                    </Typography>
+                  ) : null}
+                </View>
+              ))
+            )}
+          </ScrollView>
+        </BrutalistBottomSheet>
+      )}
     </View>
   );
 });
@@ -219,12 +305,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontFamily: BRUTALIST_THEME.fonts.mono,
   },
-  trackContainer: {
-    height: 32,
-    justifyContent: 'center',
-    position: 'relative',
-    marginVertical: 8,
-  },
   track: {
     height: 16,
     backgroundColor: BRUTALIST_THEME.colors.paper,
@@ -237,25 +317,76 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: BRUTALIST_THEME.colors.warning,
   },
-  thumb: {
-    position: 'absolute',
-    width: 24,
-    height: 24,
-    backgroundColor: BRUTALIST_THEME.colors.border,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    borderRadius: 2,
-    shadowColor: '#000000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 0,
-    elevation: 4,
+  staticTrackContainer: {
+    height: 16,
+    marginVertical: 8,
+    marginBottom: 14,
   },
-  sliderHint: {
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+  },
+  formContent: {
+    paddingBottom: 24,
+  },
+  submitBtn: {
+    marginTop: 16,
+  },
+  historyListContent: {
+    paddingBottom: 24,
+  },
+  emptyContainer: {
+    paddingVertical: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
     textAlign: 'center',
-    fontSize: 9,
-    color: BRUTALIST_THEME.colors.textMuted,
-    marginTop: 6,
     fontFamily: BRUTALIST_THEME.fonts.mono,
+    fontSize: 12,
+    color: BRUTALIST_THEME.colors.textMuted,
+  },
+  txnItem: {
+    borderWidth: BRUTALIST_THEME.borderWidth,
+    borderColor: BRUTALIST_THEME.colors.border,
+    borderRadius: BRUTALIST_THEME.borderRadius,
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    marginVertical: 6,
+    shadowColor: BRUTALIST_THEME.colors.border,
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+  },
+  txnHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  txnAmount: {
+    fontSize: 16,
+    color: BRUTALIST_THEME.colors.success,
+  },
+  txnDate: {
+    fontSize: 11,
+    color: BRUTALIST_THEME.colors.textMuted,
+  },
+  txnSource: {
+    fontSize: 11,
+    color: BRUTALIST_THEME.colors.text,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  txnComment: {
+    fontSize: 11,
+    color: BRUTALIST_THEME.colors.textMuted,
+    fontStyle: 'italic',
+  },
+  buttonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
 });
