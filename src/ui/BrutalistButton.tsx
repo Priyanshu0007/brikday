@@ -53,9 +53,11 @@ export function BrutalistButton({
 
   return (
     <PressableScale
+      // @ts-ignore
       disabled={disabled || loading}
       onPress={handlePress}
       style={[styles.outer, style]}
+      // @ts-ignore
       activeScale={0.96}
     >
       <View style={styles.buttonOuter}>

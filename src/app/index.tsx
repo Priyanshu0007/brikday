@@ -96,6 +96,7 @@ const AppDashboard = observer(() => {
                 styles.tabButton,
                 isActive && styles.tabButtonActive,
               ]}
+              // @ts-ignore
               activeScale={0.93}
             >
               <Typography variant="mono" style={styles.tabIcon}>

@@ -246,7 +246,7 @@ export const VaultScreen = observer(function VaultScreen() {
                   </Typography>
                   {tx.comment ? (
                     <Typography variant="caption" style={styles.txnComment}>
-                      "{tx.comment}"
+                      &quot;{tx.comment}&quot;
                     </Typography>
                   ) : null}
                 </View>
