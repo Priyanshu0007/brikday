@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { appState$, appActions, Project } from '@/state/store';
+import { appState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -14,61 +14,67 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
   const activeProjects = projects.filter((p) => !p.neglected);
   const neglectedProjects = projects.filter((p) => p.neglected);
 
-  const renderProjectCard = (project: Project) => {
-    return (
-      <BrutalistCard
-        key={project.id}
-        neglected={project.neglected}
-        backgroundColor="#FFFFFF"
-        style={styles.cardSpacing}
-      >
-        <View style={styles.cardHeader}>
-          <Typography
-            variant="mono"
-            style={styles.categoryBadge}
-            color={project.neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.textMuted}
-          >
-            {project.category}
-          </Typography>
-          
-          <Typography
-            variant="mono"
-            style={[styles.statusIndicator, project.neglected && styles.decayText]}
-            color={project.neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
-          >
-            {project.neglected ? '● DECAYING' : '● OPERATIONAL'}
-          </Typography>
-        </View>
+const ProjectCard = observer(({ projectId }: { projectId: string }) => {
+  const project$ = appState$.blueprintProjects.find((p) => p.id.get() === projectId);
+  if (!project$) return null;
 
+  const neglected = project$.neglected.get();
+  const category = project$.category.get();
+  const title = project$.title.get();
+
+  return (
+    <BrutalistCard
+      neglected={neglected}
+      backgroundColor="#FFFFFF"
+      style={styles.cardSpacing}
+    >
+      <View style={styles.cardHeader}>
         <Typography
-          variant="h3"
-          color={project.neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
-          style={styles.projectTitle}
+          variant="mono"
+          style={styles.categoryBadge}
+          color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.textMuted}
         >
-          {project.title}
+          {category}
         </Typography>
-
-        {project.neglected ? (
-          <Typography variant="caption" style={{ color: '#FFD2D2', marginBottom: 12 }}>
-            🚨 WARNING: Neglected project. Decay status has increased shadow size and converted theme colors.
-          </Typography>
-        ) : (
-          <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted, marginBottom: 12 }}>
-            ✓ Consistent commits registered. Structure is holding.
-          </Typography>
-        )}
-
-        {/* Accountability trigger toggle button */}
-        <BrutalistButton
-          onPress={() => appActions.toggleProjectNeglect(project.id)}
-          backgroundColor={project.neglected ? BRUTALIST_THEME.colors.success : BRUTALIST_THEME.colors.danger}
-          size="sm"
+        
+        <Typography
+          variant="mono"
+          style={[styles.statusIndicator, neglected && styles.decayText]}
+          color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
         >
-          {project.neglected ? 'EXECUTE & RESTORE' : 'NEGLECT PROJECT'}
-        </BrutalistButton>
-      </BrutalistCard>
-    );
-  };
+          {neglected ? '● DECAYING' : '● OPERATIONAL'}
+        </Typography>
+      </View>
+
+      <Typography
+        variant="h3"
+        color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
+        style={styles.projectTitle}
+      >
+        {title}
+      </Typography>
+
+      {neglected ? (
+        <Typography variant="caption" style={{ color: '#FFD2D2', marginBottom: 12 }}>
+          🚨 WARNING: Neglected project. Decay status has increased shadow size and converted theme colors.
+        </Typography>
+      ) : (
+        <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted, marginBottom: 12 }}>
+          ✓ Consistent commits registered. Structure is holding.
+        </Typography>
+      )}
+
+      {/* Accountability trigger toggle button */}
+      <BrutalistButton
+        onPress={() => appActions.toggleProjectNeglect(projectId)}
+        backgroundColor={neglected ? BRUTALIST_THEME.colors.success : BRUTALIST_THEME.colors.danger}
+        size="sm"
+      >
+        {neglected ? 'EXECUTE & RESTORE' : 'NEGLECT PROJECT'}
+      </BrutalistButton>
+    </BrutalistCard>
+  );
+});
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
@@ -92,7 +98,7 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
                 DECAYING SECTOR ({neglectedProjects.length})
               </Typography>
             </View>
-            {neglectedProjects.map(renderProjectCard)}
+            {neglectedProjects.map(p => <ProjectCard key={p.id} projectId={p.id} />)}
           </View>
         )}
 
@@ -103,7 +109,7 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
               OPERATIONAL SECTOR ({activeProjects.length})
             </Typography>
           </View>
-          {activeProjects.map(renderProjectCard)}
+          {activeProjects.map(p => <ProjectCard key={p.id} projectId={p.id} />)}
         </View>
       </View>
     </ScrollView>

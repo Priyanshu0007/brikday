@@ -2,11 +2,59 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Pressable } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { appState$, appActions, Habit } from '@/state/store';
+import { appState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
+
+const HabitItem = observer(({ habitId }: { habitId: string }) => {
+  const item$ = appState$.habits.find((h) => h.id.get() === habitId);
+  if (!item$) return null;
+
+  const title = item$.title.get();
+  const isCompleted = item$.completed.get();
+  const isNeglected = item$.neglected.get() && !isCompleted;
+
+  return (
+    <Pressable onPress={() => appActions.toggleHabit(habitId)}>
+      <BrutalistCard
+        accentColor={isCompleted ? BRUTALIST_THEME.colors.success : undefined}
+        neglected={isNeglected}
+        style={styles.cardSpacing}
+      >
+        <View style={styles.itemRow}>
+          {/* Custom styled checkbox indicator */}
+          <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
+            {isCompleted && (
+              <Typography variant="bodyBold" color="#000000" style={styles.checkboxTick}>
+                ✓
+              </Typography>
+            )}
+          </View>
+          
+          <View style={styles.textContainer}>
+            <Typography
+              variant="bodyBold"
+              color={isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
+              style={[
+                isCompleted && styles.strikeThrough,
+              ]}
+            >
+              {title}
+            </Typography>
+            
+            {isNeglected && (
+              <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
+                ⚠️ SLIPPING! Neglected yesterday.
+              </Typography>
+            )}
+          </View>
+        </View>
+      </BrutalistCard>
+    </Pressable>
+  );
+});
 
 export const HabitsScreen = observer(function HabitsScreen() {
   const [newHabitTitle, setNewHabitTitle] = useState('');
@@ -19,49 +67,19 @@ export const HabitsScreen = observer(function HabitsScreen() {
     }
   };
 
-  const renderHabitItem = ({ item }: { item: Habit }) => {
-    const isCompleted = item.completed;
-    const isNeglected = item.neglected && !isCompleted;
 
-    return (
-      <Pressable onPress={() => appActions.toggleHabit(item.id)}>
-        <BrutalistCard
-          accentColor={isCompleted ? BRUTALIST_THEME.colors.success : undefined}
-          neglected={isNeglected}
-          style={styles.cardSpacing}
-        >
-          <View style={styles.itemRow}>
-            {/* Custom styled checkbox indicator */}
-            <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
-              {isCompleted && (
-                <Typography variant="bodyBold" color="#000000" style={styles.checkboxTick}>
-                  ✓
-                </Typography>
-              )}
-            </View>
-            
-            <View style={styles.textContainer}>
-              <Typography
-                variant="bodyBold"
-                color={isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
-                style={[
-                  isCompleted && styles.strikeThrough,
-                ]}
-              >
-                {item.title}
-              </Typography>
-              
-              {isNeglected && (
-                <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
-                  ⚠️ SLIPPING! Neglected yesterday.
-                </Typography>
-              )}
-            </View>
-          </View>
-        </BrutalistCard>
-      </Pressable>
-    );
-  };
+
+  // Stable ID array
+  const habitIds = React.useMemo(
+    () => habits.map((h) => h.id),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [habits.length]
+  );
+
+  const renderItem = React.useCallback(
+    ({ item }: { item: string }) => <HabitItem habitId={item} />,
+    []
+  );
 
   return (
     <View style={styles.container}>
@@ -98,9 +116,9 @@ export const HabitsScreen = observer(function HabitsScreen() {
 
       {/* High performance LegendList */}
       <LegendList
-        data={habits}
-        renderItem={renderHabitItem}
-        keyExtractor={(item) => item.id}
+        data={habitIds}
+        renderItem={renderItem}
+        keyExtractor={(item) => item}
         contentContainerStyle={styles.listContent}
         style={styles.list}
       />
