@@ -1,9 +1,19 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle, StyleProp, ActivityIndicator } from 'react-native';
-import { PressableScale } from 'pressto';
+import { createAnimatedPressable } from 'pressto';
 import * as Haptics from 'expo-haptics'; // Since it's standard in Expo to use haptics
 import { BRUTALIST_THEME } from './theme';
 import { Typography } from './Typography';
+
+const PressableBrutalist = createAnimatedPressable((progress) => {
+  'worklet';
+  return {
+    transform: [
+      { translateX: progress * 4 },
+      { translateY: progress * 4 },
+    ],
+  };
+});
 
 interface BrutalistButtonProps {
   children: React.ReactNode;
@@ -52,39 +62,38 @@ export function BrutalistButton({
   };
 
   return (
-    <PressableScale
-      // @ts-ignore
-      disabled={disabled || loading}
-      onPress={handlePress}
-      style={[styles.outer, style]}
-      // @ts-ignore
-      activeScale={0.96}
-    >
+    <View style={[styles.outer, style]}>
       <View style={styles.buttonOuter}>
         {/* Shadow Layer */}
         <View style={styles.shadow} />
         
-        {/* Button layer */}
-        <View
-          style={[
-            styles.button,
-            getPadding(),
-            { backgroundColor },
-            disabled && styles.disabled,
-          ]}
+        {/* Button layer wrapped in PressableBrutalist */}
+        <PressableBrutalist
+          disabled={disabled || loading}
+          onPress={handlePress}
+          style={styles.pressable}
         >
-          {loading ? (
-            <ActivityIndicator color={textColor} size="small" />
-          ) : typeof children === 'string' ? (
-            <Typography variant="bodyBold" style={{ color: textColor }} uppercase>
-              {children}
-            </Typography>
-          ) : (
-            children
-          )}
-        </View>
+          <View
+            style={[
+              styles.button,
+              getPadding(),
+              { backgroundColor },
+              disabled && styles.disabled,
+            ]}
+          >
+            {loading ? (
+              <ActivityIndicator color={textColor} size="small" />
+            ) : typeof children === 'string' ? (
+              <Typography variant="bodyBold" style={{ color: textColor }} uppercase>
+                {children}
+              </Typography>
+            ) : (
+              children
+            )}
+          </View>
+        </PressableBrutalist>
       </View>
-    </PressableScale>
+    </View>
   );
 }
 
@@ -97,6 +106,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     paddingRight: 4,
     paddingBottom: 4,
+  },
+  pressable: {
+    alignSelf: 'stretch',
   },
   shadow: {
     position: 'absolute',

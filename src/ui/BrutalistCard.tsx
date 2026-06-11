@@ -1,6 +1,29 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { createAnimatedPressable } from 'pressto';
+import * as Haptics from 'expo-haptics';
 import { BRUTALIST_THEME } from './theme';
+
+const PressableBrutalist4 = createAnimatedPressable((progress) => {
+  'worklet';
+  return {
+    transform: [
+      { translateX: progress * 4 },
+      { translateY: progress * 4 },
+    ],
+  };
+});
+
+const PressableBrutalist8 = createAnimatedPressable((progress) => {
+  'worklet';
+  return {
+    transform: [
+      { translateX: progress * 8 },
+      { translateY: progress * 8 },
+    ],
+  };
+});
 
 interface BrutalistCardProps {
   children: React.ReactNode;
@@ -8,6 +31,7 @@ interface BrutalistCardProps {
   style?: StyleProp<ViewStyle>;
   neglected?: boolean;
   accentColor?: string;
+  onPress?: () => void;
 }
 
 export function BrutalistCard({
@@ -16,6 +40,7 @@ export function BrutalistCard({
   style,
   neglected = false,
   accentColor,
+  onPress,
 }: BrutalistCardProps) {
   
   // When neglected, the card decays: turns background to danger red, and doubles the shadow offset.
@@ -24,6 +49,24 @@ export function BrutalistCard({
     : (accentColor || backgroundColor);
   
   const offset = neglected ? 8 : 4;
+
+  const animatedCardStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: withTiming(activeBgColor, { duration: 200 }),
+    };
+  }, [activeBgColor]);
+
+  const handlePress = () => {
+    if (!onPress) return;
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {
+      // Ignore haptics fail on web
+    }
+    onPress();
+  };
+
+  const PressableWrapper = onPress ? (offset === 8 ? PressableBrutalist8 : PressableBrutalist4) : View;
 
   return (
     <View 
@@ -47,16 +90,17 @@ export function BrutalistCard({
       />
       
       {/* Foreground card layer */}
-      <View
-        style={[
-          styles.card,
-          { 
-            backgroundColor: activeBgColor,
-          },
-        ]}
-      >
-        {children}
-      </View>
+      {/* @ts-ignore */}
+      <PressableWrapper onPress={onPress ? handlePress : undefined}>
+        <Animated.View
+          style={[
+            styles.card,
+            animatedCardStyle,
+          ]}
+        >
+          {children}
+        </Animated.View>
+      </PressableWrapper>
     </View>
   );
 }

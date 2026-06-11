@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, TextInput } from 'react-native';
+
+import Animated, { useAnimatedStyle, withTiming, withSpring, interpolateColor } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
 import { appState$, appActions } from '@/state/store';
@@ -7,6 +9,8 @@ import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
+
+const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
 const HabitItem = observer(({ habitId }: { habitId: string }) => {
   const item$ = appState$.habits.find((h) => h.id.get() === habitId);
@@ -16,33 +20,58 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
   const isCompleted = item$.completed.get();
   const isNeglected = item$.neglected.get() && !isCompleted;
 
+  // Reanimated styles
+  const textAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      color: withTiming(
+        isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text,
+        { duration: 200 }
+      ),
+      opacity: withTiming(isCompleted ? 0.75 : 1, { duration: 200 }),
+    };
+  }, [isCompleted, isNeglected]);
+
+  const strikeAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      width: withTiming(isCompleted ? '100%' : '0%', { duration: 300 }),
+    };
+  }, [isCompleted]);
+
+  const tickAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
+      transform: [{ scale: withSpring(isCompleted ? 1 : 0.5) }],
+    };
+  }, [isCompleted]);
+
   return (
-    <Pressable onPress={() => appActions.toggleHabit(habitId)}>
-      <BrutalistCard
-        accentColor={isCompleted ? BRUTALIST_THEME.colors.success : undefined}
-        neglected={isNeglected}
-        style={styles.cardSpacing}
-      >
-        <View style={styles.itemRow}>
+    <BrutalistCard
+      accentColor={isCompleted ? BRUTALIST_THEME.colors.success : undefined}
+      neglected={isNeglected}
+      style={styles.cardSpacing}
+      onPress={() => appActions.toggleHabit(habitId)}
+    >
+      <View style={styles.itemRow}>
           {/* Custom styled checkbox indicator */}
           <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
-            {isCompleted && (
+            <Animated.View style={tickAnimatedStyle}>
               <Typography variant="bodyBold" color="#000000" style={styles.checkboxTick}>
                 ✓
               </Typography>
-            )}
+            </Animated.View>
           </View>
           
           <View style={styles.textContainer}>
-            <Typography
-              variant="bodyBold"
-              color={isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
-              style={[
-                isCompleted && styles.strikeThrough,
-              ]}
-            >
-              {title}
-            </Typography>
+            <View style={{ alignSelf: 'flex-start' }}>
+              <AnimatedTypography
+                variant="bodyBold"
+                style={[textAnimatedStyle]}
+              >
+                {title}
+              </AnimatedTypography>
+              {/* Custom Animated Strikethrough Line */}
+              <Animated.View style={[styles.customStrike, strikeAnimatedStyle]} />
+            </View>
             
             {isNeglected && (
               <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
@@ -52,7 +81,6 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
           </View>
         </View>
       </BrutalistCard>
-    </Pressable>
   );
 });
 
@@ -196,9 +224,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  strikeThrough: {
-    textDecorationLine: 'line-through',
-    textDecorationStyle: 'solid',
-    opacity: 0.75,
+  customStrike: {
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    height: 2,
+    backgroundColor: '#000000',
+    marginTop: -1,
   },
 });
