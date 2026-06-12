@@ -5,7 +5,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { appState$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
-import { OnboardingScreen } from '@/components/screens/OnboardingScreen';
+import { OnboardingScreen } from '@/components/screens/onboarding';
 import { LoginScreen } from '@/components/screens/LoginScreen';
 import { HabitsScreen } from '@/components/screens/HabitsScreen';
 import { VaultScreen } from '@/components/screens/VaultScreen';
