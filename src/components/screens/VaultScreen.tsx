@@ -352,13 +352,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   formContent: {
-    paddingBottom: 24,
+    paddingBottom: 4,
   },
   submitBtn: {
     marginTop: 16,
   },
   historyListContent: {
-    paddingBottom: 24,
+    paddingBottom: 4,
   },
   emptyContainer: {
     paddingVertical: 32,

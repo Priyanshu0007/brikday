@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: 'transparent',
     paddingVertical: 10,
-    marginBottom: 16,
+    marginBottom: 4,
   },
   formActions: {
     flexDirection: 'row',

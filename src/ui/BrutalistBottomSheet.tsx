@@ -63,7 +63,7 @@ export function BrutalistBottomSheet({
 
 const styles = StyleSheet.create({
   sheetContent: {
-    paddingBottom: 24,
+    paddingBottom: 16,
     paddingHorizontal: 16,
   },
   header: {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   content: {
-    paddingBottom: 10,
+    paddingBottom: 0,
   },
 });
 

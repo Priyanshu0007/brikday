@@ -227,7 +227,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   form: {
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 4,
   },
   submitBtn: {
     marginTop: 16,

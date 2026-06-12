@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Platform, StatusBar } from 'react-native';
+import { StyleSheet, View, StatusBar } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appState$ } from '@/state/store';
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? 36 : 12,
+    paddingTop: 4,
     paddingBottom: 12,
     borderBottomWidth: BRUTALIST_THEME.borderWidth,
     borderColor: BRUTALIST_THEME.colors.border,
