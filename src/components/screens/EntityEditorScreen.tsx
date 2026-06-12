@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
+import PagerView from 'react-native-pager-view';
 import { appState$, appActions, ScheduleType } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
@@ -432,13 +433,12 @@ const BlueprintEditor = observer(() => {
 
 export const EntityEditorScreen = observer(() => {
   const [activeTab, setActiveTab] = useState<'engine' | 'vault' | 'blueprint'>('engine');
+  const pagerRef = useRef<PagerView>(null);
+  const tabs = ['engine', 'vault', 'blueprint'] as const;
 
-  const renderActiveEditor = () => {
-    switch (activeTab) {
-      case 'engine': return <EngineEditor />;
-      case 'vault': return <VaultEditor />;
-      case 'blueprint': return <BlueprintEditor />;
-    }
+  const handleTabPress = (tab: typeof tabs[number], index: number) => {
+    setActiveTab(tab);
+    pagerRef.current?.setPage(index);
   };
 
   return (
@@ -451,11 +451,11 @@ export const EntityEditorScreen = observer(() => {
       </View>
 
       <View style={styles.tabsContainer}>
-        {(['engine', 'vault', 'blueprint'] as const).map((tab) => (
+        {tabs.map((tab, index) => (
           <Pressable
             key={tab}
             style={[styles.tab, activeTab === tab && styles.tabActive]}
-            onPress={() => setActiveTab(tab)}
+            onPress={() => handleTabPress(tab, index)}
           >
             <Typography variant="bodyBold" style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
               {tab.toUpperCase()}
@@ -464,9 +464,29 @@ export const EntityEditorScreen = observer(() => {
         ))}
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
-        {renderActiveEditor()}
-      </ScrollView>
+      <PagerView
+        style={styles.content}
+        initialPage={0}
+        ref={pagerRef}
+        scrollEnabled={false}
+        onPageSelected={(e) => setActiveTab(tabs[e.nativeEvent.position])}
+      >
+        <View key="engine" style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <EngineEditor />
+          </ScrollView>
+        </View>
+        <View key="vault" style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <VaultEditor />
+          </ScrollView>
+        </View>
+        <View key="blueprint" style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <BlueprintEditor />
+          </ScrollView>
+        </View>
+      </PagerView>
     </SafeAreaView>
   );
 });
