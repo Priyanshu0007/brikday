@@ -43,12 +43,12 @@ export function BrutalistCard({
   onPress,
 }: BrutalistCardProps) {
   
-  // When neglected, the card decays: turns background to danger red, and doubles the shadow offset.
+  // When neglected, the card decays: turns background to danger red, but keeps same shadow offset for alignment.
   const activeBgColor = neglected 
     ? BRUTALIST_THEME.colors.danger 
     : (accentColor || backgroundColor);
   
-  const offset = neglected ? 8 : 4;
+  const offset = 4;
 
   const animatedCardStyle = useAnimatedStyle(() => {
     return {
@@ -66,7 +66,7 @@ export function BrutalistCard({
     onPress();
   };
 
-  const PressableWrapper = onPress ? (offset === 8 ? PressableBrutalist8 : PressableBrutalist4) : View;
+  const PressableWrapper = onPress ? PressableBrutalist4 : View;
 
   return (
     <View 
