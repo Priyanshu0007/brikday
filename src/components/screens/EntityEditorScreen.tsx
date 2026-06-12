@@ -9,6 +9,7 @@ import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistInput } from '@/ui/BrutalistInput';
+import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 
 const DayPicker = ({
   selectedDays,
@@ -55,6 +56,7 @@ const EngineEditor = observer(() => {
   const habits = appState$.habits.get();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -90,65 +92,10 @@ const EngineEditor = observer(() => {
     setIsAdding(false);
   };
 
-  const handleDelete = (id: string) => {
+  const confirmDelete = (id: string) => {
     appActions.deleteHabit(id);
+    setDeletingId(null);
   };
-
-  if (editingId || isAdding) {
-    return (
-      <View style={styles.formContainer}>
-        <BrutalistInput
-          label="HABIT INSTRUCTION"
-          value={title}
-          onChangeText={setTitle}
-          placeholder="e.g. 100 PUSHUPS"
-        />
-        
-        <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
-          SCHEDULE TYPE
-        </Typography>
-        <View style={styles.segmentedControl}>
-          {(['daily', 'alternate_days', 'specific_days'] as ScheduleType[]).map((type) => (
-            <BrutalistButton
-              key={type}
-              onPress={() => setScheduleType(type)}
-              backgroundColor={scheduleType === type ? BRUTALIST_THEME.colors.primary : '#FFFFFF'}
-              size="sm"
-              style={{ flex: 1, marginHorizontal: 2 }}
-            >
-              {type.replace('_', ' ').toUpperCase()}
-            </BrutalistButton>
-          ))}
-        </View>
-
-        {scheduleType === 'specific_days' && (
-          <>
-            <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
-              SELECT DAYS
-            </Typography>
-            <DayPicker selectedDays={specificDays} onChange={setSpecificDays} />
-          </>
-        )}
-
-        <View style={styles.formActions}>
-          <BrutalistButton
-            onPress={() => { setEditingId(null); setIsAdding(false); }}
-            backgroundColor={BRUTALIST_THEME.colors.paper}
-            style={{ flex: 1 }}
-          >
-            CANCEL
-          </BrutalistButton>
-          <BrutalistButton
-            onPress={handleSave}
-            backgroundColor={BRUTALIST_THEME.colors.success}
-            style={{ flex: 1 }}
-          >
-            SAVE
-          </BrutalistButton>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -168,13 +115,85 @@ const EngineEditor = observer(() => {
               <BrutalistButton onPress={() => handleEdit(habit.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.warning}>
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => handleDelete(habit.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
+              <BrutalistButton onPress={() => setDeletingId(habit.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
                 DEL
               </BrutalistButton>
             </View>
           </View>
         </BrutalistCard>
       ))}
+
+      <BrutalistBottomSheet
+        visible={isAdding || editingId !== null}
+        onClose={() => { setEditingId(null); setIsAdding(false); }}
+        title={isAdding ? 'NEW HABIT' : 'EDIT HABIT'}
+      >
+        <View style={styles.formContainer}>
+          <BrutalistInput
+            label="HABIT INSTRUCTION"
+            value={title}
+            onChangeText={setTitle}
+            placeholder="e.g. 100 PUSHUPS"
+          />
+          
+          <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
+            SCHEDULE TYPE
+          </Typography>
+          <View style={styles.segmentedControl}>
+            {(['daily', 'alternate_days', 'specific_days'] as ScheduleType[]).map((type) => {
+              const label = type === 'alternate_days' ? 'ALT DAYS' : type === 'specific_days' ? 'SPEC DAYS' : 'DAILY';
+              return (
+                <BrutalistButton
+                  key={type}
+                  onPress={() => setScheduleType(type)}
+                  backgroundColor={scheduleType === type ? BRUTALIST_THEME.colors.primary : '#FFFFFF'}
+                  size="sm"
+                  style={{ flex: 1, marginHorizontal: 2 }}
+                >
+                  {label}
+                </BrutalistButton>
+              );
+            })}
+          </View>
+
+          {scheduleType === 'specific_days' && (
+            <>
+              <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
+                SELECT DAYS
+              </Typography>
+              <DayPicker selectedDays={specificDays} onChange={setSpecificDays} />
+            </>
+          )}
+
+          <BrutalistButton
+            onPress={handleSave}
+            backgroundColor={BRUTALIST_THEME.colors.success}
+            style={{ marginTop: 20 }}
+          >
+            SAVE
+          </BrutalistButton>
+        </View>
+      </BrutalistBottomSheet>
+
+      <BrutalistBottomSheet
+        visible={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        title="CONFIRM DELETION"
+      >
+        <View style={styles.formContainer}>
+          <Typography variant="body" style={{ marginBottom: 20 }}>
+            Are you sure you want to delete this habit? This action cannot be undone.
+          </Typography>
+          <View style={styles.formActions}>
+            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
+              CANCEL
+            </BrutalistButton>
+            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={BRUTALIST_THEME.colors.danger} style={{ flex: 1 }}>
+              DELETE
+            </BrutalistButton>
+          </View>
+        </View>
+      </BrutalistBottomSheet>
     </View>
   );
 });
@@ -184,6 +203,7 @@ const VaultEditor = observer(() => {
   const goals = appState$.vaultGoals.get();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [title, setTitle] = useState('');
   const [target, setTarget] = useState('');
@@ -216,37 +236,10 @@ const VaultEditor = observer(() => {
     setIsAdding(false);
   };
 
-  const handleDelete = (id: string) => {
+  const confirmDelete = (id: string) => {
     appActions.deleteVaultGoal(id);
+    setDeletingId(null);
   };
-
-  if (editingId || isAdding) {
-    return (
-      <View style={styles.formContainer}>
-        <BrutalistInput
-          label="GOAL DESCRIPTION"
-          value={title}
-          onChangeText={setTitle}
-          placeholder="e.g. M4 MACBOOK PRO"
-        />
-        <BrutalistInput
-          label="TARGET FUNDING LIMIT ($)"
-          value={target}
-          onChangeText={setTarget}
-          keyboardType="numeric"
-          placeholder="e.g. 3500"
-        />
-        <View style={styles.formActions}>
-          <BrutalistButton onPress={() => { setEditingId(null); setIsAdding(false); }} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
-            CANCEL
-          </BrutalistButton>
-          <BrutalistButton onPress={handleSave} backgroundColor={BRUTALIST_THEME.colors.success} style={{ flex: 1 }}>
-            SAVE
-          </BrutalistButton>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -266,13 +259,58 @@ const VaultEditor = observer(() => {
               <BrutalistButton onPress={() => handleEdit(goal.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.warning}>
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => handleDelete(goal.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
+              <BrutalistButton onPress={() => setDeletingId(goal.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
                 DEL
               </BrutalistButton>
             </View>
           </View>
         </BrutalistCard>
       ))}
+
+      <BrutalistBottomSheet
+        visible={isAdding || editingId !== null}
+        onClose={() => { setEditingId(null); setIsAdding(false); }}
+        title={isAdding ? 'NEW VAULT GOAL' : 'EDIT VAULT GOAL'}
+      >
+        <View style={styles.formContainer}>
+          <BrutalistInput
+            label="GOAL DESCRIPTION"
+            value={title}
+            onChangeText={setTitle}
+            placeholder="e.g. M4 MACBOOK PRO"
+          />
+          <BrutalistInput
+            label="TARGET FUNDING LIMIT ($)"
+            value={target}
+            onChangeText={setTarget}
+            keyboardType="numeric"
+            placeholder="e.g. 3500"
+          />
+          <BrutalistButton onPress={handleSave} backgroundColor={BRUTALIST_THEME.colors.success} style={{ marginTop: 20 }}>
+            SAVE
+          </BrutalistButton>
+        </View>
+      </BrutalistBottomSheet>
+
+      <BrutalistBottomSheet
+        visible={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        title="CONFIRM DELETION"
+      >
+        <View style={styles.formContainer}>
+          <Typography variant="body" style={{ marginBottom: 20 }}>
+            Are you sure you want to delete this vault goal?
+          </Typography>
+          <View style={styles.formActions}>
+            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
+              CANCEL
+            </BrutalistButton>
+            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={BRUTALIST_THEME.colors.danger} style={{ flex: 1 }}>
+              DELETE
+            </BrutalistButton>
+          </View>
+        </View>
+      </BrutalistBottomSheet>
     </View>
   );
 });
@@ -282,6 +320,7 @@ const BlueprintEditor = observer(() => {
   const projects = appState$.blueprintProjects.get();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -313,36 +352,10 @@ const BlueprintEditor = observer(() => {
     setIsAdding(false);
   };
 
-  const handleDelete = (id: string) => {
+  const confirmDelete = (id: string) => {
     appActions.deleteProject(id);
+    setDeletingId(null);
   };
-
-  if (editingId || isAdding) {
-    return (
-      <View style={styles.formContainer}>
-        <BrutalistInput
-          label="PROJECT TITLE"
-          value={title}
-          onChangeText={setTitle}
-          placeholder="e.g. VeloCity App"
-        />
-        <BrutalistInput
-          label="CATEGORY"
-          value={category}
-          onChangeText={setCategory}
-          placeholder="e.g. WORK"
-        />
-        <View style={styles.formActions}>
-          <BrutalistButton onPress={() => { setEditingId(null); setIsAdding(false); }} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
-            CANCEL
-          </BrutalistButton>
-          <BrutalistButton onPress={handleSave} backgroundColor={BRUTALIST_THEME.colors.success} style={{ flex: 1 }}>
-            SAVE
-          </BrutalistButton>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -362,13 +375,57 @@ const BlueprintEditor = observer(() => {
               <BrutalistButton onPress={() => handleEdit(project.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.warning}>
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => handleDelete(project.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
+              <BrutalistButton onPress={() => setDeletingId(project.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
                 DEL
               </BrutalistButton>
             </View>
           </View>
         </BrutalistCard>
       ))}
+
+      <BrutalistBottomSheet
+        visible={isAdding || editingId !== null}
+        onClose={() => { setEditingId(null); setIsAdding(false); }}
+        title={isAdding ? 'NEW PROJECT' : 'EDIT PROJECT'}
+      >
+        <View style={styles.formContainer}>
+          <BrutalistInput
+            label="PROJECT TITLE"
+            value={title}
+            onChangeText={setTitle}
+            placeholder="e.g. VeloCity App"
+          />
+          <BrutalistInput
+            label="CATEGORY"
+            value={category}
+            onChangeText={setCategory}
+            placeholder="e.g. WORK"
+          />
+          <BrutalistButton onPress={handleSave} backgroundColor={BRUTALIST_THEME.colors.success} style={{ marginTop: 20 }}>
+            SAVE
+          </BrutalistButton>
+        </View>
+      </BrutalistBottomSheet>
+
+      <BrutalistBottomSheet
+        visible={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        title="CONFIRM DELETION"
+      >
+        <View style={styles.formContainer}>
+          <Typography variant="body" style={{ marginBottom: 20 }}>
+            Are you sure you want to delete this project?
+          </Typography>
+          <View style={styles.formActions}>
+            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
+              CANCEL
+            </BrutalistButton>
+            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={BRUTALIST_THEME.colors.danger} style={{ flex: 1 }}>
+              DELETE
+            </BrutalistButton>
+          </View>
+        </View>
+      </BrutalistBottomSheet>
     </View>
   );
 });
@@ -470,16 +527,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   formContainer: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 4,
-    padding: 16,
+    backgroundColor: 'transparent',
+    paddingVertical: 10,
     marginBottom: 16,
-    shadowColor: '#000000',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
   },
   formActions: {
     flexDirection: 'row',

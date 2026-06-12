@@ -84,7 +84,13 @@ export function BrutalistButton({
             {loading ? (
               <ActivityIndicator color={textColor} size="small" />
             ) : typeof children === 'string' ? (
-              <Typography variant="bodyBold" style={{ color: textColor }} uppercase>
+              <Typography 
+                variant="bodyBold" 
+                style={{ color: textColor, textAlign: 'center' }} 
+                uppercase
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
                 {children}
               </Typography>
             ) : (

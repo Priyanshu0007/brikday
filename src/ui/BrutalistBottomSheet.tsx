@@ -3,6 +3,7 @@
 import React, { useRef, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BRUTALIST_THEME } from './theme';
 import { Typography } from './Typography';
 
@@ -20,12 +21,15 @@ export function BrutalistBottomSheet({
   children,
 }: BrutalistBottomSheetProps) {
   const sheetRef = useRef<TrueSheet>(null);
+  const isPresented = useRef(false);
 
   useEffect(() => {
     if (visible) {
+      isPresented.current = true;
       sheetRef.current?.present();
-    } else {
+    } else if (isPresented.current) {
       sheetRef.current?.dismiss();
+      isPresented.current = false;
     }
   }, [visible]);
 
@@ -33,7 +37,10 @@ export function BrutalistBottomSheet({
     <TrueSheet
       ref={sheetRef}
       detents={['auto']}
-      onDidDismiss={onClose}
+      onDidDismiss={() => {
+        isPresented.current = false;
+        onClose();
+      }}
       backgroundColor={BRUTALIST_THEME.colors.paper}
       cornerRadius={BRUTALIST_THEME.borderRadius}
     >
@@ -45,8 +52,10 @@ export function BrutalistBottomSheet({
           </Typography>
         </View>
 
-        {/* Scrollable / Interactive Content */}
-        <View style={styles.content}>{children}</View>
+        {/* Content - wrapped in GestureHandlerRootView for pressto buttons */}
+        <GestureHandlerRootView style={styles.content}>
+          {children}
+        </GestureHandlerRootView>
       </View>
     </TrueSheet>
   );
@@ -68,3 +77,4 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
 });
+
