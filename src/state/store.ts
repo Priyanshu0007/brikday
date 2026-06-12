@@ -1,10 +1,15 @@
 import { observable } from '@legendapp/state';
 
+export type ScheduleType = 'daily' | 'alternate_days' | 'specific_days';
+
 export interface Habit {
   id: string;
   title: string;
   completed: boolean;
   neglected: boolean;
+  scheduleType: ScheduleType;
+  specificDays: number[]; // 0 for Sunday, 1 for Monday, etc.
+  startDate: number; // For alternate_days calculation
 }
 
 export interface SavingTransaction {
@@ -54,10 +59,10 @@ export const appState$ = observable<AppState>({
     streak: 12,
   },
   habits: [
-    { id: 'h1', title: 'LOG DAILY SPENDING', completed: false, neglected: false },
-    { id: 'h2', title: '6AM CLUB WAKEUP', completed: true, neglected: false },
-    { id: 'h3', title: 'NO COFFEE BEFORE 10AM', completed: false, neglected: true },
-    { id: 'h4', title: '1 HOUR LEETCODE / SHADERS', completed: false, neglected: false },
+    { id: 'h1', title: 'LOG DAILY SPENDING', completed: false, neglected: false, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
+    { id: 'h2', title: '6AM CLUB WAKEUP', completed: true, neglected: false, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
+    { id: 'h3', title: 'NO COFFEE BEFORE 10AM', completed: false, neglected: true, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
+    { id: 'h4', title: '1 HOUR LEETCODE / SHADERS', completed: false, neglected: false, scheduleType: 'alternate_days', specificDays: [], startDate: Date.now() },
   ],
   vaultGoals: [
     {
@@ -117,15 +122,34 @@ export const appActions = {
       habit.completed.set(!habit.completed.get());
     }
   },
-  addHabit(title: string) {
+  addHabit(title: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
     if (!title.trim()) return;
     const newHabit: Habit = {
       id: `h_${Date.now()}`,
       title: title.toUpperCase(),
       completed: false,
       neglected: false,
+      scheduleType,
+      specificDays,
+      startDate,
     };
     appState$.habits.push(newHabit);
+  },
+  updateHabit(id: string, updates: Partial<Omit<Habit, 'id'>>) {
+    const habit = appState$.habits.find((h) => h.id.get() === id);
+    if (habit) {
+      if (updates.title !== undefined) habit.title.set(updates.title);
+      if (updates.scheduleType !== undefined) habit.scheduleType.set(updates.scheduleType);
+      if (updates.specificDays !== undefined) habit.specificDays.set(updates.specificDays);
+      if (updates.startDate !== undefined) habit.startDate.set(updates.startDate);
+    }
+  },
+  deleteHabit(id: string) {
+    const habits = appState$.habits.get();
+    const index = habits.findIndex((h) => h.id === id);
+    if (index !== -1) {
+      appState$.habits[index].delete();
+    }
   },
   updateVaultGoal(id: string, saved: number) {
     const goal = appState$.vaultGoals.find((g) => g.id.get() === id);
@@ -161,6 +185,20 @@ export const appActions = {
     };
     appState$.vaultGoals.push(newGoal);
   },
+  updateVaultGoal(id: string, updates: Partial<Omit<VaultGoal, 'id' | 'transactions' | 'saved'>>) {
+    const goal = appState$.vaultGoals.find((g) => g.id.get() === id);
+    if (goal) {
+      if (updates.title !== undefined) goal.title.set(updates.title);
+      if (updates.target !== undefined) goal.target.set(updates.target);
+    }
+  },
+  deleteVaultGoal(id: string) {
+    const goals = appState$.vaultGoals.get();
+    const index = goals.findIndex((g) => g.id === id);
+    if (index !== -1) {
+      appState$.vaultGoals[index].delete();
+    }
+  },
   addProject(title: string, category: string, neglected: boolean = false) {
     if (!title.trim()) return;
     const newProject: Project = {
@@ -170,6 +208,20 @@ export const appActions = {
       neglected,
     };
     appState$.blueprintProjects.push(newProject);
+  },
+  updateProject(id: string, updates: Partial<Omit<Project, 'id' | 'neglected'>>) {
+    const project = appState$.blueprintProjects.find((p) => p.id.get() === id);
+    if (project) {
+      if (updates.title !== undefined) project.title.set(updates.title);
+      if (updates.category !== undefined) project.category.set(updates.category);
+    }
+  },
+  deleteProject(id: string) {
+    const projects = appState$.blueprintProjects.get();
+    const index = projects.findIndex((p) => p.id === id);
+    if (index !== -1) {
+      appState$.blueprintProjects[index].delete();
+    }
   },
   toggleProjectNeglect(id: string) {
     const project = appState$.blueprintProjects.find((p) => p.id.get() === id);

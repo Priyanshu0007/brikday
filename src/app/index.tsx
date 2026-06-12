@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Platform, StatusBar } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appState$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
@@ -132,9 +131,9 @@ export default observer(function HomeScreen() {
   };
 
   return (
-    <GestureHandlerRootView style={styles.root}>
+    <View style={styles.root}>
       {renderContent()}
-    </GestureHandlerRootView>
+    </View>
   );
 });
 

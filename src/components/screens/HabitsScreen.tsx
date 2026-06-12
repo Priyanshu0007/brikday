@@ -85,21 +85,32 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
 });
 
 export const HabitsScreen = observer(function HabitsScreen() {
-  const [newHabitTitle, setNewHabitTitle] = useState('');
   const habits = appState$.habits.get();
 
-  const handleAddHabit = () => {
-    if (newHabitTitle.trim()) {
-      appActions.addHabit(newHabitTitle);
-      setNewHabitTitle('');
+  // Calculate if habit is active today
+  const isHabitActiveToday = (habit: typeof habits[0]) => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    
+    if (habit.scheduleType === 'daily' || !habit.scheduleType) return true;
+    
+    if (habit.scheduleType === 'specific_days') {
+      return habit.specificDays?.includes(dayOfWeek) ?? false;
     }
+    
+    if (habit.scheduleType === 'alternate_days') {
+      // difference in days from start date
+      const msPerDay = 86400000;
+      const diffDays = Math.floor((Date.now() - (habit.startDate || 0)) / msPerDay);
+      return diffDays % 2 === 0;
+    }
+    
+    return true;
   };
 
-
-
-  // Stable ID array
+  // Stable ID array - filtered by today's schedule
   const habitIds = React.useMemo(
-    () => habits.map((h) => h.id),
+    () => habits.filter(isHabitActiveToday).map((h) => h.id),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [habits.length]
   );
@@ -121,26 +132,6 @@ export const HabitsScreen = observer(function HabitsScreen() {
         </Typography>
       </View>
 
-      {/* Add Habit input inline card */}
-      <BrutalistCard backgroundColor="#FFFFFF">
-        <View style={styles.addInputRow}>
-          <TextInput
-            style={styles.input}
-            placeholder="NEW HABIT INSTRUCTION..."
-            placeholderTextColor="#888888"
-            value={newHabitTitle}
-            onChangeText={setNewHabitTitle}
-          />
-          <BrutalistButton
-            onPress={handleAddHabit}
-            backgroundColor={BRUTALIST_THEME.colors.warning}
-            style={styles.addButton}
-            size="sm"
-          >
-            ADD
-          </BrutalistButton>
-        </View>
-      </BrutalistCard>
 
       {/* High performance LegendList */}
       <LegendList
@@ -168,26 +159,7 @@ const styles = StyleSheet.create({
     color: BRUTALIST_THEME.colors.textMuted,
     marginTop: 4,
   },
-  addInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  input: {
-    flex: 1,
-    fontFamily: BRUTALIST_THEME.fonts.mono,
-    fontSize: 14,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderWidth: 2,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
-    backgroundColor: '#FFFFFF',
-  },
-  addButton: {
-    alignSelf: 'auto',
-    minWidth: 80,
-  },
+
   list: {
     flex: 1,
     marginTop: 8,

@@ -6,6 +6,7 @@ import { PlusJakartaSans_400Regular, PlusJakartaSans_700Bold } from '@expo-googl
 import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -21,9 +22,11 @@ export default function TabLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <Stack screenOptions={{ headerShown: false }} />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <AnimatedSplashOverlay />
+        <Stack screenOptions={{ headerShown: false }} />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
