@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     alignSelf: 'auto',
-    width: 70,
+    minWidth: 80,
   },
   list: {
     flex: 1,

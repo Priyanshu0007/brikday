@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     alignSelf: 'auto',
-    width: 90,
+    minWidth: 100,
   },
   logoutButton: {
     marginTop: 30,
