@@ -8,7 +8,7 @@ import { Typography } from '@/ui/Typography';
 import { OnboardingScreen } from '@/components/screens/onboarding';
 import { LoginScreen } from '@/components/screens/LoginScreen';
 import { HabitsScreen } from '@/components/screens/HabitsScreen';
-import { VaultScreen } from '@/components/screens/VaultScreen';
+import { VaultScreen } from '@/components/screens/vault';
 import { BlueprintScreen } from '@/components/screens/BlueprintScreen';
 import { SettingsScreen } from '@/components/screens/SettingsScreen';
 import { PressableScale } from 'pressto';

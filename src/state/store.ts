@@ -151,7 +151,7 @@ export const appActions = {
       appState$.habits[index].delete();
     }
   },
-  updateVaultGoal(id: string, saved: number) {
+  updateVaultGoalSaved(id: string, saved: number) {
     const goal = appState$.vaultGoals.find((g) => g.id.get() === id);
     if (goal) {
       goal.saved.set(saved);
