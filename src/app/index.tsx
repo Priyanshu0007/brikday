@@ -12,7 +12,7 @@ import { VaultScreen } from '@/components/screens/vault';
 import { BlueprintScreen } from '@/components/screens/BlueprintScreen';
 import { SettingsScreen } from '@/components/screens/SettingsScreen';
 import { PressableScale } from 'pressto';
-import * as Haptics from 'expo-haptics';
+import { triggerHaptic } from '@/ui/haptics';
 
 const DashboardHeader = observer(() => {
   const user = userState$.get();
@@ -57,11 +57,7 @@ const AppDashboard = observer(() => {
   };
 
   const handleTabPress = (tabId: typeof activeTab) => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {
-      // Ignore haptics fail on web
-    }
+    triggerHaptic('selection');
     uiState$.activeTab.set(tabId);
   };
 

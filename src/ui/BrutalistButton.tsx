@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle, StyleProp, ActivityIndicator } from 'react-native';
 import { createAnimatedPressable } from 'pressto';
-import * as Haptics from 'expo-haptics'; // Since it's standard in Expo to use haptics
+import { triggerHaptic, HapticFeedbackType } from './haptics';
 import { BRUTALIST_THEME } from './theme';
 import { Typography } from './Typography';
 
@@ -24,6 +24,7 @@ interface BrutalistButtonProps {
   disabled?: boolean;
   loading?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  hapticFeedback?: HapticFeedbackType;
 }
 
 export function BrutalistButton({
@@ -35,15 +36,12 @@ export function BrutalistButton({
   disabled = false,
   loading = false,
   size = 'md',
+  hapticFeedback = 'light',
 }: BrutalistButtonProps) {
   
   const handlePress = () => {
     if (disabled || loading) return;
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    } catch {
-      // Ignore haptics fail on web
-    }
+    triggerHaptic(hapticFeedback);
     if (onPress) {
       onPress();
     }

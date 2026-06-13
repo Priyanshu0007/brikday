@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { createAnimatedPressable } from 'pressto';
-import * as Haptics from 'expo-haptics';
+import { triggerHaptic, HapticFeedbackType } from './haptics';
 import { BRUTALIST_THEME } from './theme';
 
 const PressableBrutalist4 = createAnimatedPressable((progress) => {
@@ -32,6 +32,7 @@ interface BrutalistCardProps {
   neglected?: boolean;
   accentColor?: string;
   onPress?: () => void;
+  hapticFeedback?: HapticFeedbackType;
 }
 
 export function BrutalistCard({
@@ -41,6 +42,7 @@ export function BrutalistCard({
   neglected = false,
   accentColor,
   onPress,
+  hapticFeedback = 'soft',
 }: BrutalistCardProps) {
   
   // When neglected, the card decays: turns background to danger red, but keeps same shadow offset for alignment.
@@ -58,11 +60,7 @@ export function BrutalistCard({
 
   const handlePress = () => {
     if (!onPress) return;
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {
-      // Ignore haptics fail on web
-    }
+    triggerHaptic(hapticFeedback);
     onPress();
   };
 
