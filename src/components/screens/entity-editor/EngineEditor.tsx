@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { appState$, appActions, ScheduleType } from '@/state/store';
+import { habitsState$, appActions, ScheduleType } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -12,7 +12,7 @@ import { DayPicker } from './DayPicker';
 import { styles } from './styles';
 
 export const EngineEditor = observer(() => {
-  const habits = appState$.habits.get();
+  const habits = habitsState$.get();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);

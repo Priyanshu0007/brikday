@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { appState$ } from '@/state/store';
+import { vaultState$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -17,7 +17,7 @@ export const GoalCard = observer(({
   onAddSaving: (id: string) => void;
   onViewTransactions: (id: string) => void;
 }) => {
-  const goal$ = appState$.vaultGoals.find((g) => g.id.get() === goalId);
+  const goal$ = vaultState$.find((g) => g.id.get() === goalId);
   if (!goal$) return null;
 
   const saved = goal$.saved.get();

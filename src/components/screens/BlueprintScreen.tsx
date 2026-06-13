@@ -1,21 +1,21 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { appState$, appActions } from '@/state/store';
+import { blueprintState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 
 export const BlueprintScreen = observer(function BlueprintScreen() {
-  const projects = appState$.blueprintProjects.get();
+  const projects = blueprintState$.get();
 
   // Separate active vs decaying projects for a kanban feel
   const activeProjects = projects.filter((p) => !p.neglected);
   const neglectedProjects = projects.filter((p) => p.neglected);
 
 const ProjectCard = observer(({ projectId }: { projectId: string }) => {
-  const project$ = appState$.blueprintProjects.find((p) => p.id.get() === projectId);
+  const project$ = blueprintState$.find((p) => p.id.get() === projectId);
   if (!project$) return null;
 
   const neglected = project$.neglected.get();

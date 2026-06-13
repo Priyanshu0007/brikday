@@ -4,7 +4,7 @@ import { StyleSheet, View, TextInput } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming, withSpring, interpolateColor } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { appState$, appActions } from '@/state/store';
+import { habitsState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -13,7 +13,7 @@ import { BrutalistButton } from '@/ui/BrutalistButton';
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
 const HabitItem = observer(({ habitId }: { habitId: string }) => {
-  const item$ = appState$.habits.find((h) => h.id.get() === habitId);
+  const item$ = habitsState$.find((h) => h.id.get() === habitId);
   if (!item$) return null;
 
   const title = item$.title.get();
@@ -85,7 +85,7 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
 });
 
 export const HabitsScreen = observer(function HabitsScreen() {
-  const habits = appState$.habits.get();
+  const habits = habitsState$.get();
 
   // Calculate if habit is active today
   const isHabitActiveToday = (habit: typeof habits[0]) => {

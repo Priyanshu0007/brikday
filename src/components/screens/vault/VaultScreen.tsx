@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, Alert } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { appState$, appActions } from '@/state/store';
+import { vaultState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistButton } from '@/ui/BrutalistButton';
@@ -14,7 +14,7 @@ import { GoalHistorySheet } from './GoalHistorySheet';
 import { styles } from './styles';
 
 export const VaultScreen = observer(function VaultScreen() {
-  const goals = appState$.vaultGoals.get();
+  const goals = vaultState$.get();
 
   const [addSavingVisible, setAddSavingVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);

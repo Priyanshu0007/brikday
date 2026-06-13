@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { appState$ } from '@/state/store';
+import { userState$, uiState$, authState$, statsState$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { OnboardingScreen } from '@/components/screens/onboarding';
@@ -15,7 +15,8 @@ import { PressableScale } from 'pressto';
 import * as Haptics from 'expo-haptics';
 
 const DashboardHeader = observer(() => {
-  const user = appState$.user.get();
+  const user = userState$.get();
+  const stats = statsState$.get();
   
   return (
     <View style={styles.header}>
@@ -25,7 +26,7 @@ const DashboardHeader = observer(() => {
         </Typography>
         <View style={styles.streakBadge}>
           <Typography variant="mono" style={styles.streakText}>
-            🔥 {user.streak}D STREAK
+            🔥 {stats.streak}D STREAK
           </Typography>
         </View>
       </View>
@@ -37,7 +38,7 @@ const DashboardHeader = observer(() => {
 });
 
 const AppDashboard = observer(() => {
-  const activeTab = appState$.activeTab.get();
+  const activeTab = uiState$.activeTab.get();
   const insets = useSafeAreaInsets();
 
   const renderActiveScreen = () => {
@@ -61,7 +62,7 @@ const AppDashboard = observer(() => {
     } catch {
       // Ignore haptics fail on web
     }
-    appState$.activeTab.set(tabId);
+    uiState$.activeTab.set(tabId);
   };
 
   const tabs = [
@@ -116,7 +117,7 @@ const AppDashboard = observer(() => {
 });
 
 export default observer(function HomeScreen() {
-  const status = appState$.status.get();
+  const status = authState$.status.get();
 
   const renderContent = () => {
     switch (status) {

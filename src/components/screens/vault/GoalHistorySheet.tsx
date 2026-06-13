@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { appState$, SavingTransaction } from '@/state/store';
+import { vaultState$, SavingTransaction } from '@/state/store';
 import { Typography } from '@/ui/Typography';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { styles } from './styles';
@@ -15,7 +15,7 @@ export const GoalHistorySheet = observer(({
   visible: boolean;
   onClose: () => void;
 }) => {
-  const goal$ = goalId ? appState$.vaultGoals.find((g) => g.id.get() === goalId) : undefined;
+  const goal$ = goalId ? vaultState$.find((g) => g.id.get() === goalId) : undefined;
   
   if (!goalId || !goal$) return null;
 

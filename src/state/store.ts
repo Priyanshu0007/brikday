@@ -1,4 +1,8 @@
 import { observable } from '@legendapp/state';
+import { syncObservable } from '@legendapp/state/sync';
+import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
+
+const mmkvPlugin = new ObservablePersistMMKV({ id: 'brikday-storage' });
 
 export type ScheduleType = 'daily' | 'alternate_days' | 'specific_days';
 
@@ -38,86 +42,112 @@ export interface Project {
 export interface UserProfile {
   username: string;
   role: string;
+  isLoggedIn: boolean;
+}
+
+export interface StatsProfile {
   streak: number;
 }
 
-export interface AppState {
+export interface AuthState {
   status: 'onboarding' | 'login' | 'authenticated';
-  activeTab: 'engine' | 'vault' | 'blueprint' | 'settings';
-  user: UserProfile;
-  habits: Habit[];
-  vaultGoals: VaultGoal[];
-  blueprintProjects: Project[];
 }
 
-export const appState$ = observable<AppState>({
-  status: 'onboarding',
-  activeTab: 'engine',
-  user: {
-    username: 'SDE-1, React Native',
-    role: 'Core Architect',
-    streak: 12,
-  },
-  habits: [
-    { id: 'h1', title: 'LOG DAILY SPENDING', completed: false, neglected: false, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
-    { id: 'h2', title: '6AM CLUB WAKEUP', completed: true, neglected: false, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
-    { id: 'h3', title: 'NO COFFEE BEFORE 10AM', completed: false, neglected: true, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
-    { id: 'h4', title: '1 HOUR LEETCODE / SHADERS', completed: false, neglected: false, scheduleType: 'alternate_days', specificDays: [], startDate: Date.now() },
-  ],
-  vaultGoals: [
-    {
-      id: 'v1',
-      title: 'M3 MacBook Pro (Full Pay)',
-      target: 3500,
-      saved: 2100,
-      transactions: [
-        { id: 't1_1', amount: 1500, source: 'Freelance Design', comment: 'Initial layout project milestone pay', date: Date.now() - 86400000 * 5 },
-        { id: 't1_2', amount: 600, source: 'Consulting Bonus', comment: 'Extra code review bonus hours', date: Date.now() - 86400000 * 2 },
-      ],
-    },
-    {
-      id: 'v2',
-      title: 'iPad Pro OLED',
-      target: 1500,
-      saved: 300,
-      transactions: [
-        { id: 't2_1', amount: 300, source: 'eBay Sale', comment: 'Sold my old second-gen iPad Pro', date: Date.now() - 86400000 * 8 },
-      ],
-    },
-    {
-      id: 'v3',
-      title: 'Land Purchase Fund',
-      target: 50000,
-      saved: 5000,
-      transactions: [
-        { id: 't3_1', amount: 5000, source: 'HSA Reinvestment', comment: 'Transferred quarterly dividend gains', date: Date.now() - 86400000 * 12 },
-      ],
-    },
-  ],
-  blueprintProjects: [
-    { id: 'p1', title: 'VeloCity Transit App', category: 'WORK', neglected: false },
-    { id: 'p2', title: 'Cyberpunk Portfolio', category: 'SIDE PROJECT', neglected: true },
-    { id: 'p3', title: 'Workout Routine V2', category: 'LIFE', neglected: false },
-    { id: 'p4', title: 'EAS Build Automator', category: 'WORK', neglected: true },
-  ],
-});
+export interface UiState {
+  activeTab: 'engine' | 'vault' | 'blueprint' | 'settings';
+}
 
-// State Operations
+// -----------------------------------------------------------------------------
+// Slices
+// -----------------------------------------------------------------------------
+
+export const authState$ = observable<AuthState>({ status: 'onboarding' });
+syncObservable(authState$, { persist: { name: 'authState', plugin: mmkvPlugin } });
+
+export const uiState$ = observable<UiState>({ activeTab: 'engine' });
+syncObservable(uiState$, { persist: { name: 'uiState', plugin: mmkvPlugin } });
+
+export const userState$ = observable<UserProfile>({
+  username: 'SDE-1, React Native',
+  role: 'Core Architect',
+  isLoggedIn: false,
+});
+syncObservable(userState$, { persist: { name: 'userState', plugin: mmkvPlugin } });
+
+export const statsState$ = observable<StatsProfile>({
+  streak: 12,
+});
+syncObservable(statsState$, { persist: { name: 'statsState', plugin: mmkvPlugin } });
+
+export const habitsState$ = observable<Habit[]>([
+  { id: 'h1', title: 'LOG DAILY SPENDING', completed: false, neglected: false, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
+  { id: 'h2', title: '6AM CLUB WAKEUP', completed: true, neglected: false, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
+  { id: 'h3', title: 'NO COFFEE BEFORE 10AM', completed: false, neglected: true, scheduleType: 'daily', specificDays: [], startDate: Date.now() },
+  { id: 'h4', title: '1 HOUR LEETCODE / SHADERS', completed: false, neglected: false, scheduleType: 'alternate_days', specificDays: [], startDate: Date.now() },
+]);
+syncObservable(habitsState$, { persist: { name: 'habitsState', plugin: mmkvPlugin } });
+
+export const vaultState$ = observable<VaultGoal[]>([
+  {
+    id: 'v1',
+    title: 'M3 MacBook Pro (Full Pay)',
+    target: 3500,
+    saved: 2100,
+    transactions: [
+      { id: 't1_1', amount: 1500, source: 'Freelance Design', comment: 'Initial layout project milestone pay', date: Date.now() - 86400000 * 5 },
+      { id: 't1_2', amount: 600, source: 'Consulting Bonus', comment: 'Extra code review bonus hours', date: Date.now() - 86400000 * 2 },
+    ],
+  },
+  {
+    id: 'v2',
+    title: 'iPad Pro OLED',
+    target: 1500,
+    saved: 300,
+    transactions: [
+      { id: 't2_1', amount: 300, source: 'eBay Sale', comment: 'Sold my old second-gen iPad Pro', date: Date.now() - 86400000 * 8 },
+    ],
+  },
+  {
+    id: 'v3',
+    title: 'Land Purchase Fund',
+    target: 50000,
+    saved: 5000,
+    transactions: [
+      { id: 't3_1', amount: 5000, source: 'HSA Reinvestment', comment: 'Transferred quarterly dividend gains', date: Date.now() - 86400000 * 12 },
+    ],
+  },
+]);
+syncObservable(vaultState$, { persist: { name: 'vaultState', plugin: mmkvPlugin } });
+
+export const blueprintState$ = observable<Project[]>([
+  { id: 'p1', title: 'VeloCity Transit App', category: 'WORK', neglected: false },
+  { id: 'p2', title: 'Cyberpunk Portfolio', category: 'SIDE PROJECT', neglected: true },
+  { id: 'p3', title: 'Workout Routine V2', category: 'LIFE', neglected: false },
+  { id: 'p4', title: 'EAS Build Automator', category: 'WORK', neglected: true },
+]);
+syncObservable(blueprintState$, { persist: { name: 'blueprintState', plugin: mmkvPlugin } });
+
+// -----------------------------------------------------------------------------
+// Actions
+// -----------------------------------------------------------------------------
+
 export const appActions = {
   completeOnboarding() {
-    appState$.status.set('login');
+    authState$.status.set('login');
   },
   login(username: string) {
     if (username.trim()) {
-      appState$.user.username.set(username);
+      userState$.username.set(username);
     }
-    appState$.status.set('authenticated');
+    userState$.isLoggedIn.set(true);
+    authState$.status.set('authenticated');
   },
   logout() {
-    appState$.status.set('login');
+    userState$.isLoggedIn.set(false);
+    authState$.status.set('login');
   },
   toggleHabit(id: string) {
-    const habit = appState$.habits.find((h) => h.id.get() === id);
+    const habit = habitsState$.find((h) => h.id.get() === id);
     if (habit) {
       habit.completed.set(!habit.completed.get());
     }
@@ -133,10 +163,10 @@ export const appActions = {
       specificDays,
       startDate,
     };
-    appState$.habits.push(newHabit);
+    habitsState$.push(newHabit);
   },
   updateHabit(id: string, updates: Partial<Omit<Habit, 'id'>>) {
-    const habit = appState$.habits.find((h) => h.id.get() === id);
+    const habit = habitsState$.find((h) => h.id.get() === id);
     if (habit) {
       if (updates.title !== undefined) habit.title.set(updates.title);
       if (updates.scheduleType !== undefined) habit.scheduleType.set(updates.scheduleType);
@@ -145,20 +175,20 @@ export const appActions = {
     }
   },
   deleteHabit(id: string) {
-    const habits = appState$.habits.get();
+    const habits = habitsState$.get();
     const index = habits.findIndex((h) => h.id === id);
     if (index !== -1) {
-      appState$.habits[index].delete();
+      habitsState$[index].delete();
     }
   },
   updateVaultGoalSaved(id: string, saved: number) {
-    const goal = appState$.vaultGoals.find((g) => g.id.get() === id);
+    const goal = vaultState$.find((g) => g.id.get() === id);
     if (goal) {
       goal.saved.set(saved);
     }
   },
   addSavingTransaction(goalId: string, amount: number, source: string, comment: string) {
-    const goal = appState$.vaultGoals.find((g) => g.id.get() === goalId);
+    const goal = vaultState$.find((g) => g.id.get() === goalId);
     if (goal) {
       const currentTxns = goal.transactions.get() || [];
       const newTransaction: SavingTransaction = {
@@ -183,20 +213,20 @@ export const appActions = {
       saved: 0,
       transactions: [],
     };
-    appState$.vaultGoals.push(newGoal);
+    vaultState$.push(newGoal);
   },
   updateVaultGoal(id: string, updates: Partial<Omit<VaultGoal, 'id' | 'transactions' | 'saved'>>) {
-    const goal = appState$.vaultGoals.find((g) => g.id.get() === id);
+    const goal = vaultState$.find((g) => g.id.get() === id);
     if (goal) {
       if (updates.title !== undefined) goal.title.set(updates.title);
       if (updates.target !== undefined) goal.target.set(updates.target);
     }
   },
   deleteVaultGoal(id: string) {
-    const goals = appState$.vaultGoals.get();
+    const goals = vaultState$.get();
     const index = goals.findIndex((g) => g.id === id);
     if (index !== -1) {
-      appState$.vaultGoals[index].delete();
+      vaultState$[index].delete();
     }
   },
   addProject(title: string, category: string, neglected: boolean = false) {
@@ -207,30 +237,30 @@ export const appActions = {
       category: category.toUpperCase() || 'GENERAL',
       neglected,
     };
-    appState$.blueprintProjects.push(newProject);
+    blueprintState$.push(newProject);
   },
   updateProject(id: string, updates: Partial<Omit<Project, 'id' | 'neglected'>>) {
-    const project = appState$.blueprintProjects.find((p) => p.id.get() === id);
+    const project = blueprintState$.find((p) => p.id.get() === id);
     if (project) {
       if (updates.title !== undefined) project.title.set(updates.title);
       if (updates.category !== undefined) project.category.set(updates.category);
     }
   },
   deleteProject(id: string) {
-    const projects = appState$.blueprintProjects.get();
+    const projects = blueprintState$.get();
     const index = projects.findIndex((p) => p.id === id);
     if (index !== -1) {
-      appState$.blueprintProjects[index].delete();
+      blueprintState$[index].delete();
     }
   },
   toggleProjectNeglect(id: string) {
-    const project = appState$.blueprintProjects.find((p) => p.id.get() === id);
+    const project = blueprintState$.find((p) => p.id.get() === id);
     if (project) {
       project.neglected.set(!project.neglected.get());
     }
   },
   updateProfile(username: string, role: string) {
-    if (username.trim()) appState$.user.username.set(username);
-    if (role.trim()) appState$.user.role.set(role);
+    if (username.trim()) userState$.username.set(username);
+    if (role.trim()) userState$.role.set(role);
   },
 };

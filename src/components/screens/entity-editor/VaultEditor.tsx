@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { appState$, appActions } from '@/state/store';
+import { vaultState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -11,7 +11,7 @@ import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { styles } from './styles';
 
 export const VaultEditor = observer(() => {
-  const goals = appState$.vaultGoals.get();
+  const goals = vaultState$.get();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);

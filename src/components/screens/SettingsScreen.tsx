@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
-import { appState$, appActions } from '@/state/store';
+import { userState$, statsState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -11,7 +11,8 @@ import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 
 export const SettingsScreen = observer(function SettingsScreen() {
-  const user = appState$.user.get();
+  const user = userState$.get();
+  const stats = statsState$.get();
   
   // Sheet visible state
   const [sheetType, setSheetType] = useState<'profile' | null>(null);
@@ -62,7 +63,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
                 {user.role}
               </Typography>
               <Typography variant="bodyBold" style={styles.streakCount}>
-                🔥 STREAK: {user.streak} DAYS
+                🔥 STREAK: {stats.streak} DAYS
               </Typography>
             </View>
           </View>
