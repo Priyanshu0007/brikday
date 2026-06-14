@@ -79,10 +79,10 @@ export const VaultScreen = observer(function VaultScreen() {
       {/* Title Header */}
       <View style={styles.header}>
         <Typography variant="h2" uppercase>
-          THE VAULT
+          SAVINGS
         </Typography>
         <Typography variant="mono" style={styles.subtitle}>
-          ZERO EMI // FULL CASH ACQUISITIONS
+          SAVE UP TO BUY THINGS
         </Typography>
       </View>
 
@@ -128,7 +128,7 @@ export const VaultScreen = observer(function VaultScreen() {
               backgroundColor={BRUTALIST_THEME.colors.success}
               style={styles.submitBtn}
             >
-              CONFIRM SAVINGS
+              SAVE MONEY
             </BrutalistButton>
           </ScrollView>
         </BrutalistBottomSheet>

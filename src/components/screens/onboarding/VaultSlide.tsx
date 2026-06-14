@@ -15,7 +15,7 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
   return (
     <SlideContent index={2} activeIndex={activeIndex}>
         <View style={[styles.pillBadge, { backgroundColor: '#FEF3C7' }]}>
-          <Typography variant="mono" style={styles.pillText}>🪙 VAULT</Typography>
+          <Typography variant="mono" style={styles.pillText}>🪙 SAVINGS</Typography>
         </View>
 
         <Typography variant="h2" style={styles.slideTitle}>
@@ -52,7 +52,7 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
 
         <View style={styles.tipBox}>
           <Typography variant="mono" style={styles.tipText}>
-            TIP: Tap "+ Add Saving" to log each deposit
+            TIP: Tap "+ Add Money" to add savings
           </Typography>
         </View>
       </SlideContent>

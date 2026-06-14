@@ -67,7 +67,7 @@ export const EngineEditor = observer(() => {
             <View style={styles.listItemContent}>
               <Typography variant="bodyBold">{habit.title}</Typography>
               <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted }}>
-                SCHEDULE: {habit.scheduleType.toUpperCase()}
+                HOW OFTEN: {habit.scheduleType === 'alternate_days' ? 'EVERY OTHER DAY' : habit.scheduleType === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY'}
               </Typography>
             </View>
             <View style={styles.listItemActions}>
@@ -89,18 +89,18 @@ export const EngineEditor = observer(() => {
       >
         <View style={styles.formContainer}>
           <BrutalistInput
-            label="HABIT INSTRUCTION"
+            label="HABIT NAME"
             value={title}
             onChangeText={setTitle}
             placeholder="e.g. 100 PUSHUPS"
           />
           
           <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
-            SCHEDULE TYPE
+            HOW OFTEN
           </Typography>
           <View style={styles.segmentedControl}>
             {(['daily', 'alternate_days', 'specific_days'] as ScheduleType[]).map((type) => {
-              const label = type === 'alternate_days' ? 'ALT DAYS' : type === 'specific_days' ? 'SPEC DAYS' : 'DAILY';
+              const label = type === 'alternate_days' ? 'OTHER DAYS' : type === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY';
               const isActive = scheduleType === type;
               return (
                 <BrutalistButton

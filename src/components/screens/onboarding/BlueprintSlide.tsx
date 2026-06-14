@@ -15,14 +15,14 @@ export function BlueprintSlide({ activeIndex }: BlueprintSlideProps) {
   return (
     <SlideContent index={3} activeIndex={activeIndex}>
         <View style={[styles.pillBadge, { backgroundColor: '#DBEAFE' }]}>
-          <Typography variant="mono" style={styles.pillText}>🧱 BLUEPRINT</Typography>
+          <Typography variant="mono" style={styles.pillText}>🧱 PROJECTS</Typography>
         </View>
 
         <Typography variant="h2" style={styles.slideTitle}>
           Track Every Project
         </Typography>
         <Typography variant="body" style={styles.slideDescription}>
-          Side projects, work tasks, life goals — add them all. If you ignore a project too long, it decays visually. Red cards demand your attention and keep you moving.
+          Side projects, work tasks, life goals — add them all. If you ignore a project too long, it turns red. Red cards demand your attention and keep you moving.
         </Typography>
 
         {/* Visual Preview */}
@@ -43,10 +43,10 @@ export function BlueprintSlide({ activeIndex }: BlueprintSlideProps) {
             <View style={styles.projectPreviewRow}>
               <View>
                 <Typography variant="bodyBold" color="#FFF">CYBERPUNK PORTFOLIO</Typography>
-                <Typography variant="caption" style={{ color: '#FFCDD2' }}>⚠️ NEGLECTED — 8 DAYS</Typography>
+                <Typography variant="caption" style={{ color: '#FFCDD2' }}>⚠️ IGNORED — 8 DAYS</Typography>
               </View>
               <View style={[styles.activeTag, { backgroundColor: '#FFFFFF33' }]}>
-                <Typography variant="mono" style={[styles.activeTagText, { color: '#FFF' }]}>DECAYED</Typography>
+                <Typography variant="mono" style={[styles.activeTagText, { color: '#FFF' }]}>IGNORED</Typography>
               </View>
             </View>
           </BrutalistCard>
@@ -54,7 +54,7 @@ export function BlueprintSlide({ activeIndex }: BlueprintSlideProps) {
 
         <View style={styles.tipBox}>
           <Typography variant="mono" style={styles.tipText}>
-            TIP: Long-press to mark as neglected/active
+            TIP: Tap the button on any card to update its status
           </Typography>
         </View>
       </SlideContent>

@@ -29,10 +29,10 @@ export function LoginScreen() {
             {/* Branding Header */}
             <View style={styles.header}>
               <Typography variant="h1" style={styles.title} uppercase>
-                AUTHENTICATE
+                LOGIN
               </Typography>
               <Typography variant="mono" style={styles.subtitle}>
-                SECURE AUTHENTICATION SYSTEM // BRICKDAY
+                LOGIN TO BRICKDAY
               </Typography>
             </View>
 
@@ -40,12 +40,12 @@ export function LoginScreen() {
             <View style={styles.formContainer}>
               <View style={styles.securityWarningCard}>
                 <Typography variant="mono" style={styles.warningText} color="#FFFFFF">
-                  [WARNING]: ZERO LIABILITY SYSTEM. COMMITTING CREDENTIALS TRIGGERS ACCOUNTABILITY LOGGING.
+                  [NOTE]: LOGGING IN STARTS YOUR JOURNEY.
                 </Typography>
               </View>
 
               <BrutalistInput
-                label="OPERATOR CODE (USERNAME)"
+                label="USERNAME"
                 value={username}
                 onChangeText={setUsername}
                 placeholder="Enter username..."
@@ -53,7 +53,7 @@ export function LoginScreen() {
               />
 
               <BrutalistInput
-                label="ENCRYPTION KEY (PASSWORD)"
+                label="PASSWORD"
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Enter password..."
@@ -66,14 +66,14 @@ export function LoginScreen() {
                 backgroundColor={BRUTALIST_THEME.colors.success}
                 style={styles.button}
               >
-                INITIALIZE SESSION
+                LOGIN
               </BrutalistButton>
             </View>
 
             {/* Bottom disclaimer */}
             <View style={styles.footer}>
               <Typography variant="caption" style={styles.disclaimer}>
-                BY INITIALIZING A SESSION, YOU AGREE TO EXTREME ACCOUNTABILITY OVER GOALS AND FINANCIAL MILESTONES.
+                BY LOGGING IN, YOU AGREE TO WORK HARD TOWARDS YOUR GOALS.
               </Typography>
             </View>
           </View>

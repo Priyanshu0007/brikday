@@ -38,7 +38,7 @@ export const GoalCard = observer(({
         </View>
 
         <Typography variant="caption" style={styles.savedCaption}>
-          ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED (FULL PAY)
+          ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED
         </Typography>
 
         {/* Static Progress Bar */}
@@ -62,7 +62,7 @@ export const GoalCard = observer(({
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                + ADD SAVING
+                + ADD MONEY
               </Typography>
             </BrutalistButton>
           </View>

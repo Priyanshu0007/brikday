@@ -21,14 +21,14 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
           What is Brickday?
         </Typography>
         <Typography variant="body" style={styles.slideDescription}>
-          Brickday is your personal accountability system. It helps you build discipline through three pillars — daily habits, debt-free savings, and active project tracking.
+          Brickday is a tool to help you stay on track. It helps you build good habits, save money without debt, and complete your projects.
         </Typography>
 
         <BrutalistCard>
           <View style={styles.conceptRow}>
             <Typography variant="bodyBold" style={styles.conceptIcon}>⚡</Typography>
             <View style={styles.conceptText}>
-              <Typography variant="bodyBold">ENGINE</Typography>
+              <Typography variant="bodyBold">HABITS</Typography>
               <Typography variant="caption">Daily habits & streaks</Typography>
             </View>
           </View>
@@ -38,7 +38,7 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
           <View style={styles.conceptRow}>
             <Typography variant="bodyBold" style={styles.conceptIcon}>🪙</Typography>
             <View style={styles.conceptText}>
-              <Typography variant="bodyBold">VAULT</Typography>
+              <Typography variant="bodyBold">SAVINGS</Typography>
               <Typography variant="caption">Save & pay in full — zero EMI</Typography>
             </View>
           </View>
@@ -48,7 +48,7 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
           <View style={styles.conceptRow}>
             <Typography variant="bodyBold" style={styles.conceptIcon}>🧱</Typography>
             <View style={styles.conceptText}>
-              <Typography variant="bodyBold">BLUEPRINT</Typography>
+              <Typography variant="bodyBold">PROJECTS</Typography>
               <Typography variant="caption">Projects & goals tracker</Typography>
             </View>
           </View>

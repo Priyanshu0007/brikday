@@ -55,7 +55,7 @@ export const VaultEditor = observer(() => {
   return (
     <View style={{ flex: 1 }}>
       <BrutalistButton onPress={handleAdd} backgroundColor={BRUTALIST_THEME.colors.success} style={{ marginBottom: 16 }}>
-        + NEW VAULT GOAL
+        + NEW SAVINGS GOAL
       </BrutalistButton>
       {goals.map((goal) => (
         <BrutalistCard key={goal.id} backgroundColor="#FFFFFF" style={{ marginBottom: 8 }}>
@@ -81,17 +81,17 @@ export const VaultEditor = observer(() => {
       <BrutalistBottomSheet
         visible={isAdding || editingId !== null}
         onClose={() => { setEditingId(null); setIsAdding(false); }}
-        title={isAdding ? 'NEW VAULT GOAL' : 'EDIT VAULT GOAL'}
+        title={isAdding ? 'NEW SAVINGS GOAL' : 'EDIT SAVINGS GOAL'}
       >
         <View style={styles.formContainer}>
           <BrutalistInput
-            label="GOAL DESCRIPTION"
+            label="GOAL NAME"
             value={title}
             onChangeText={setTitle}
             placeholder="e.g. M4 MACBOOK PRO"
           />
           <BrutalistInput
-            label="TARGET FUNDING LIMIT ($)"
+            label="GOAL AMOUNT ($)"
             value={target}
             onChangeText={setTarget}
             keyboardType="numeric"
@@ -110,7 +110,7 @@ export const VaultEditor = observer(() => {
       >
         <View style={styles.formContainer}>
           <Typography variant="body" style={{ marginBottom: 20 }}>
-            Are you sure you want to delete this vault goal?
+            Are you sure you want to delete this savings goal?
           </Typography>
           <View style={styles.formActions}>
             <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>

@@ -40,7 +40,7 @@ export function GetStartedSlide({ activeIndex }: GetStartedSlideProps) {
           <BrutalistCard>
             <View style={styles.summaryRow}>
               <Typography variant="bodyBold" style={styles.summaryEmoji}>🧱</Typography>
-              <Typography variant="body">Add projects to your blueprint</Typography>
+              <Typography variant="body">Add projects to your list</Typography>
             </View>
           </BrutalistCard>
         </View>

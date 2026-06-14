@@ -75,7 +75,7 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
             
             {isNeglected && (
               <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
-                ⚠️ SLIPPING! Neglected yesterday.
+                ⚠️ You missed this yesterday.
               </Typography>
             )}
           </View>
@@ -125,10 +125,10 @@ export const HabitsScreen = observer(function HabitsScreen() {
       {/* Title block */}
       <View style={styles.header}>
         <Typography variant="h2" uppercase>
-          THE ENGINE
+          HABITS
         </Typography>
         <Typography variant="mono" style={styles.subtitle}>
-          HABITS // STREAK STABILITY CHECKLIST
+          YOUR DAILY HABITS
         </Typography>
       </View>
 

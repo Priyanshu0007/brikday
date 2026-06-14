@@ -15,14 +15,14 @@ export function EngineSlide({ activeIndex }: EngineSlideProps) {
   return (
     <SlideContent index={1} activeIndex={activeIndex}>
         <View style={styles.pillBadge}>
-          <Typography variant="mono" style={styles.pillText}>⚡ ENGINE</Typography>
+          <Typography variant="mono" style={styles.pillText}>⚡ HABITS</Typography>
         </View>
 
         <Typography variant="h2" style={styles.slideTitle}>
           Build Daily Discipline
         </Typography>
         <Typography variant="body" style={styles.slideDescription}>
-          Create habits you commit to every day. Check them off and build a streak. Miss a day? Your card turns red — a visual reminder to stay consistent.
+          Create habits you do every day. Check them off and build a streak. Miss a day? Your card turns red to remind you to stay consistent.
         </Typography>
 
         {/* Visual Preview */}
@@ -54,7 +54,7 @@ export function EngineSlide({ activeIndex }: EngineSlideProps) {
               <View style={[styles.checkboxPending, { borderColor: '#FFF' }]} />
               <View style={styles.habitPreviewText}>
                 <Typography variant="bodyBold" color="#FFF">NO COFFEE BEFORE 10AM</Typography>
-                <Typography variant="caption" style={{ color: '#FFCDD2' }}>⚠️ Neglected — streak broken</Typography>
+                <Typography variant="caption" style={{ color: '#FFCDD2' }}>⚠️ Missed — streak broken</Typography>
               </View>
             </View>
           </BrutalistCard>
@@ -62,7 +62,7 @@ export function EngineSlide({ activeIndex }: EngineSlideProps) {
 
         <View style={styles.tipBox}>
           <Typography variant="mono" style={styles.tipText}>
-            TIP: Swipe a habit to edit or delete it
+            TIP: Tap a habit to check it off
           </Typography>
         </View>
       </SlideContent>

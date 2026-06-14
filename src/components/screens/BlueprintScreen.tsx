@@ -42,7 +42,7 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
           style={[styles.statusIndicator, neglected && styles.decayText]}
           color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
         >
-          {neglected ? '● DECAYING' : '● OPERATIONAL'}
+          {neglected ? '● IGNORED' : '● ACTIVE'}
         </Typography>
       </View>
 
@@ -56,11 +56,11 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
 
       {neglected ? (
         <Typography variant="caption" style={{ color: '#FFD2D2', marginBottom: 12 }}>
-          🚨 WARNING: Neglected project. Decay status has increased shadow size and converted theme colors.
+          ⚠️ You haven't worked on this recently.
         </Typography>
       ) : (
         <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted, marginBottom: 12 }}>
-          ✓ Consistent commits registered. Structure is holding.
+          ✓ Doing great. Keep it up!
         </Typography>
       )}
 
@@ -70,7 +70,7 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
         backgroundColor={neglected ? BRUTALIST_THEME.colors.success : BRUTALIST_THEME.colors.danger}
         size="sm"
       >
-        {neglected ? 'EXECUTE & RESTORE' : 'NEGLECT PROJECT'}
+        {neglected ? 'WORK ON IT' : 'IGNORE PROJECT'}
       </BrutalistButton>
     </BrutalistCard>
   );
@@ -81,10 +81,10 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
       {/* Title */}
       <View style={styles.header}>
         <Typography variant="h2" uppercase>
-          THE BLUEPRINT
+          PROJECTS
         </Typography>
         <Typography variant="mono" style={styles.subtitle}>
-          CIRCLE // PROJECTS VISUAL DEGRADATION STATUS
+          YOUR PROJECTS AND TASKS
         </Typography>
       </View>
 
@@ -95,7 +95,7 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
           <View style={styles.column}>
             <View style={[styles.columnHeader, { backgroundColor: BRUTALIST_THEME.colors.danger }]}>
               <Typography variant="bodyBold" color="#FFFFFF" uppercase>
-                DECAYING SECTOR ({neglectedProjects.length})
+                IGNORED PROJECTS ({neglectedProjects.length})
               </Typography>
             </View>
             {neglectedProjects.map(p => <ProjectCard key={p.id} projectId={p.id} />)}
@@ -106,7 +106,7 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
         <View style={styles.column}>
           <View style={[styles.columnHeader, { backgroundColor: BRUTALIST_THEME.colors.success }]}>
             <Typography variant="bodyBold" color="#000000" uppercase>
-              OPERATIONAL SECTOR ({activeProjects.length})
+              ACTIVE PROJECTS ({activeProjects.length})
             </Typography>
           </View>
           {activeProjects.map(p => <ProjectCard key={p.id} projectId={p.id} />)}

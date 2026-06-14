@@ -31,7 +31,7 @@ const DashboardHeader = observer(() => {
         </View>
       </View>
       <Typography variant="caption" style={styles.headerSub}>
-        {`OPERATOR: ${user.username.toUpperCase()} // STATUS: ONLINE`}
+        {`USER: ${user.username.toUpperCase()} // ONLINE`}
       </Typography>
     </View>
   );
@@ -62,10 +62,10 @@ const AppDashboard = observer(() => {
   };
 
   const tabs = [
-    { id: 'engine', label: 'ENGINE', icon: '⚡' },
-    { id: 'vault', label: 'VAULT', icon: '🪙' },
-    { id: 'blueprint', label: 'BLUEPRINT', icon: '🧱' },
-    { id: 'settings', label: 'CONTROL', icon: '⚙️' },
+    { id: 'engine', label: 'HABITS', icon: '⚡' },
+    { id: 'vault', label: 'SAVINGS', icon: '🪙' },
+    { id: 'blueprint', label: 'PROJECTS', icon: '🧱' },
+    { id: 'settings', label: 'SETTINGS', icon: '⚙️' },
   ] as const;
 
   return (

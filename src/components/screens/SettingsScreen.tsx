@@ -44,10 +44,10 @@ export const SettingsScreen = observer(function SettingsScreen() {
         {/* Title */}
         <View style={styles.header}>
           <Typography variant="h2" uppercase>
-            CONTROL CENTER
+            SETTINGS
           </Typography>
           <Typography variant="mono" style={styles.subtitle}>
-            SYSTEM PREFERENCES & METRICS
+            ACCOUNT INFO
           </Typography>
         </View>
 
@@ -71,7 +71,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
 
         {/* Action List Section */}
         <Typography variant="bodyBold" style={styles.sectionTitle} uppercase>
-          SYSTEM ACTIONS
+          ACCOUNT OPTIONS
         </Typography>
 
         <View style={styles.actionList}>
@@ -79,8 +79,8 @@ export const SettingsScreen = observer(function SettingsScreen() {
           <BrutalistCard backgroundColor="#FFFFFF">
             <View style={styles.actionItem}>
               <View style={styles.actionTextWrapper}>
-                <Typography variant="bodyBold">OPERATOR ATTRIBUTES</Typography>
-                <Typography variant="caption">Modify username & title roles</Typography>
+                <Typography variant="bodyBold">YOUR PROFILE</Typography>
+                <Typography variant="caption">Change your name and bio</Typography>
               </View>
               <BrutalistButton
                 onPress={() => handleOpenSheet('profile')}
@@ -97,8 +97,8 @@ export const SettingsScreen = observer(function SettingsScreen() {
           <BrutalistCard backgroundColor="#FFFFFF">
             <View style={styles.actionItem}>
               <View style={styles.actionTextWrapper}>
-                <Typography variant="bodyBold">DATABASE EDITOR</Typography>
-                <Typography variant="caption">Modify Engine, Vault, Blueprint</Typography>
+                <Typography variant="bodyBold">YOUR DATA</Typography>
+                <Typography variant="caption">Edit Habits, Savings, Projects</Typography>
               </View>
               <BrutalistButton
                 onPress={() => router.push('/editor')}
@@ -118,7 +118,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
           backgroundColor={BRUTALIST_THEME.colors.danger}
           style={styles.logoutButton}
         >
-          LOGOUT FROM SYSTEM
+          LOG OUT
         </BrutalistButton>
       </ScrollView>
 
@@ -126,27 +126,27 @@ export const SettingsScreen = observer(function SettingsScreen() {
       <BrutalistBottomSheet
         visible={sheetType === 'profile'}
         onClose={() => setSheetType(null)}
-        title="EDIT ATTRIBUTES"
+        title="EDIT PROFILE"
       >
         <View style={styles.form}>
           <BrutalistInput
-            label="OPERATOR USERNAME"
+            label="USERNAME"
             value={profileName}
             onChangeText={setProfileName}
             placeholder="Change username..."
           />
           <BrutalistInput
-            label="OPERATOR SYSTEM ROLE"
+            label="BIO / ROLE"
             value={profileRole}
             onChangeText={setProfileRole}
-            placeholder="Change role/title..."
+            placeholder="Change bio/role..."
           />
           <BrutalistButton
             onPress={handleSaveProfile}
             backgroundColor={BRUTALIST_THEME.colors.success}
             style={styles.submitBtn}
           >
-            COMMIT CHANGES
+            SAVE CHANGES
           </BrutalistButton>
         </View>
       </BrutalistBottomSheet>

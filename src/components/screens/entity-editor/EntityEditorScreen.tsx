@@ -16,6 +16,11 @@ export const EntityEditorScreen = observer(() => {
   const [activeTab, setActiveTab] = useState<'engine' | 'vault' | 'blueprint'>('engine');
   const pagerRef = useRef<PagerView>(null);
   const tabs = ['engine', 'vault', 'blueprint'] as const;
+  const tabLabels: Record<typeof tabs[number], string> = {
+    engine: 'HABITS',
+    vault: 'SAVINGS',
+    blueprint: 'PROJECTS',
+  };
 
   const handleTabPress = (tab: typeof tabs[number], index: number) => {
     setActiveTab(tab);
@@ -25,7 +30,7 @@ export const EntityEditorScreen = observer(() => {
   return (
     <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <Typography variant="h2">DATABASE EDITOR</Typography>
+        <Typography variant="h2">YOUR DATA</Typography>
         <BrutalistButton onPress={() => router.back()} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
           CLOSE
         </BrutalistButton>
@@ -39,7 +44,7 @@ export const EntityEditorScreen = observer(() => {
             onPress={() => handleTabPress(tab, index)}
           >
             <Typography variant="bodyBold" style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-              {tab.toUpperCase()}
+              {tabLabels[tab]}
             </Typography>
           </Pressable>
         ))}

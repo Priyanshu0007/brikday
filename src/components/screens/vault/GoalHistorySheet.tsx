@@ -32,7 +32,7 @@ export const GoalHistorySheet = observer(({
         {transactions.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Typography variant="body" style={styles.emptyText}>
-              NO TRANSACTIONS LOGGED FOR THIS ACQUISITION.
+              NO SAVINGS YET.
             </Typography>
           </View>
         ) : (
