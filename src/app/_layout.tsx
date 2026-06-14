@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { useFonts } from 'expo-font';
@@ -7,9 +8,16 @@ import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { setupDevMenu } from '@/state/devtool';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    if (__DEV__) {
+      setupDevMenu();
+    }
+  }, []);
   const [loaded, error] = useFonts({
     'SpaceGrotesk-Bold': SpaceGrotesk_700Bold,
     'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
