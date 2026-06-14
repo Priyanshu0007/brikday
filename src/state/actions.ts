@@ -4,6 +4,7 @@ import { habitsState$ } from './slices/habitsSlice';
 import { vaultState$ } from './slices/vaultSlice';
 import { blueprintState$ } from './slices/blueprintSlice';
 import { Habit, ScheduleType, SavingTransaction, VaultGoal, Project } from './types';
+import { getLocalDateString } from '@/utils/date';
 
 export const appActions = {
   completeOnboarding() {
@@ -20,10 +21,26 @@ export const appActions = {
     userState$.isLoggedIn.set(false);
     authState$.status.set('login');
   },
-  toggleHabit(id: string) {
+  toggleHabit(id: string, dateStr?: string) {
     const habit = habitsState$.find((h) => h.id.get() === id);
     if (habit) {
-      habit.completed.set(!habit.completed.get());
+      const todayStr = getLocalDateString();
+      const targetDateStr = dateStr || todayStr;
+      const completedDates = habit.completedDates.get() || [];
+      const isCurrentlyCompleted = completedDates.includes(targetDateStr);
+
+      if (isCurrentlyCompleted) {
+        habit.completedDates.set(completedDates.filter((d) => d !== targetDateStr));
+        if (targetDateStr === todayStr) {
+          habit.completed.set(false);
+        }
+      } else {
+        habit.completedDates.set([...completedDates, targetDateStr]);
+        if (targetDateStr === todayStr) {
+          habit.completed.set(true);
+          habit.neglected.set(false);
+        }
+      }
     }
   },
   addHabit(title: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
@@ -36,6 +53,7 @@ export const appActions = {
       scheduleType,
       specificDays,
       startDate,
+      completedDates: [],
     };
     habitsState$.push(newHabit);
   },

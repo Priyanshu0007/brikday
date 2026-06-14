@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
+import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { userState$, uiState$, authState$, statsState$ } from '@/state/store';
@@ -10,7 +11,7 @@ import { LoginScreen } from '@/components/screens/LoginScreen';
 import { HabitsScreen } from '@/components/screens/HabitsScreen';
 import { VaultScreen } from '@/components/screens/vault';
 import { BlueprintScreen } from '@/components/screens/BlueprintScreen';
-import { SettingsScreen } from '@/components/screens/SettingsScreen';
+import { AnalyticsScreen } from '@/components/screens/AnalyticsScreen';
 import { PressableScale } from 'pressto';
 import { triggerHaptic } from '@/ui/haptics';
 
@@ -24,10 +25,23 @@ const DashboardHeader = observer(() => {
         <Typography variant="h2" uppercase style={styles.headerLogo}>
           BRICKDAY
         </Typography>
-        <View style={styles.streakBadge}>
-          <Typography variant="mono" style={styles.streakText}>
-            🔥 {stats.streak}D STREAK
-          </Typography>
+        <View style={styles.headerRightRow}>
+          <View style={styles.streakBadge}>
+            <Typography variant="mono" style={styles.streakText}>
+              🔥 {stats.streak}D STREAK
+            </Typography>
+          </View>
+          <PressableScale
+            onPress={() => {
+              triggerHaptic('selection');
+              router.push('/settings');
+            }}
+            style={styles.profileButton}
+            // @ts-ignore
+            activeScale={0.9}
+          >
+            <Typography variant="bodyBold" style={styles.profileIcon}>👤</Typography>
+          </PressableScale>
         </View>
       </View>
       <Typography variant="caption" style={styles.headerSub}>
@@ -49,8 +63,8 @@ const AppDashboard = observer(() => {
         return <VaultScreen />;
       case 'blueprint':
         return <BlueprintScreen />;
-      case 'settings':
-        return <SettingsScreen />;
+      case 'analytics':
+        return <AnalyticsScreen />;
       default:
         return <HabitsScreen />;
     }
@@ -65,7 +79,7 @@ const AppDashboard = observer(() => {
     { id: 'engine', label: 'HABITS', icon: '⚡' },
     { id: 'vault', label: 'SAVINGS', icon: '🪙' },
     { id: 'blueprint', label: 'PROJECTS', icon: '🧱' },
-    { id: 'settings', label: 'SETTINGS', icon: '⚙️' },
+    { id: 'analytics', label: 'ANALYTICS', icon: '📊' },
   ] as const;
 
   return (
@@ -172,6 +186,24 @@ const styles = StyleSheet.create({
   streakText: {
     fontSize: 11,
     fontWeight: 'bold',
+  },
+  headerRightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  profileButton: {
+    width: 36,
+    height: 36,
+    borderWidth: BRUTALIST_THEME.borderWidth,
+    borderColor: BRUTALIST_THEME.colors.border,
+    borderRadius: BRUTALIST_THEME.borderRadius,
+    backgroundColor: BRUTALIST_THEME.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileIcon: {
+    fontSize: 18,
   },
   headerSub: {
     marginTop: 2,

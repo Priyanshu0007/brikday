@@ -8,6 +8,7 @@ export interface Habit {
   scheduleType: ScheduleType;
   specificDays: number[]; // 0 for Sunday, 1 for Monday, etc.
   startDate: number; // For alternate_days calculation
+  completedDates?: string[]; // Array of 'YYYY-MM-DD' strings
 }
 
 export interface SavingTransaction {
@@ -48,5 +49,5 @@ export interface AuthState {
 }
 
 export interface UiState {
-  activeTab: 'engine' | 'vault' | 'blueprint' | 'settings';
+  activeTab: 'engine' | 'vault' | 'blueprint' | 'analytics';
 }

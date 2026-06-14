@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
-
-import Animated, { useAnimatedStyle, withTiming, withSpring, interpolateColor } from 'react-native-reanimated';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
 import { habitsState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
-import { BrutalistButton } from '@/ui/BrutalistButton';
+import {
+  getLocalDateString,
+  isHabitActiveOnDate,
+} from '@/utils/date';
 
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
@@ -17,7 +19,9 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
   if (!item$) return null;
 
   const title = item$.title.get();
-  const isCompleted = item$.completed.get();
+  const completedDates = item$.completedDates.get() || [];
+  const todayStr = getLocalDateString();
+  const isCompleted = completedDates.includes(todayStr);
   const isNeglected = item$.neglected.get() && !isCompleted;
 
   // Reanimated styles
@@ -87,32 +91,36 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
 export const HabitsScreen = observer(function HabitsScreen() {
   const habits = habitsState$.get();
 
-  // Calculate if habit is active today
-  const isHabitActiveToday = (habit: typeof habits[0]) => {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    
-    if (habit.scheduleType === 'daily' || !habit.scheduleType) return true;
-    
-    if (habit.scheduleType === 'specific_days') {
-      return habit.specificDays?.includes(dayOfWeek) ?? false;
-    }
-    
-    if (habit.scheduleType === 'alternate_days') {
-      // difference in days from start date
-      const msPerDay = 86400000;
-      const diffDays = Math.floor((Date.now() - (habit.startDate || 0)) / msPerDay);
-      return diffDays % 2 === 0;
-    }
-    
-    return true;
-  };
+  // Synchronize Legend State persistence on load
+  useEffect(() => {
+    const todayStr = getLocalDateString();
+    const yesterdayStr = getLocalDateString(new Date(Date.now() - 86400000));
 
-  // Stable ID array - filtered by today's schedule
+    habitsState$.get().forEach((h, index) => {
+      const completedDates = h.completedDates || [];
+      const hasToday = completedDates.includes(todayStr);
+      const hasYesterday = completedDates.includes(yesterdayStr);
+
+      const obsHabit = habitsState$[index];
+
+      // Sync completed
+      if (h.completed !== hasToday) {
+        obsHabit.completed.set(hasToday);
+      }
+
+      // Sync neglected
+      const isYesterdayActive = isHabitActiveOnDate(h, new Date(Date.now() - 86400000));
+      const shouldBeNeglected = isYesterdayActive && !hasYesterday && !hasToday;
+      if (h.neglected !== shouldBeNeglected) {
+        obsHabit.neglected.set(shouldBeNeglected);
+      }
+    });
+  }, []);
+
+  // Filter habit IDs for today's active habits
   const habitIds = React.useMemo(
-    () => habits.filter(isHabitActiveToday).map((h) => h.id),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [habits.length]
+    () => habits.filter(h => isHabitActiveOnDate(h, new Date())).map((h) => h.id),
+    [habits]
   );
 
   const renderItem = React.useCallback(
@@ -131,7 +139,6 @@ export const HabitsScreen = observer(function HabitsScreen() {
           YOUR DAILY HABITS
         </Typography>
       </View>
-
 
       {/* High performance LegendList */}
       <LegendList
@@ -159,7 +166,6 @@ const styles = StyleSheet.create({
     color: BRUTALIST_THEME.colors.textMuted,
     marginTop: 4,
   },
-
   list: {
     flex: 1,
     marginTop: 8,
