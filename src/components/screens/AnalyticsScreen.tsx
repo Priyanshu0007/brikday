@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
-import { habitsState$ } from '@/state/store';
+import { habitTemplates$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { PressableScale } from 'pressto';
 import { triggerHaptic } from '@/ui/haptics';
+import { DailyHabitEntry } from '@/state/types';
 import {
   getLocalDateString,
   isHabitActiveOnDate,
-  getDayCompletionStats,
   getWeekDates,
   getMonthGrid,
   isSameDay,
@@ -24,13 +24,9 @@ import {
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
 // Read-only habit item for the bottom sheet detail view
-const ReadOnlyHabitItem = observer(({ habitId, dateStr }: { habitId: string; dateStr: string }) => {
-  const item$ = habitsState$.find((h) => h.id.get() === habitId);
-  if (!item$) return null;
-
-  const title = item$.title.get();
-  const completedDates = item$.completedDates.get() || [];
-  const isCompleted = completedDates.includes(dateStr);
+const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr: string }) => {
+  const title = entry.title;
+  const isCompleted = entry.completed;
   const todayStr = getLocalDateString();
   const isPast = dateStr < todayStr;
   const isNeglected = !isCompleted && isPast;
@@ -82,10 +78,10 @@ const ReadOnlyHabitItem = observer(({ habitId, dateStr }: { habitId: string; dat
       </View>
     </BrutalistCard>
   );
-});
+};
 
 export const AnalyticsScreen = observer(function AnalyticsScreen() {
-  const habits = habitsState$.get();
+  const habits = habitTemplates$.get() || [];
 
   // View modes: 'week' | 'month'
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
@@ -143,16 +139,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   };
 
   const selectedDateString = getLocalDateString(selectedDate);
-
-  const activeHabitsForSelectedDate = React.useMemo(
-    () => habits.filter(h => isHabitActiveOnDate(h, selectedDate)),
-    [habits, selectedDate]
-  );
-
-  const completedCountForSelectedDate = React.useMemo(
-    () => activeHabitsForSelectedDate.filter(h => h.completedDates?.includes(selectedDateString)).length,
-    [activeHabitsForSelectedDate, selectedDateString]
-  );
+  const selectedDayStats = React.useMemo(() => appActions.getDayStats(selectedDateString), [selectedDateString, isSheetVisible]);
 
   // ── Switcher ──
   const renderSwitcher = () => (
@@ -213,12 +200,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.weekStrip}>
           {weekCells.map((cell, idx) => {
             const isToday = isSameDay(cell.date, new Date());
-            const { totalCount, ratio } = getDayCompletionStats(habits, cell.date);
+            const { total, rate } = appActions.getDayStats(cell.dateString);
             let bottomBarColor = 'transparent';
-            if (totalCount > 0) {
-              bottomBarColor = ratio === 1
+            if (total > 0) {
+              bottomBarColor = rate === 1
                 ? BRUTALIST_THEME.colors.success
-                : ratio > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
+                : rate > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
             }
             return (
               <PressableScale
@@ -230,7 +217,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
               >
                 <Typography variant="caption" style={styles.weekDayLabel}>{cell.dayName.substring(0, 1)}</Typography>
                 <Typography variant="bodyBold" style={styles.weekDateLabel}>{cell.dayNumber}</Typography>
-                {totalCount > 0 && <View style={[styles.weekStatusIndicator, { backgroundColor: bottomBarColor }]} />}
+                {total > 0 && <View style={[styles.weekStatusIndicator, { backgroundColor: bottomBarColor }]} />}
               </PressableScale>
             );
           })}
@@ -243,15 +230,15 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
           <Typography variant="bodyBold" uppercase style={styles.chartTitle}>Completion Rates</Typography>
           <View style={styles.chartRow}>
             {weekCells.map((cell) => {
-              const { totalCount, ratio } = getDayCompletionStats(habits, cell.date);
-              const percentage = Math.round(ratio * 100);
+              const { total, rate } = appActions.getDayStats(cell.dateString);
+              const percentage = Math.round(rate * 100);
               let barColor: string = BRUTALIST_THEME.colors.paper;
-              if (totalCount > 0) {
-                barColor = ratio === 1
+              if (total > 0) {
+                barColor = rate === 1
                   ? BRUTALIST_THEME.colors.success
-                  : ratio > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
+                  : rate > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
               }
-              const barHeight = totalCount > 0 ? Math.max(10, ratio * 90) : 4;
+              const barHeight = total > 0 ? Math.max(10, rate * 90) : 4;
               return (
                 <PressableScale
                   key={cell.dateString}
@@ -260,7 +247,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                   // @ts-ignore
                   activeScale={0.93}
                 >
-                  {totalCount > 0 && (
+                  {total > 0 && (
                     <Typography variant="mono" style={styles.chartPercentageText}>{percentage}%</Typography>
                   )}
                   <View style={[styles.chartBar, { height: barHeight, backgroundColor: barColor }]} />
@@ -277,20 +264,19 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // ── Month View ──
   const renderMonthView = () => {
     const monthLabel = `${getMonthFullName(monthAnchorDate)} ${monthAnchorDate.getFullYear()}`;
-    const monthDays = monthCells.filter(c => c.isCurrentMonth).map(c => c.date);
+    const monthDays = monthCells.filter(c => c.isCurrentMonth).map(c => getLocalDateString(c.date));
 
     const habitBreakdown = habits.map(habit => {
-      const scheduledDays = monthDays.filter(date => isHabitActiveOnDate(habit, date));
-      const scheduledDatesStr = scheduledDays.map(d => getLocalDateString(d));
-      const completedDates = habit.completedDates || [];
-      const completedDaysCount = completedDates.filter(d => scheduledDatesStr.includes(d)).length;
+      const history = appActions.getHabitHistory(habit.id, monthDays);
+      const scheduledDays = history.filter(h => h.isScheduled);
+      const completedDaysCount = scheduledDays.filter(h => h.completed).length;
       return {
         habit,
         scheduledCount: scheduledDays.length,
         completedCount: completedDaysCount,
         rate: scheduledDays.length > 0 ? completedDaysCount / scheduledDays.length : 0,
       };
-    });
+    }).filter(b => !b.habit.archivedAt || b.scheduledCount > 0);
 
     return (
       <View style={styles.viewSection}>
@@ -320,15 +306,15 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.calendarGrid}>
           {monthCells.map((cell, idx) => {
             const isToday = isSameDay(cell.date, new Date());
-            const { totalCount, ratio } = getDayCompletionStats(habits, cell.date);
+            const { total, rate } = appActions.getDayStats(cell.dateString);
             let cellBg: string = BRUTALIST_THEME.colors.paper;
             let cellOpacity = 1;
             if (!cell.isCurrentMonth) {
               cellBg = '#EAEAEA';
               cellOpacity = 0.4;
-            } else if (totalCount > 0) {
-              if (ratio === 1) cellBg = BRUTALIST_THEME.colors.success;
-              else if (ratio > 0) cellBg = BRUTALIST_THEME.colors.warning;
+            } else if (total > 0) {
+              if (rate === 1) cellBg = BRUTALIST_THEME.colors.success;
+              else if (rate > 0) cellBg = BRUTALIST_THEME.colors.warning;
               else if (cell.date <= new Date()) cellBg = '#FCA5A5';
             }
             return (
@@ -386,20 +372,20 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // ── Bottom Sheet Details ──
   const renderSelectedDayDetails = () => (
     <View style={styles.detailsSection}>
-      {activeHabitsForSelectedDate.length > 0 && (
+      {selectedDayStats.total > 0 && (
         <View style={styles.detailsStatRow}>
           <Typography variant="mono" style={styles.detailsSubtitle}>
-            {completedCountForSelectedDate} / {activeHabitsForSelectedDate.length} HABITS COMPLETED
+            {selectedDayStats.completed} / {selectedDayStats.total} HABITS COMPLETED
           </Typography>
         </View>
       )}
-      {activeHabitsForSelectedDate.length === 0 ? (
+      {selectedDayStats.total === 0 ? (
         <BrutalistCard style={styles.emptyCard}>
           <Typography variant="bodyBold" style={styles.emptyText}>NO HABITS SCHEDULED</Typography>
         </BrutalistCard>
       ) : (
-        activeHabitsForSelectedDate.map((habit) => (
-          <ReadOnlyHabitItem key={habit.id} habitId={habit.id} dateStr={selectedDateString} />
+        selectedDayStats.entries.map((entry) => (
+          <ReadOnlyHabitItem key={entry.habitId} entry={entry} dateStr={selectedDateString} />
         ))
       )}
     </View>

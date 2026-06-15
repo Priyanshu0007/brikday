@@ -1,28 +1,28 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { habitsState$, appActions } from '@/state/store';
+import { todayLog$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
-import {
-  getLocalDateString,
-  isHabitActiveOnDate,
-} from '@/utils/date';
+import { BrutalistButton } from '@/ui/BrutalistButton';
 
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
 const HabitItem = observer(({ habitId }: { habitId: string }) => {
-  const item$ = habitsState$.find((h) => h.id.get() === habitId);
-  if (!item$) return null;
+  const log = todayLog$.get();
+  if (!log) return null;
 
-  const title = item$.title.get();
-  const completedDates = item$.completedDates.get() || [];
-  const todayStr = getLocalDateString();
-  const isCompleted = completedDates.includes(todayStr);
-  const isNeglected = item$.neglected.get() && !isCompleted;
+  const entryIndex = log.entries.findIndex(e => e.habitId === habitId);
+  if (entryIndex === -1) return null;
+
+  const title = todayLog$.entries[entryIndex].title.get();
+  const isCompleted = todayLog$.entries[entryIndex].completed.get();
+  
+  // neglected status only depends on yesterday, and is cleared when completed today
+  const isNeglected = React.useMemo(() => appActions.isHabitNeglected(habitId) && !isCompleted, [habitId, isCompleted]);
 
   // Reanimated styles
   const textAnimatedStyle = useAnimatedStyle(() => {
@@ -89,39 +89,8 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
 });
 
 export const HabitsScreen = observer(function HabitsScreen() {
-  const habits = habitsState$.get();
-
-  // Synchronize Legend State persistence on load
-  useEffect(() => {
-    const todayStr = getLocalDateString();
-    const yesterdayStr = getLocalDateString(new Date(Date.now() - 86400000));
-
-    habitsState$.get().forEach((h, index) => {
-      const completedDates = h.completedDates || [];
-      const hasToday = completedDates.includes(todayStr);
-      const hasYesterday = completedDates.includes(yesterdayStr);
-
-      const obsHabit = habitsState$[index];
-
-      // Sync completed
-      if (h.completed !== hasToday) {
-        obsHabit.completed.set(hasToday);
-      }
-
-      // Sync neglected
-      const isYesterdayActive = isHabitActiveOnDate(h, new Date(Date.now() - 86400000));
-      const shouldBeNeglected = isYesterdayActive && !hasYesterday && !hasToday;
-      if (h.neglected !== shouldBeNeglected) {
-        obsHabit.neglected.set(shouldBeNeglected);
-      }
-    });
-  }, []);
-
-  // Filter habit IDs for today's active habits
-  const habitIds = React.useMemo(
-    () => habits.filter(h => isHabitActiveOnDate(h, new Date())).map((h) => h.id),
-    [habits]
-  );
+  const log = todayLog$.get();
+  const habitIds = log?.entries.map(e => e.habitId) || [];
 
   const renderItem = React.useCallback(
     ({ item }: { item: string }) => <HabitItem habitId={item} />,
@@ -140,14 +109,32 @@ export const HabitsScreen = observer(function HabitsScreen() {
         </Typography>
       </View>
 
-      {/* High performance LegendList */}
-      <LegendList
-        data={habitIds}
-        renderItem={renderItem}
-        keyExtractor={(item) => item}
-        contentContainerStyle={styles.listContent}
-        style={styles.list}
-      />
+      {!log ? (
+        <BrutalistCard style={{ marginTop: 24, alignItems: 'center', paddingVertical: 40 }} backgroundColor="#FFFFFF">
+          <Typography variant="h3" uppercase style={{ textAlign: 'center', marginBottom: 12 }}>
+            A New Day Begins
+          </Typography>
+          <Typography variant="body" style={{ textAlign: 'center', color: BRUTALIST_THEME.colors.textMuted, marginBottom: 24 }}>
+            Ready to crush your goals today? Pull your latest habits and start tracking.
+          </Typography>
+          <BrutalistButton 
+            onPress={() => appActions.generateDailyLogIfMissing()}
+            backgroundColor={BRUTALIST_THEME.colors.success}
+            style={{ minWidth: 200 }}
+          >
+            START DAY
+          </BrutalistButton>
+        </BrutalistCard>
+      ) : (
+        /* High performance LegendList */
+        <LegendList
+          data={habitIds}
+          renderItem={renderItem}
+          keyExtractor={(item) => item}
+          contentContainerStyle={styles.listContent}
+          style={styles.list}
+        />
+      )}
     </View>
   );
 });

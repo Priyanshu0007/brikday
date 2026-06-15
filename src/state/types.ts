@@ -1,14 +1,27 @@
 export type ScheduleType = 'daily' | 'alternate_days' | 'specific_days';
 
-export interface Habit {
+export interface HabitTemplate {
   id: string;
   title: string;
-  completed: boolean;
-  neglected: boolean;
+  emoji?: string;
   scheduleType: ScheduleType;
   specificDays: number[]; // 0 for Sunday, 1 for Monday, etc.
-  startDate: number; // For alternate_days calculation
-  completedDates?: string[]; // Array of 'YYYY-MM-DD' strings
+  startDate: number; // timestamp
+  createdAt: number; // timestamp
+  archivedAt?: number; // timestamp
+}
+
+export interface DailyHabitEntry {
+  habitId: string;
+  title: string;
+  completed: boolean;
+  completedAt?: number;
+}
+
+export interface DailyLog {
+  date: string; // 'YYYY-MM-DD' in local timezone
+  entries: DailyHabitEntry[];
+  generatedAt: number; // timestamp
 }
 
 export interface SavingTransaction {

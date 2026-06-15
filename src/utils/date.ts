@@ -1,4 +1,4 @@
-import { Habit } from '@/state/types';
+import { HabitTemplate } from '@/state/types';
 
 /**
  * Returns a timezone-safe date string in the format YYYY-MM-DD for a local Date object.
@@ -21,7 +21,7 @@ export const parseLocalDateString = (str: string): Date => {
 /**
  * Checks if a habit is active on a given local Date.
  */
-export const isHabitActiveOnDate = (habit: Habit, date: Date): boolean => {
+export const isHabitActiveOnDate = (habit: HabitTemplate, date: Date): boolean => {
   const startOf = (d: Date) => {
     const copy = new Date(d);
     copy.setHours(0, 0, 0, 0);
@@ -33,6 +33,9 @@ export const isHabitActiveOnDate = (habit: Habit, date: Date): boolean => {
 
   // Habit was not yet created relative to the target date
   if (targetTime < startTime) return false;
+  
+  // If archived before target date, it is not active
+  if (habit.archivedAt && targetTime >= startOf(new Date(habit.archivedAt))) return false;
 
   if (habit.scheduleType === 'daily' || !habit.scheduleType) return true;
 
@@ -48,24 +51,6 @@ export const isHabitActiveOnDate = (habit: Habit, date: Date): boolean => {
   }
 
   return true;
-};
-
-/**
- * Calculates completion rate, completed count, active list, and total active habits on a given day.
- */
-export const getDayCompletionStats = (habits: Habit[], date: Date) => {
-  const dateStr = getLocalDateString(date);
-  const activeHabits = habits.filter(h => isHabitActiveOnDate(h, date));
-  if (activeHabits.length === 0) {
-    return { completedCount: 0, totalCount: 0, ratio: 0, activeHabits };
-  }
-  const completedCount = activeHabits.filter(h => h.completedDates?.includes(dateStr)).length;
-  return {
-    completedCount,
-    totalCount: activeHabits.length,
-    ratio: completedCount / activeHabits.length,
-    activeHabits,
-  };
 };
 
 /**

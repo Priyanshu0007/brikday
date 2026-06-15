@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, AppState } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { PlusJakartaSans_400Regular, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
@@ -9,6 +9,8 @@ import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { setupDevMenu } from '@/state/devtool';
+import { migrateToLogSystem } from '@/state/migration';
+import { appActions } from '@/state/store';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,6 +19,20 @@ export default function TabLayout() {
     if (__DEV__) {
       setupDevMenu();
     }
+    
+    // Run one-time migration and init daily log
+    migrateToLogSystem();
+    appActions.loadTodayLog();
+    
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState === 'active') {
+        appActions.loadTodayLog();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
   const [loaded, error] = useFonts({
     'SpaceGrotesk-Bold': SpaceGrotesk_700Bold,
