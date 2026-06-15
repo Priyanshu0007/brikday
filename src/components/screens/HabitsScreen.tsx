@@ -1,13 +1,14 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { todayLog$, appActions } from '@/state/store';
+import { todayLog$, appActions, habitTemplates$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
+import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
 
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
@@ -92,6 +93,16 @@ export const HabitsScreen = observer(function HabitsScreen() {
   const log = todayLog$.get();
   const habitIds = log?.entries.map(e => e.habitId) || [];
 
+  const templates = habitTemplates$.get() || [];
+  const activeToday = React.useMemo(() => {
+    return templates.filter(t => isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
+  }, [templates]);
+
+  const todayStr = React.useMemo(() => {
+    const today = new Date();
+    return `${getDayName(today)} // ${getMonthShortName(today)} ${today.getDate()}`;
+  }, []);
+
   const renderItem = React.useCallback(
     ({ item }: { item: string }) => <HabitItem habitId={item} />,
     []
@@ -110,21 +121,68 @@ export const HabitsScreen = observer(function HabitsScreen() {
       </View>
 
       {!log ? (
-        <BrutalistCard style={{ marginTop: 24, alignItems: 'center', paddingVertical: 40 }} backgroundColor="#FFFFFF">
-          <Typography variant="h3" uppercase style={{ textAlign: 'center', marginBottom: 12 }}>
-            A New Day Begins
-          </Typography>
-          <Typography variant="body" style={{ textAlign: 'center', color: BRUTALIST_THEME.colors.textMuted, marginBottom: 24 }}>
-            Ready to crush your goals today? Pull your latest habits and start tracking.
-          </Typography>
-          <BrutalistButton 
-            onPress={() => appActions.generateDailyLogIfMissing()}
-            backgroundColor={BRUTALIST_THEME.colors.success}
-            style={{ minWidth: 200 }}
-          >
-            START DAY
-          </BrutalistButton>
-        </BrutalistCard>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContainer}
+        >
+          <BrutalistCard style={styles.emptyCard} backgroundColor="#FFFFFF">
+            <View style={styles.emptyCardContent}>
+              {/* Sticker Badge */}
+              <View style={styles.badgeContainer}>
+                <Typography style={styles.badgeEmoji}>🧱</Typography>
+              </View>
+
+              {/* Date Tag */}
+              <View style={styles.dateTag}>
+                <Typography variant="mono" style={styles.dateTagText}>
+                  {todayStr}
+                </Typography>
+              </View>
+
+              <Typography variant="h3" uppercase style={styles.cardTitle}>
+                A New Day Begins
+              </Typography>
+              <Typography variant="body" style={styles.cardDescription}>
+                Ready to crush your goals today? Pull your latest habits and start tracking.
+              </Typography>
+
+              {/* Habit Preview Section */}
+              <View style={styles.previewSection}>
+                <Typography variant="mono" style={styles.previewTitle}>
+                  {activeToday.length > 0 
+                    ? `TODAY'S BUILD LIST (${activeToday.length})`
+                    : 'NO HABITS SCHEDULED'}
+                </Typography>
+                
+                {activeToday.length > 0 ? (
+                  <View style={styles.previewGrid}>
+                    {activeToday.map((habit) => (
+                      <View key={habit.id} style={styles.habitBadge}>
+                        <Typography variant="caption" style={styles.habitBadgeBullet}>⚡</Typography>
+                        <Typography variant="mono" style={styles.habitBadgeText} numberOfLines={1}>
+                          {habit.title}
+                        </Typography>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Typography variant="body" style={styles.noHabitsText}>
+                    You don't have any habits scheduled for today. Add templates in settings or manage them!
+                  </Typography>
+                )}
+              </View>
+
+              <BrutalistButton 
+                onPress={() => appActions.generateDailyLogIfMissing()}
+                backgroundColor={BRUTALIST_THEME.colors.success}
+                style={styles.startBtn}
+                size="lg"
+              >
+                START DAY ➔
+              </BrutalistButton>
+            </View>
+          </BrutalistCard>
+        </ScrollView>
       ) : (
         /* High performance LegendList */
         <LegendList
@@ -196,5 +254,120 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: '#000000',
     marginTop: -1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 100,
+  },
+  // Beautified Start Day Card styles
+  emptyCard: {
+    marginTop: 24,
+  },
+  emptyCardContent: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+  },
+  badgeContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: BRUTALIST_THEME.colors.warning,
+    borderWidth: 3,
+    borderColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 3,
+  },
+  badgeEmoji: {
+    fontSize: 32,
+  },
+  dateTag: {
+    backgroundColor: '#000000',
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginBottom: 16,
+  },
+  dateTagText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontFamily: BRUTALIST_THEME.fonts.mono,
+    letterSpacing: 1,
+  },
+  cardTitle: {
+    textAlign: 'center',
+    marginBottom: 8,
+    fontSize: 20,
+  },
+  cardDescription: {
+    textAlign: 'center',
+    color: BRUTALIST_THEME.colors.textMuted,
+    marginBottom: 24,
+    fontSize: 13,
+    lineHeight: 18,
+    paddingHorizontal: 8,
+  },
+  previewSection: {
+    alignSelf: 'stretch',
+    backgroundColor: BRUTALIST_THEME.colors.paper,
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 4,
+    padding: 12,
+    marginBottom: 24,
+  },
+  previewTitle: {
+    fontSize: 10,
+    fontFamily: BRUTALIST_THEME.fonts.heading,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 10,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  previewGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  habitBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    shadowColor: '#000000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 2,
+  },
+  habitBadgeBullet: {
+    fontSize: 10,
+    marginRight: 4,
+  },
+  habitBadgeText: {
+    fontSize: 9,
+    fontFamily: BRUTALIST_THEME.fonts.mono,
+    fontWeight: 'bold',
+  },
+  noHabitsText: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: BRUTALIST_THEME.colors.textMuted,
+  },
+  startBtn: {
+    marginTop: 8,
+    minWidth: 220,
   },
 });
