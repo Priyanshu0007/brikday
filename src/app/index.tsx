@@ -7,6 +7,7 @@ import { userState$, uiState$, authState$, statsState$ } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { OnboardingScreen } from '@/components/screens/onboarding';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { LoginScreen } from '@/components/screens/LoginScreen';
 import { HabitsScreen } from '@/components/screens/HabitsScreen';
 import { VaultScreen } from '@/components/screens/vault';
@@ -134,7 +135,8 @@ export default observer(function HomeScreen() {
       case 'onboarding':
         return <OnboardingScreen />;
       case 'login':
-        return <LoginScreen />;
+        // return <LoginScreen />;
+        return <AppDashboard />;
       case 'authenticated':
       default:
         return <AppDashboard />;
