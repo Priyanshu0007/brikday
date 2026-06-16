@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
 import { BRUTALIST_THEME } from '@/ui/theme';
+import { StyleSheet } from 'react-native-unistyles';
 
 export const styles = StyleSheet.create({
   safeArea: {

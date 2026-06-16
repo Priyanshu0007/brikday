@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
-import { observer } from '@legendapp/state/react';
-import { habitTemplates$, appActions } from '@/state/store';
+import { appActions, habitTemplates$ } from '@/state/store';
+import { DailyHabitEntry } from '@/state/types';
+import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
+import { BrutalistCard } from '@/ui/BrutalistCard';
+import { triggerHaptic } from '@/ui/haptics';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
-import { BrutalistCard } from '@/ui/BrutalistCard';
-import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
-import { PressableScale } from 'pressto';
-import { triggerHaptic } from '@/ui/haptics';
-import { DailyHabitEntry } from '@/state/types';
 import {
-  getLocalDateString,
-  isHabitActiveOnDate,
-  getWeekDates,
-  getMonthGrid,
-  isSameDay,
   getDayName,
-  getMonthShortName,
+  getLocalDateString,
   getMonthFullName,
+  getMonthGrid,
+  getMonthShortName,
+  getWeekDates,
+  isSameDay
 } from '@/utils/date';
+import { observer } from '@legendapp/state/react';
+import { PressableScale } from 'pressto';
+import React, { useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import { StyleSheet } from 'react-native-unistyles';
 
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 

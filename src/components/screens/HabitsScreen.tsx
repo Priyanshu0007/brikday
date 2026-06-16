@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';

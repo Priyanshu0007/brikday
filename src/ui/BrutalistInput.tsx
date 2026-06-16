@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TextInputProps, StyleProp, ViewStyle } from 'react-native';
+import { View, TextInput, TextInputProps, StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { BRUTALIST_THEME } from './theme';
 import { Typography } from './Typography';
 

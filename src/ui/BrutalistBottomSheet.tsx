@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/immutability */
 "use no memo";
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BRUTALIST_THEME } from './theme';
@@ -77,4 +78,3 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
 });
-

@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, ViewStyle, StyleProp, ActivityIndicator } from 'react-native';
+import { View, ViewStyle, StyleProp, ActivityIndicator } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { createAnimatedPressable } from 'pressto';
 import { triggerHaptic, HapticFeedbackType } from './haptics';
 import { BRUTALIST_THEME } from './theme';

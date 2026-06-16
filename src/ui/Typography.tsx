@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, TextProps, StyleSheet, StyleProp, TextStyle } from 'react-native';
+import { Text, TextProps, StyleProp, TextStyle } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { BRUTALIST_THEME } from './theme';
 
 interface TypographyProps extends TextProps {
@@ -20,15 +21,8 @@ export function Typography({
   const isHeading = ['h1', 'h2', 'h3'].includes(variant);
   const textTransform = (uppercase || (isHeading && uppercase !== false) ? 'uppercase' : undefined) as TextStyle['textTransform'];
 
-  const fontStyle = StyleSheet.flatten([
-    styles.base,
-    styles[variant],
-    { color, textTransform },
-    style,
-  ]);
-
   return (
-    <Text style={fontStyle} {...props}>
+    <Text style={[styles.base, styles[variant], { color, textTransform }, style]} {...props}>
       {children}
     </Text>
   );

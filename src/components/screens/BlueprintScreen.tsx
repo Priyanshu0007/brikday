@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { observer } from '@legendapp/state/react';
 import { blueprintState$, appActions } from '@/state/store';
 import { BRUTALIST_THEME } from '@/ui/theme';

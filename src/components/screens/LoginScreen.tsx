@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { appActions } from '@/state/store';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CONTAINER_WIDTH = Math.min(SCREEN_WIDTH, 480);
 
 export function LoginScreen() {
   const [username, setUsername] = useState('SDE-1, React Native');
@@ -101,7 +99,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    maxWidth: CONTAINER_WIDTH,
+    maxWidth: 480,
     alignSelf: 'center',
     paddingVertical: 20,
   },

@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, StatusBar } from 'react-native';
+import { View, StatusBar } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';

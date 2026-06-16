@@ -1,3 +1,4 @@
+import '@/unistyles';
 import { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import { useColorScheme, AppState } from 'react-native';
