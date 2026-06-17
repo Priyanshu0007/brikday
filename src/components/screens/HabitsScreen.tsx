@@ -190,6 +190,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
           data={habitIds}
           renderItem={renderItem}
           keyExtractor={(item) => item}
+          recycleItems={false}
           contentContainerStyle={styles.listContent}
           style={styles.list}
         />

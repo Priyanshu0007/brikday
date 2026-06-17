@@ -91,6 +91,7 @@ export const VaultScreen = observer(function VaultScreen() {
         data={goalIds}
         renderItem={renderGoalItem}
         keyExtractor={(item) => item}
+        recycleItems={false}
         contentContainerStyle={styles.listContent}
         style={styles.list}
       />
