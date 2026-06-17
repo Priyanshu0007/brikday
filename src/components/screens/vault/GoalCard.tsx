@@ -1,12 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
+import { useUnistyles } from 'react-native-unistyles';
 import { vaultState$ } from '@/state/store';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
-import { styles } from './styles';
+import { stylesheet } from './styles';
 
 export const GoalCard = observer(({
   goalId,
@@ -17,6 +17,7 @@ export const GoalCard = observer(({
   onAddSaving: (id: string) => void;
   onViewTransactions: (id: string) => void;
 }) => {
+  const { theme } = useUnistyles();
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
   if (!goal$) return null;
 
@@ -28,37 +29,37 @@ export const GoalCard = observer(({
   const percentage = Math.round(progress * 100);
 
   return (
-    <BrutalistCard style={styles.cardSpacing} backgroundColor="#FFFFFF">
-      <View style={styles.sliderContainer}>
-        <View style={styles.sliderHeader}>
+    <BrutalistCard style={stylesheet.cardSpacing} backgroundColor={theme.colors.background}>
+      <View style={stylesheet.sliderContainer}>
+        <View style={stylesheet.sliderHeader}>
           <Typography variant="bodyBold">{title}</Typography>
-          <Typography variant="mono" style={styles.percentBadge}>
+          <Typography variant="mono" style={stylesheet.percentBadge}>
             {percentage}%
           </Typography>
         </View>
 
-        <Typography variant="caption" style={styles.savedCaption}>
+        <Typography variant="caption" style={stylesheet.savedCaption}>
           ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED
         </Typography>
 
         {/* Static Progress Bar */}
-        <View style={styles.staticTrackContainer}>
-          <View style={styles.track}>
-            <View style={[styles.progressFill, { width: `${Math.min(percentage, 100)}%` }]} />
+        <View style={stylesheet.staticTrackContainer}>
+          <View style={stylesheet.track}>
+            <View style={[stylesheet.progressFill, { width: `${Math.min(percentage, 100)}%` }]} />
           </View>
         </View>
 
         {/* Action Buttons */}
-        <View style={styles.buttonRow}>
+        <View style={stylesheet.buttonRow}>
           <View style={{ flex: 1 }}>
             <BrutalistButton
               onPress={() => onAddSaving(goalId)}
-              backgroundColor={BRUTALIST_THEME.colors.success}
+              backgroundColor={theme.colors.success}
               size="sm"
             >
               <Typography
                 variant="bodyBold"
-                style={styles.buttonText}
+                style={stylesheet.buttonText}
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
@@ -69,12 +70,12 @@ export const GoalCard = observer(({
           <View style={{ flex: 1 }}>
             <BrutalistButton
               onPress={() => onViewTransactions(goalId)}
-              backgroundColor={BRUTALIST_THEME.colors.warning}
+              backgroundColor={theme.colors.warning}
               size="sm"
             >
               <Typography
                 variant="bodyBold"
-                style={styles.buttonText}
+                style={stylesheet.buttonText}
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >

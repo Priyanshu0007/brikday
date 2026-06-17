@@ -1,10 +1,9 @@
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { StyleSheet } from 'react-native-unistyles';
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
-    backgroundColor: BRUTALIST_THEME.colors.background,
+    backgroundColor: theme.colors.background,
   },
   wrapper: {
     flex: 1,
@@ -20,11 +19,11 @@ export const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 36,
     lineHeight: 40,
-    color: BRUTALIST_THEME.colors.text,
+    color: theme.colors.text,
     letterSpacing: -1,
   },
   brandSubtitle: {
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     fontSize: 11,
     marginTop: 4,
     letterSpacing: 1.5,
@@ -59,10 +58,10 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 28,
     marginBottom: 8,
-    color: BRUTALIST_THEME.colors.text,
+    color: theme.colors.text,
   },
   slideDescription: {
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     lineHeight: 22,
     marginBottom: 16,
     fontSize: 14,
@@ -100,9 +99,9 @@ export const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderWidth: 2.5,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     borderRadius: 3,
-    backgroundColor: BRUTALIST_THEME.colors.success,
+    backgroundColor: theme.colors.success,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -115,22 +114,22 @@ export const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderWidth: 2.5,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     borderRadius: 3,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.colors.background,
   },
   doneText: {
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid',
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
   },
 
   // Progress bar (Slide 2)
   progressBarBg: {
     height: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background,
     borderWidth: 2,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     borderRadius: 2,
     marginTop: 8,
     overflow: 'hidden',
@@ -154,12 +153,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeTag: {
-    backgroundColor: BRUTALIST_THEME.colors.success + '30',
+    backgroundColor: theme.colors.success + '30',
     borderRadius: 3,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderWidth: 1.5,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
   },
   activeTagText: {
     fontSize: 9,
@@ -192,23 +191,23 @@ export const styles = StyleSheet.create({
   motivationBox: {
     marginTop: 16,
     borderTopWidth: 2,
-    borderTopColor: BRUTALIST_THEME.colors.border,
+    borderTopColor: theme.colors.border,
     paddingTop: 12,
   },
   motivationText: {
     textAlign: 'center',
     fontSize: 10,
     lineHeight: 16,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 0.8,
   },
 
   // Tip box
   tipBox: {
     marginTop: 12,
-    backgroundColor: BRUTALIST_THEME.colors.paper,
+    backgroundColor: theme.colors.paper,
     borderWidth: 1.5,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
     borderRadius: 3,
     paddingVertical: 8,
@@ -217,16 +216,16 @@ export const styles = StyleSheet.create({
   tipText: {
     fontSize: 10,
     textAlign: 'center',
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
   },
 
   // Pill badge
   pillBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#EDE9FE',
+    backgroundColor: theme.colors.paper,
     borderRadius: 3,
     borderWidth: 2,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     paddingHorizontal: 10,
     paddingVertical: 4,
     marginBottom: 12,
@@ -235,6 +234,7 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1,
+    color: theme.colors.text,
   },
 
   // Footer
@@ -256,7 +256,7 @@ export const styles = StyleSheet.create({
   pageCounter: {
     textAlign: 'center',
     fontSize: 10,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
   },
   skipButton: {
     alignSelf: 'center',
@@ -268,4 +268,4 @@ export const styles = StyleSheet.create({
     color: '#999',
     textDecorationLine: 'underline',
   },
-});
+}));

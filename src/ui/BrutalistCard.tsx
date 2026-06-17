@@ -1,10 +1,9 @@
 import React from 'react';
 import { View, ViewStyle, StyleProp } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { createAnimatedPressable } from 'pressto';
 import { triggerHaptic, HapticFeedbackType } from './haptics';
-import { BRUTALIST_THEME } from './theme';
 
 const PressableBrutalist4 = createAnimatedPressable((progress) => {
   'worklet';
@@ -38,18 +37,21 @@ interface BrutalistCardProps {
 
 export function BrutalistCard({
   children,
-  backgroundColor = BRUTALIST_THEME.colors.paper,
+  backgroundColor,
   style,
   neglected = false,
   accentColor,
   onPress,
   hapticFeedback = 'soft',
 }: BrutalistCardProps) {
+  const { theme } = useUnistyles();
   
+  const finalBackgroundColor = backgroundColor || theme.colors.paper;
+
   // When neglected, the card decays: turns background to danger red, but keeps same shadow offset for alignment.
   const activeBgColor = neglected 
-    ? BRUTALIST_THEME.colors.danger 
-    : (accentColor || backgroundColor);
+    ? theme.colors.danger 
+    : (accentColor || finalBackgroundColor);
   
   const offset = 4;
 
@@ -70,7 +72,7 @@ export function BrutalistCard({
   return (
     <View 
       style={[
-        styles.cardWrapper, 
+        stylesheet.cardWrapper, 
         style, 
         { paddingRight: offset, paddingBottom: offset }
       ]}
@@ -78,12 +80,12 @@ export function BrutalistCard({
       {/* Shadow layer behind */}
       <View
         style={[
-          styles.shadowLayer,
+          stylesheet.shadowLayer,
           {
             top: offset,
             left: offset,
-            borderRadius: BRUTALIST_THEME.borderRadius,
-            backgroundColor: BRUTALIST_THEME.colors.border,
+            borderRadius: theme.borderRadius,
+            backgroundColor: theme.colors.border,
           },
         ]}
       />
@@ -93,7 +95,7 @@ export function BrutalistCard({
       <PressableWrapper onPress={onPress ? handlePress : undefined}>
         <Animated.View
           style={[
-            styles.card,
+            stylesheet.card,
             animatedCardStyle,
           ]}
         >
@@ -104,7 +106,7 @@ export function BrutalistCard({
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
   cardWrapper: {
     alignSelf: 'stretch',
     marginVertical: 6,
@@ -116,9 +118,9 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   card: {
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
     padding: 16,
   },
-});
+}));

@@ -3,18 +3,19 @@ import React, { useState } from 'react';
 import { View, ScrollView, Alert } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
+import { useUnistyles } from 'react-native-unistyles';
 import { vaultState$, appActions } from '@/state/store';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { GoalCard } from './GoalCard';
 import { GoalHistorySheet } from './GoalHistorySheet';
-import { styles } from './styles';
+import { stylesheet } from './styles';
 
 export const VaultScreen = observer(function VaultScreen() {
   const goals = vaultState$.get();
+  const { theme } = useUnistyles();
 
   const [addSavingVisible, setAddSavingVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
@@ -69,19 +70,19 @@ export const VaultScreen = observer(function VaultScreen() {
         onViewTransactions={handleViewTransactionsPress}
       />
     ),
-    [],
+    [handleAddSavingPress, handleViewTransactionsPress],
   );
 
   const selectedGoal = goals.find((g) => g.id === selectedGoalId);
 
   return (
-    <View style={styles.container}>
+    <View style={stylesheet.container}>
       {/* Title Header */}
-      <View style={styles.header}>
+      <View style={stylesheet.header}>
         <Typography variant="h2" uppercase>
           SAVINGS
         </Typography>
-        <Typography variant="mono" style={styles.subtitle}>
+        <Typography variant="mono" style={stylesheet.subtitle}>
           SAVE UP TO BUY THINGS
         </Typography>
       </View>
@@ -92,8 +93,8 @@ export const VaultScreen = observer(function VaultScreen() {
         renderItem={renderGoalItem}
         keyExtractor={(item) => item}
         recycleItems={false}
-        contentContainerStyle={styles.listContent}
-        style={styles.list}
+        contentContainerStyle={stylesheet.listContent}
+        style={stylesheet.list}
       />
 
       {/* Add Saving Bottom Sheet */}
@@ -103,7 +104,7 @@ export const VaultScreen = observer(function VaultScreen() {
           onClose={() => setAddSavingVisible(false)}
           title={`SAVE FOR ${selectedGoal.title}`}
         >
-          <ScrollView contentContainerStyle={styles.formContent} keyboardShouldPersistTaps="handled">
+          <ScrollView contentContainerStyle={stylesheet.formContent} keyboardShouldPersistTaps="handled">
             <BrutalistInput
               label="Amount ($)"
               placeholder="e.g. 500"
@@ -126,8 +127,8 @@ export const VaultScreen = observer(function VaultScreen() {
             
             <BrutalistButton
               onPress={handleSaveTransactionSubmit}
-              backgroundColor={BRUTALIST_THEME.colors.success}
-              style={styles.submitBtn}
+              backgroundColor={theme.colors.success}
+              style={stylesheet.submitBtn}
             >
               SAVE MONEY
             </BrutalistButton>

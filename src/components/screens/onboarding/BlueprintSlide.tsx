@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { SlideContent } from './SlideContent';

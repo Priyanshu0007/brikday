@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, TextInputProps, StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import { BRUTALIST_THEME } from './theme';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Typography } from './Typography';
 
 interface BrutalistInputProps extends TextInputProps {
@@ -18,6 +17,7 @@ export function BrutalistInput({
   ...props
 }: BrutalistInputProps) {
   const [focused, setFocused] = useState(false);
+  const { theme } = useUnistyles();
 
   const handleFocus = (e: any) => {
     setFocused(true);
@@ -32,9 +32,9 @@ export function BrutalistInput({
   const offset = focused ? 2 : 4;
 
   return (
-    <View style={[styles.wrapper, containerStyle]}>
+    <View style={[stylesheet.wrapper, containerStyle]}>
       {label && (
-        <Typography variant="bodyBold" style={styles.label} uppercase>
+        <Typography variant="bodyBold" style={stylesheet.label} uppercase>
           {label}
         </Typography>
       )}
@@ -42,28 +42,28 @@ export function BrutalistInput({
       {/* Outer box holding both foreground and background layers */}
       <View 
         style={[
-          styles.inputOuter, 
+          stylesheet.inputOuter, 
           { paddingRight: offset, paddingBottom: offset }
         ]}
       >
         {/* Shadow layer behind */}
         <View
           style={[
-            styles.shadowBg,
+            stylesheet.shadowBg,
             {
               top: offset,
               left: offset,
-              borderRadius: BRUTALIST_THEME.borderRadius,
-              backgroundColor: BRUTALIST_THEME.colors.border,
+              borderRadius: theme.borderRadius,
+              backgroundColor: theme.colors.border,
             },
           ]}
         />
         
         {/* Foreground input container */}
-        <View style={styles.inputContainer}>
+        <View style={stylesheet.inputContainer}>
           <TextInput
-            style={[styles.input, style]}
-            placeholderTextColor="#888888"
+            style={[stylesheet.input, style]}
+            placeholderTextColor={theme.colors.textMuted}
             onFocus={handleFocus}
             onBlur={handleBlur}
             {...props}
@@ -74,7 +74,7 @@ export function BrutalistInput({
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
   wrapper: {
     alignSelf: 'stretch',
     marginVertical: 8,
@@ -93,16 +93,16 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   inputContainer: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    backgroundColor: theme.colors.paper,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
   },
   input: {
-    fontFamily: BRUTALIST_THEME.fonts.mono,
+    fontFamily: theme.fonts.mono,
     fontSize: 15,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    color: BRUTALIST_THEME.colors.text,
+    color: theme.colors.text,
   },
-});
+}));

@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { habitTemplates$, appActions, ScheduleType } from '@/state/store';
-import { BRUTALIST_THEME } from '@/ui/theme';
+import { useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { DayPicker } from './DayPicker';
-import { styles } from './styles';
+import { stylesheet } from './styles';
 
 export const EngineEditor = observer(() => {
+  const { theme } = useUnistyles();
   const habits = habitTemplates$.get()?.filter(h => !h.archivedAt) || [];
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -58,23 +59,23 @@ export const EngineEditor = observer(() => {
 
   return (
     <View style={{ flex: 1 }}>
-      <BrutalistButton onPress={handleAdd} backgroundColor={BRUTALIST_THEME.colors.success} style={{ marginBottom: 16 }}>
+      <BrutalistButton onPress={handleAdd} backgroundColor={theme.colors.success} style={{ marginBottom: 16 }}>
         + NEW HABIT
       </BrutalistButton>
       {habits.map((habit) => (
-        <BrutalistCard key={habit.id} backgroundColor="#FFFFFF" style={{ marginBottom: 8 }}>
-          <View style={styles.listItemRow}>
-            <View style={styles.listItemContent}>
+        <BrutalistCard key={habit.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
+          <View style={stylesheet.listItemRow}>
+            <View style={stylesheet.listItemContent}>
               <Typography variant="bodyBold">{habit.title}</Typography>
-              <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted }}>
+              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
                 HOW OFTEN: {habit.scheduleType === 'alternate_days' ? 'EVERY OTHER DAY' : habit.scheduleType === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY'}
               </Typography>
             </View>
-            <View style={styles.listItemActions}>
-              <BrutalistButton onPress={() => handleEdit(habit.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.warning}>
+            <View style={stylesheet.listItemActions}>
+              <BrutalistButton onPress={() => handleEdit(habit.id)} size="sm" backgroundColor={theme.colors.warning}>
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => setDeletingId(habit.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
+              <BrutalistButton onPress={() => setDeletingId(habit.id)} size="sm" backgroundColor={theme.colors.danger}>
                 DEL
               </BrutalistButton>
             </View>
@@ -87,7 +88,7 @@ export const EngineEditor = observer(() => {
         onClose={() => { setEditingId(null); setIsAdding(false); }}
         title={isAdding ? 'NEW HABIT' : 'EDIT HABIT'}
       >
-        <View style={styles.formContainer}>
+        <View style={stylesheet.formContainer}>
           <BrutalistInput
             label="HABIT NAME"
             value={title}
@@ -98,7 +99,7 @@ export const EngineEditor = observer(() => {
           <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
             HOW OFTEN
           </Typography>
-          <View style={styles.segmentedControl}>
+          <View style={stylesheet.segmentedControl}>
             {(['daily', 'alternate_days', 'specific_days'] as ScheduleType[]).map((type) => {
               const label = type === 'alternate_days' ? 'OTHER DAYS' : type === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY';
               const isActive = scheduleType === type;
@@ -106,7 +107,7 @@ export const EngineEditor = observer(() => {
                 <BrutalistButton
                   key={type}
                   onPress={() => setScheduleType(type)}
-                  backgroundColor={isActive ? BRUTALIST_THEME.colors.warning : '#FFFFFF'}
+                  backgroundColor={isActive ? theme.colors.warning : theme.colors.background}
                   size="sm"
                   style={{ flex: 1, marginHorizontal: 2 }}
                 >
@@ -127,7 +128,7 @@ export const EngineEditor = observer(() => {
 
           <BrutalistButton
             onPress={handleSave}
-            backgroundColor={BRUTALIST_THEME.colors.success}
+            backgroundColor={theme.colors.success}
             style={{ marginTop: 20 }}
           >
             SAVE
@@ -140,15 +141,15 @@ export const EngineEditor = observer(() => {
         onClose={() => setDeletingId(null)}
         title="CONFIRM DELETION"
       >
-        <View style={styles.formContainer}>
+        <View style={stylesheet.formContainer}>
           <Typography variant="body" style={{ marginBottom: 20 }}>
             Are you sure you want to delete this habit? This action cannot be undone.
           </Typography>
-          <View style={styles.formActions}>
-            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
+          <View style={stylesheet.formActions}>
+            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={theme.colors.paper} style={{ flex: 1 }}>
               CANCEL
             </BrutalistButton>
-            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={BRUTALIST_THEME.colors.danger} style={{ flex: 1 }}>
+            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={theme.colors.danger} style={{ flex: 1 }}>
               DELETE
             </BrutalistButton>
           </View>

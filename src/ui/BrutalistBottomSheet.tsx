@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/immutability */
 "use no memo";
-import React, { useRef, useEffect } from 'react';
-import { View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import React, { useEffect, useRef } from 'react';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BRUTALIST_THEME } from './theme';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Typography } from './Typography';
 
 interface BrutalistBottomSheetProps {
@@ -23,6 +22,7 @@ export function BrutalistBottomSheet({
 }: BrutalistBottomSheetProps) {
   const sheetRef = useRef<TrueSheet>(null);
   const isPresented = useRef(false);
+  const { theme } = useUnistyles();
 
   useEffect(() => {
     if (visible) {
@@ -42,19 +42,19 @@ export function BrutalistBottomSheet({
         isPresented.current = false;
         onClose();
       }}
-      backgroundColor={BRUTALIST_THEME.colors.paper}
-      cornerRadius={BRUTALIST_THEME.borderRadius}
+      backgroundColor={theme.colors.paper}
+      cornerRadius={theme.borderRadius}
     >
-      <View style={styles.sheetContent}>
+      <View style={stylesheet.sheetContent}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={stylesheet.header}>
           <Typography variant="h2" uppercase>
             {title}
           </Typography>
         </View>
 
         {/* Content - wrapped in GestureHandlerRootView for pressto buttons */}
-        <GestureHandlerRootView style={styles.content}>
+        <GestureHandlerRootView style={stylesheet.content}>
           {children}
         </GestureHandlerRootView>
       </View>
@@ -62,7 +62,7 @@ export function BrutalistBottomSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
   sheetContent: {
     paddingBottom: 16,
     paddingHorizontal: 16,
@@ -70,11 +70,11 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: 16,
     borderBottomWidth: 2,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     marginBottom: 20,
     marginTop: 8,
   },
   content: {
     paddingBottom: 0,
   },
-});
+}));

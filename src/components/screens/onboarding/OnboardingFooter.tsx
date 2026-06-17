@@ -3,11 +3,11 @@ import { View, Pressable } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
 import { Typography } from '@/ui/Typography';
 import { BrutalistButton } from '@/ui/BrutalistButton';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { appActions } from '@/state/store';
 import { AnimatedDot } from './AnimatedDot';
 import { TOTAL_SLIDES } from './constants';
 import { styles } from './styles';
+import { useUnistyles } from 'react-native-unistyles';
 
 interface OnboardingFooterProps {
   currentPage: number;
@@ -16,6 +16,8 @@ interface OnboardingFooterProps {
 }
 
 export function OnboardingFooter({ currentPage, activeIndex, onNext }: OnboardingFooterProps) {
+  const { theme } = useUnistyles();
+
   const getButtonLabel = () => {
     if (currentPage === TOTAL_SLIDES - 1) return 'GET STARTED';
     if (currentPage === 0) return 'SEE HOW IT WORKS';
@@ -23,8 +25,8 @@ export function OnboardingFooter({ currentPage, activeIndex, onNext }: Onboardin
   };
 
   const getButtonColor = () => {
-    if (currentPage === TOTAL_SLIDES - 1) return BRUTALIST_THEME.colors.success;
-    return BRUTALIST_THEME.colors.warning;
+    if (currentPage === TOTAL_SLIDES - 1) return theme.colors.success;
+    return theme.colors.warning;
   };
 
   return (

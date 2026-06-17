@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
+import { useUnistyles } from 'react-native-unistyles';
 import { SlideContent } from './SlideContent';
 import { styles } from './styles';
 
@@ -11,6 +12,7 @@ interface WelcomeSlideProps {
 }
 
 export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
+  useUnistyles();
   return (
     <SlideContent index={0} activeIndex={activeIndex}>
         <View style={styles.welcomeEmoji}>

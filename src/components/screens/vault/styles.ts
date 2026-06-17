@@ -1,18 +1,18 @@
 import { StyleSheet } from 'react-native-unistyles';
-import { BRUTALIST_THEME } from '@/ui/theme';
 
-export const styles = StyleSheet.create({
+export const stylesheet = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 12,
+    backgroundColor: theme.colors.background,
   },
   header: {
     marginBottom: 16,
   },
   subtitle: {
     fontSize: 10,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 4,
   },
   list: {
@@ -34,8 +34,8 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   percentBadge: {
-    backgroundColor: BRUTALIST_THEME.colors.border,
-    color: '#FFFFFF',
+    backgroundColor: theme.colors.border,
+    color: theme.colors.background,
     paddingHorizontal: 6,
     paddingVertical: 2,
     fontSize: 12,
@@ -43,21 +43,21 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
   },
   savedCaption: {
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     marginBottom: 12,
-    fontFamily: BRUTALIST_THEME.fonts.mono,
+    fontFamily: theme.fonts.mono,
   },
   track: {
     height: 16,
-    backgroundColor: BRUTALIST_THEME.colors.paper,
+    backgroundColor: theme.colors.paper,
     borderWidth: 2,
-    borderColor: BRUTALIST_THEME.colors.border,
+    borderColor: theme.colors.border,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: BRUTALIST_THEME.colors.warning,
+    backgroundColor: theme.colors.warning,
   },
   staticTrackContainer: {
     height: 16,
@@ -85,18 +85,18 @@ export const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: 'center',
-    fontFamily: BRUTALIST_THEME.fonts.mono,
+    fontFamily: theme.fonts.mono,
     fontSize: 12,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
   },
   txnItem: {
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
-    backgroundColor: '#FFFFFF',
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.background,
     padding: 12,
     marginVertical: 6,
-    shadowColor: BRUTALIST_THEME.colors.border,
+    shadowColor: theme.colors.border,
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 1,
     shadowRadius: 0,
@@ -109,21 +109,21 @@ export const styles = StyleSheet.create({
   },
   txnAmount: {
     fontSize: 16,
-    color: BRUTALIST_THEME.colors.success,
+    color: theme.colors.success,
   },
   txnDate: {
     fontSize: 11,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
   },
   txnSource: {
     fontSize: 11,
-    color: BRUTALIST_THEME.colors.text,
+    color: theme.colors.text,
     marginBottom: 4,
     textTransform: 'uppercase',
   },
   txnComment: {
     fontSize: 11,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     fontStyle: 'italic',
   },
   buttonText: {
@@ -131,4 +131,4 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
-});
+}));

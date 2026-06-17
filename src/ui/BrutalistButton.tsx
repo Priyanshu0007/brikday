@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, ViewStyle, StyleProp, ActivityIndicator } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { createAnimatedPressable } from 'pressto';
 import { triggerHaptic, HapticFeedbackType } from './haptics';
-import { BRUTALIST_THEME } from './theme';
 import { Typography } from './Typography';
 
 const PressableBrutalist = createAnimatedPressable((progress) => {
@@ -31,15 +30,19 @@ interface BrutalistButtonProps {
 export function BrutalistButton({
   children,
   onPress,
-  backgroundColor = BRUTALIST_THEME.colors.warning,
-  textColor = BRUTALIST_THEME.colors.text,
+  backgroundColor,
+  textColor,
   style,
   disabled = false,
   loading = false,
   size = 'md',
   hapticFeedback = 'light',
 }: BrutalistButtonProps) {
+  const { theme } = useUnistyles();
   
+  const finalBackgroundColor = backgroundColor || theme.colors.warning;
+  const finalTextColor = textColor || theme.colors.text;
+
   const handlePress = () => {
     if (disabled || loading) return;
     triggerHaptic(hapticFeedback);
@@ -61,32 +64,32 @@ export function BrutalistButton({
   };
 
   return (
-    <View style={[styles.outer, style]}>
-      <View style={styles.buttonOuter}>
+    <View style={[stylesheet.outer, style]}>
+      <View style={stylesheet.buttonOuter}>
         {/* Shadow Layer */}
-        <View style={styles.shadow} />
+        <View style={stylesheet.shadow} />
         
         {/* @ts-ignore */}
         <PressableBrutalist
           // @ts-ignore
           disabled={disabled || loading}
           onPress={handlePress}
-          style={styles.pressable}
+          style={stylesheet.pressable}
         >
           <View
             style={[
-              styles.button,
+              stylesheet.button,
               getPadding(),
-              { backgroundColor },
-              disabled && styles.disabled,
+              { backgroundColor: finalBackgroundColor },
+              disabled && stylesheet.disabled,
             ]}
           >
             {loading ? (
-              <ActivityIndicator color={textColor} size="small" />
+              <ActivityIndicator color={finalTextColor} size="small" />
             ) : typeof children === 'string' ? (
               <Typography 
                 variant="bodyBold" 
-                style={{ color: textColor, textAlign: 'center' }} 
+                style={{ color: finalTextColor, textAlign: 'center' }} 
                 uppercase
                 numberOfLines={1}
                 adjustsFontSizeToFit
@@ -103,7 +106,7 @@ export function BrutalistButton({
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
   outer: {
     alignSelf: 'stretch',
   },
@@ -122,13 +125,13 @@ const styles = StyleSheet.create({
     left: 4,
     right: 0,
     bottom: 0,
-    backgroundColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    backgroundColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
   },
   button: {
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -137,4 +140,4 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     backgroundColor: '#CCCCCC',
   },
-});
+}));

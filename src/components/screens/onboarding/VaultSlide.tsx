@@ -1,17 +1,19 @@
 import React from 'react';
 import { View } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { SlideContent } from './SlideContent';
 import { styles } from './styles';
+import { useUnistyles } from 'react-native-unistyles';
 
 interface VaultSlideProps {
   activeIndex: SharedValue<number>;
 }
 
 export function VaultSlide({ activeIndex }: VaultSlideProps) {
+  const { theme } = useUnistyles();
+
   return (
     <SlideContent index={2} activeIndex={activeIndex}>
         <View style={[styles.pillBadge, { backgroundColor: '#FEF3C7' }]}>
@@ -30,7 +32,7 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
           <BrutalistCard>
             <Typography variant="bodyBold">M3 MACBOOK PRO</Typography>
             <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: '60%', backgroundColor: BRUTALIST_THEME.colors.warning }]} />
+              <View style={[styles.progressBarFill, { width: '60%', backgroundColor: theme.colors.warning }]} />
             </View>
             <View style={styles.progressRow}>
               <Typography variant="caption">$2,100 saved</Typography>
@@ -38,10 +40,10 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
             </View>
           </BrutalistCard>
 
-          <BrutalistCard accentColor={BRUTALIST_THEME.colors.success}>
+          <BrutalistCard accentColor={theme.colors.success}>
             <Typography variant="bodyBold">IPAD PRO OLED</Typography>
             <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: '100%', backgroundColor: BRUTALIST_THEME.colors.success }]} />
+              <View style={[styles.progressBarFill, { width: '100%', backgroundColor: theme.colors.success }]} />
             </View>
             <View style={styles.progressRow}>
               <Typography variant="caption">$1,500 saved</Typography>

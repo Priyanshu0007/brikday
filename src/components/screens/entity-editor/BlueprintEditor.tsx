@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { blueprintState$, appActions } from '@/state/store';
-import { BRUTALIST_THEME } from '@/ui/theme';
+import { useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
-import { styles } from './styles';
+import { stylesheet } from './styles';
 
 export const BlueprintEditor = observer(() => {
+  const { theme } = useUnistyles();
   const projects = blueprintState$.get();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -53,23 +54,23 @@ export const BlueprintEditor = observer(() => {
 
   return (
     <View style={{ flex: 1 }}>
-      <BrutalistButton onPress={handleAdd} backgroundColor={BRUTALIST_THEME.colors.success} style={{ marginBottom: 16 }}>
+      <BrutalistButton onPress={handleAdd} backgroundColor={theme.colors.success} style={{ marginBottom: 16 }}>
         + NEW PROJECT
       </BrutalistButton>
       {projects.map((project) => (
-        <BrutalistCard key={project.id} backgroundColor="#FFFFFF" style={{ marginBottom: 8 }}>
-          <View style={styles.listItemRow}>
-            <View style={styles.listItemContent}>
+        <BrutalistCard key={project.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
+          <View style={stylesheet.listItemRow}>
+            <View style={stylesheet.listItemContent}>
               <Typography variant="bodyBold">{project.title}</Typography>
-              <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted }}>
+              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
                 CATEGORY: {project.category}
               </Typography>
             </View>
-            <View style={styles.listItemActions}>
-              <BrutalistButton onPress={() => handleEdit(project.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.warning}>
+            <View style={stylesheet.listItemActions}>
+              <BrutalistButton onPress={() => handleEdit(project.id)} size="sm" backgroundColor={theme.colors.warning}>
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => setDeletingId(project.id)} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
+              <BrutalistButton onPress={() => setDeletingId(project.id)} size="sm" backgroundColor={theme.colors.danger}>
                 DEL
               </BrutalistButton>
             </View>
@@ -82,7 +83,7 @@ export const BlueprintEditor = observer(() => {
         onClose={() => { setEditingId(null); setIsAdding(false); }}
         title={isAdding ? 'NEW PROJECT' : 'EDIT PROJECT'}
       >
-        <View style={styles.formContainer}>
+        <View style={stylesheet.formContainer}>
           <BrutalistInput
             label="PROJECT TITLE"
             value={title}
@@ -95,7 +96,7 @@ export const BlueprintEditor = observer(() => {
             onChangeText={setCategory}
             placeholder="e.g. WORK"
           />
-          <BrutalistButton onPress={handleSave} backgroundColor={BRUTALIST_THEME.colors.success} style={{ marginTop: 20 }}>
+          <BrutalistButton onPress={handleSave} backgroundColor={theme.colors.success} style={{ marginTop: 20 }}>
             SAVE
           </BrutalistButton>
         </View>
@@ -106,15 +107,15 @@ export const BlueprintEditor = observer(() => {
         onClose={() => setDeletingId(null)}
         title="CONFIRM DELETION"
       >
-        <View style={styles.formContainer}>
+        <View style={stylesheet.formContainer}>
           <Typography variant="body" style={{ marginBottom: 20 }}>
             Are you sure you want to delete this project?
           </Typography>
-          <View style={styles.formActions}>
-            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={BRUTALIST_THEME.colors.paper} style={{ flex: 1 }}>
+          <View style={stylesheet.formActions}>
+            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={theme.colors.paper} style={{ flex: 1 }}>
               CANCEL
             </BrutalistButton>
-            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={BRUTALIST_THEME.colors.danger} style={{ flex: 1 }}>
+            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={theme.colors.danger} style={{ flex: 1 }}>
               DELETE
             </BrutalistButton>
           </View>

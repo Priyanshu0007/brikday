@@ -1,10 +1,9 @@
 import { StyleSheet } from 'react-native-unistyles';
-import { BRUTALIST_THEME } from '@/ui/theme';
 
-export const styles = StyleSheet.create({
+export const stylesheet = StyleSheet.create((theme) => ({
   modalContainer: {
     flex: 1,
-    backgroundColor: BRUTALIST_THEME.colors.background,
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -12,30 +11,30 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 4,
-    borderBottomColor: '#000000',
-    backgroundColor: '#FFFFFF',
+    borderBottomColor: theme.colors.text,
+    backgroundColor: theme.colors.background,
   },
   tabsContainer: {
     flexDirection: 'row',
     borderBottomWidth: 2,
-    borderBottomColor: BRUTALIST_THEME.colors.border,
-    backgroundColor: BRUTALIST_THEME.colors.paper,
+    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.paper,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
     borderRightWidth: 2,
-    borderRightColor: BRUTALIST_THEME.colors.border,
+    borderRightColor: theme.colors.border,
   },
   tabActive: {
-    backgroundColor: '#000000',
+    backgroundColor: theme.colors.text,
   },
   tabText: {
-    color: '#000000',
+    color: theme.colors.text,
   },
   tabTextActive: {
-    color: '#FFFFFF',
+    color: theme.colors.background,
   },
   content: {
     flex: 1,
@@ -79,18 +78,18 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 2,
-    borderColor: '#000000',
+    borderColor: theme.colors.text,
     borderRadius: 4,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background,
   },
   dayButtonSelected: {
-    backgroundColor: '#000000',
+    backgroundColor: theme.colors.text,
   },
   dayText: {
     fontWeight: 'bold',
-    color: '#000000',
+    color: theme.colors.text,
   },
   dayTextSelected: {
-    color: '#FFFFFF',
+    color: theme.colors.background,
   },
-});
+}));

@@ -1,17 +1,19 @@
 import React from 'react';
 import { View } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { SlideContent } from './SlideContent';
 import { styles } from './styles';
+import { useUnistyles } from 'react-native-unistyles';
 
 interface EngineSlideProps {
   activeIndex: SharedValue<number>;
 }
 
 export function EngineSlide({ activeIndex }: EngineSlideProps) {
+  const { theme } = useUnistyles();
+
   return (
     <SlideContent index={1} activeIndex={activeIndex}>
         <View style={styles.pillBadge}>
@@ -27,7 +29,7 @@ export function EngineSlide({ activeIndex }: EngineSlideProps) {
 
         {/* Visual Preview */}
         <View style={styles.previewContainer}>
-          <BrutalistCard accentColor={BRUTALIST_THEME.colors.success}>
+          <BrutalistCard accentColor={theme.colors.success}>
             <View style={styles.habitPreviewRow}>
               <View style={styles.checkboxDone}>
                 <Typography variant="bodyBold" style={styles.checkmark}>✓</Typography>

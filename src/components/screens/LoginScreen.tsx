@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import { BRUTALIST_THEME } from '@/ui/theme';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistButton } from '@/ui/BrutalistButton';
@@ -11,6 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export function LoginScreen() {
   const [username, setUsername] = useState('SDE-1, React Native');
   const [password, setPassword] = useState('********');
+
+  const { theme } = useUnistyles();
 
   const handleLogin = () => {
     appActions.login(username);
@@ -61,7 +62,7 @@ export function LoginScreen() {
 
               <BrutalistButton
                 onPress={handleLogin}
-                backgroundColor={BRUTALIST_THEME.colors.success}
+                backgroundColor={theme.colors.success}
                 style={styles.button}
               >
                 LOGIN
@@ -81,10 +82,10 @@ export function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
-    backgroundColor: BRUTALIST_THEME.colors.background,
+    backgroundColor: theme.colors.background,
   },
   keyboardView: {
     flex: 1,
@@ -111,11 +112,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
     lineHeight: 38,
-    color: BRUTALIST_THEME.colors.text,
+    color: theme.colors.text,
     textAlign: 'center',
   },
   subtitle: {
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     fontSize: 10,
     marginTop: 6,
     textAlign: 'center',
@@ -125,10 +126,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   securityWarningCard: {
-    backgroundColor: BRUTALIST_THEME.colors.danger,
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    backgroundColor: theme.colors.danger,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
     padding: 12,
     marginBottom: 8,
   },
@@ -147,6 +148,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10,
     lineHeight: 14,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
   },
-});
+}));

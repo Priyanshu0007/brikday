@@ -4,15 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
 import PagerView from 'react-native-pager-view';
-import { BRUTALIST_THEME } from '@/ui/theme';
+import { useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { EngineEditor } from './EngineEditor';
 import { VaultEditor } from './VaultEditor';
 import { BlueprintEditor } from './BlueprintEditor';
-import { styles } from './styles';
+import { stylesheet } from './styles';
 
 export const EntityEditorScreen = observer(() => {
+  const { theme } = useUnistyles();
   const [activeTab, setActiveTab] = useState<'engine' | 'vault' | 'blueprint'>('engine');
   const pagerRef = useRef<PagerView>(null);
   const tabs = ['engine', 'vault', 'blueprint'] as const;
@@ -28,22 +29,22 @@ export const EntityEditorScreen = observer(() => {
   };
 
   return (
-    <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
-      <View style={styles.header}>
+    <SafeAreaView style={stylesheet.modalContainer} edges={['top', 'bottom']}>
+      <View style={stylesheet.header}>
         <Typography variant="h2">YOUR DATA</Typography>
-        <BrutalistButton onPress={() => router.back()} size="sm" backgroundColor={BRUTALIST_THEME.colors.danger}>
+        <BrutalistButton onPress={() => router.back()} size="sm" backgroundColor={theme.colors.danger}>
           CLOSE
         </BrutalistButton>
       </View>
 
-      <View style={styles.tabsContainer}>
+      <View style={stylesheet.tabsContainer}>
         {tabs.map((tab, index) => (
           <Pressable
             key={tab}
-            style={[styles.tab, activeTab === tab && styles.tabActive]}
+            style={[stylesheet.tab, activeTab === tab && stylesheet.tabActive]}
             onPress={() => handleTabPress(tab, index)}
           >
-            <Typography variant="bodyBold" style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+            <Typography variant="bodyBold" style={[stylesheet.tabText, activeTab === tab && stylesheet.tabTextActive]}>
               {tabLabels[tab]}
             </Typography>
           </Pressable>
@@ -51,24 +52,24 @@ export const EntityEditorScreen = observer(() => {
       </View>
 
       <PagerView
-        style={styles.content}
+        style={stylesheet.content}
         initialPage={0}
         ref={pagerRef}
         scrollEnabled={false}
         onPageSelected={(e) => setActiveTab(tabs[e.nativeEvent.position])}
       >
         <View key="engine" style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView contentContainerStyle={stylesheet.scrollContent}>
             <EngineEditor />
           </ScrollView>
         </View>
         <View key="vault" style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView contentContainerStyle={stylesheet.scrollContent}>
             <VaultEditor />
           </ScrollView>
         </View>
         <View key="blueprint" style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView contentContainerStyle={stylesheet.scrollContent}>
             <BlueprintEditor />
           </ScrollView>
         </View>

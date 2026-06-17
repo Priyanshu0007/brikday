@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { View, ScrollView, LayoutAnimation, UIManager, Platform, Pressable } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
-import { userState$, statsState$, appActions } from '@/state/store';
-import { BRUTALIST_THEME } from '@/ui/theme';
+import { userState$, statsState$, appActions, uiState$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const THEME_OPTIONS = [
+  { label: 'System', value: 'system' as const },
+  { label: 'Light', value: 'light' as const },
+  { label: 'Dark', value: 'dark' as const },
+];
+
 export const SettingsScreen = observer(function SettingsScreen() {
   const user = userState$.get();
   const stats = statsState$.get();
+  const { theme } = useUnistyles();
   
   // Sheet visible state
   const [sheetType, setSheetType] = useState<'profile' | null>(null);
@@ -22,7 +33,8 @@ export const SettingsScreen = observer(function SettingsScreen() {
   const [profileName, setProfileName] = useState(user.username);
   const [profileRole, setProfileRole] = useState(user.role);
 
-
+  // Accordion state
+  const [themeAccordionOpen, setThemeAccordionOpen] = useState(false);
 
   const handleOpenSheet = (type: 'profile') => {
     setSheetType(type);
@@ -38,32 +50,44 @@ export const SettingsScreen = observer(function SettingsScreen() {
     setSheetType(null);
   };
 
+  const toggleThemeAccordion = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setThemeAccordionOpen(!themeAccordionOpen);
+  };
+
+  const selectTheme = (newTheme: 'light' | 'dark' | 'system') => {
+    uiState$.theme.set(newTheme);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setThemeAccordionOpen(false);
+  };
+
+  const currentTheme = uiState$.theme.get() || 'system';
 
   return (
-    <View style={styles.outerContainer}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <View style={stylesheet.outerContainer}>
+      <ScrollView style={stylesheet.container} contentContainerStyle={stylesheet.scrollContent}>
         {/* Title */}
-        <View style={styles.header}>
+        <View style={stylesheet.header}>
           <Typography variant="h2" uppercase>
             SETTINGS
           </Typography>
-          <Typography variant="mono" style={styles.subtitle}>
+          <Typography variant="mono" style={stylesheet.subtitle}>
             ACCOUNT INFO
           </Typography>
         </View>
 
         {/* Profile Card */}
-        <BrutalistCard backgroundColor={BRUTALIST_THEME.colors.warning}>
-          <View style={styles.profileRow}>
-            <View style={styles.avatarPlaceholder}>
+        <BrutalistCard backgroundColor={theme.colors.warning}>
+          <View style={stylesheet.profileRow}>
+            <View style={stylesheet.avatarPlaceholder}>
               <Typography variant="h2">[O]</Typography>
             </View>
-            <View style={styles.profileDetails}>
+            <View style={stylesheet.profileDetails}>
               <Typography variant="h3" uppercase>{user.username}</Typography>
-              <Typography variant="mono" style={styles.profileRoleText}>
+              <Typography variant="mono" style={stylesheet.profileRoleText}>
                 {user.role}
               </Typography>
-              <Typography variant="bodyBold" style={styles.streakCount}>
+              <Typography variant="bodyBold" style={stylesheet.streakCount}>
                 🔥 STREAK: {stats.streak} DAYS
               </Typography>
             </View>
@@ -71,23 +95,23 @@ export const SettingsScreen = observer(function SettingsScreen() {
         </BrutalistCard>
 
         {/* Action List Section */}
-        <Typography variant="bodyBold" style={styles.sectionTitle} uppercase>
+        <Typography variant="bodyBold" style={stylesheet.sectionTitle} uppercase>
           ACCOUNT OPTIONS
         </Typography>
 
-        <View style={styles.actionList}>
+        <View style={stylesheet.actionList}>
           {/* Action 1: Edit Profile */}
-          <BrutalistCard backgroundColor="#FFFFFF">
-            <View style={styles.actionItem}>
-              <View style={styles.actionTextWrapper}>
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <View style={stylesheet.actionItem}>
+              <View style={stylesheet.actionTextWrapper}>
                 <Typography variant="bodyBold">YOUR PROFILE</Typography>
                 <Typography variant="caption">Change your name and bio</Typography>
               </View>
               <BrutalistButton
                 onPress={() => handleOpenSheet('profile')}
-                backgroundColor={BRUTALIST_THEME.colors.paper}
+                backgroundColor={theme.colors.paper}
                 size="sm"
-                style={styles.actionBtn}
+                style={stylesheet.actionBtn}
               >
                 EDIT
               </BrutalistButton>
@@ -95,17 +119,17 @@ export const SettingsScreen = observer(function SettingsScreen() {
           </BrutalistCard>
 
           {/* Action 2: Database Editor */}
-          <BrutalistCard backgroundColor="#FFFFFF">
-            <View style={styles.actionItem}>
-              <View style={styles.actionTextWrapper}>
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <View style={stylesheet.actionItem}>
+              <View style={stylesheet.actionTextWrapper}>
                 <Typography variant="bodyBold">YOUR DATA</Typography>
                 <Typography variant="caption">Edit Habits, Savings, Projects</Typography>
               </View>
               <BrutalistButton
                 onPress={() => router.push('/editor')}
-                backgroundColor={BRUTALIST_THEME.colors.paper}
+                backgroundColor={theme.colors.paper}
                 size="sm"
-                style={styles.actionBtn}
+                style={stylesheet.actionBtn}
               >
                 OPEN
               </BrutalistButton>
@@ -113,11 +137,55 @@ export const SettingsScreen = observer(function SettingsScreen() {
           </BrutalistCard>
         </View>
 
+        {/* App Preferences */}
+        <Typography variant="bodyBold" style={stylesheet.sectionTitle} uppercase>
+          PREFERENCES
+        </Typography>
+
+        <View style={stylesheet.actionList}>
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <Pressable onPress={toggleThemeAccordion} style={stylesheet.accordionHeader}>
+              <View style={stylesheet.actionTextWrapper}>
+                <Typography variant="bodyBold">APPEARANCE</Typography>
+                <Typography variant="caption">Current: {THEME_OPTIONS.find(t => t.value === currentTheme)?.label || 'System'}</Typography>
+              </View>
+              <Typography variant="bodyBold" style={{ fontSize: 20 }}>
+                {themeAccordionOpen ? '[-]' : '[+]'}
+              </Typography>
+            </Pressable>
+            
+            {themeAccordionOpen && (
+              <View style={stylesheet.accordionContent}>
+                {THEME_OPTIONS.map((option) => (
+                  <Pressable 
+                    key={option.value}
+                    style={[
+                      stylesheet.accordionOption, 
+                      currentTheme === option.value && stylesheet.accordionOptionSelected
+                    ]}
+                    onPress={() => selectTheme(option.value)}
+                  >
+                    <Typography 
+                      variant="bodyBold" 
+                      color={currentTheme === option.value ? theme.colors.text : theme.colors.textMuted}
+                    >
+                      {option.label}
+                    </Typography>
+                    {currentTheme === option.value && (
+                      <Typography variant="bodyBold" color={theme.colors.text}>✓</Typography>
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </BrutalistCard>
+        </View>
+
         {/* Emergency Logout */}
         <BrutalistButton
           onPress={() => appActions.logout()}
-          backgroundColor={BRUTALIST_THEME.colors.danger}
-          style={styles.logoutButton}
+          backgroundColor={theme.colors.danger}
+          style={stylesheet.logoutButton}
         >
           LOG OUT
         </BrutalistButton>
@@ -129,7 +197,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
         onClose={() => setSheetType(null)}
         title="EDIT PROFILE"
       >
-        <View style={styles.form}>
+        <View style={stylesheet.form}>
           <BrutalistInput
             label="USERNAME"
             value={profileName}
@@ -144,8 +212,8 @@ export const SettingsScreen = observer(function SettingsScreen() {
           />
           <BrutalistButton
             onPress={handleSaveProfile}
-            backgroundColor={BRUTALIST_THEME.colors.success}
-            style={styles.submitBtn}
+            backgroundColor={theme.colors.success}
+            style={stylesheet.submitBtn}
           >
             SAVE CHANGES
           </BrutalistButton>
@@ -156,9 +224,10 @@ export const SettingsScreen = observer(function SettingsScreen() {
   );
 });
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
   outerContainer: {
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
@@ -173,7 +242,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 10,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 4,
   },
   profileRow: {
@@ -184,10 +253,10 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: 64,
     height: 64,
-    backgroundColor: '#FFFFFF',
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    backgroundColor: theme.colors.background,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -196,7 +265,7 @@ const styles = StyleSheet.create({
   },
   profileRoleText: {
     fontSize: 12,
-    color: '#000000',
+    color: theme.colors.text,
     opacity: 0.8,
     marginTop: 2,
   },
@@ -235,4 +304,26 @@ const styles = StyleSheet.create({
   submitBtn: {
     marginTop: 16,
   },
-});
+  accordionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  accordionContent: {
+    marginTop: 16,
+    borderTopWidth: 2,
+    borderColor: theme.colors.border,
+    paddingTop: 8,
+  },
+  accordionOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+  },
+  accordionOptionSelected: {
+    backgroundColor: theme.colors.paper,
+    borderRadius: theme.borderRadius,
+  },
+}));

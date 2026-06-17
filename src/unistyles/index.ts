@@ -19,17 +19,28 @@ export const breakpoints = {
   xl: 1200,
 } as const;
 
+// ─── Shared Theme Properties ─────────────────────────────
+const sharedTheme = {
+  borderWidth: 3,
+  borderRadius: 4,
+  shadowOffset: { width: 4, height: 4 },
+  shadowOpacity: 1,
+  shadowRadius: 0,
+} as const;
+
 // ─── Themes ──────────────────────────────────────────────
 export const lightTheme = {
   colors: Colors.light,
   fonts: Fonts,
   spacing: Spacing,
+  ...sharedTheme,
 } as const;
 
 export const darkTheme = {
   colors: Colors.dark,
   fonts: Fonts,
   spacing: Spacing,
+  ...sharedTheme,
 } as const;
 
 // ─── TypeScript declaration merging ──────────────────────
@@ -54,6 +65,7 @@ StyleSheet.configure({
     dark: darkTheme,
   },
   settings: {
-    adaptiveThemes: true,
+    initialTheme: 'light',
+    adaptiveThemes: false,
   },
 });

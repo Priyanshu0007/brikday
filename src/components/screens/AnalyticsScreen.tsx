@@ -3,7 +3,6 @@ import { DailyHabitEntry } from '@/state/types';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { triggerHaptic } from '@/ui/haptics';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import {
   getDayName,
@@ -19,7 +18,7 @@ import { PressableScale } from 'pressto';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
@@ -31,17 +30,23 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
   const isPast = dateStr < todayStr;
   const isNeglected = !isCompleted && isPast;
 
+  const { theme } = useUnistyles();
+
   const textAnimatedStyle = useAnimatedStyle(() => ({
     color: withTiming(
-      isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text,
+      isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
       { duration: 200 }
     ),
     opacity: withTiming(isCompleted ? 0.75 : 1, { duration: 200 }),
-  }), [isCompleted, isNeglected]);
+  }), [isCompleted, isNeglected, theme.colors.text]);
 
   const strikeAnimatedStyle = useAnimatedStyle(() => ({
     width: withTiming(isCompleted ? '100%' : '0%', { duration: 300 }),
-  }), [isCompleted]);
+    backgroundColor: withTiming(
+      isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
+      { duration: 200 }
+    ),
+  }), [isCompleted, isNeglected, theme.colors.text]);
 
   const tickAnimatedStyle = useAnimatedStyle(() => ({
     opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
@@ -50,14 +55,18 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
 
   return (
     <BrutalistCard
-      accentColor={isCompleted ? BRUTALIST_THEME.colors.success : undefined}
+      accentColor={isCompleted ? theme.colors.success : undefined}
       neglected={isNeglected}
       style={styles.cardSpacing}
     >
       <View style={styles.itemRow}>
         <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
           <Animated.View style={tickAnimatedStyle}>
-            <Typography variant="bodyBold" color="#000000" style={styles.checkboxTick}>
+            <Typography
+              variant="bodyBold"
+              color={isCompleted ? theme.colors.background : theme.colors.text}
+              style={styles.checkboxTick}
+            >
               ✓
             </Typography>
           </Animated.View>
@@ -82,6 +91,7 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
 
 export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const habits = habitTemplates$.get() || [];
+  const { theme } = useUnistyles();
 
   // View modes: 'week' | 'month'
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
@@ -187,12 +197,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.navHeader}>
           {/* @ts-ignore */}
           <PressableScale onPress={handlePrevWeek} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold">◀</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>◀</Typography>
           </PressableScale>
           <Typography variant="bodyBold" style={styles.navLabel}>{rangeLabel}</Typography>
           {/* @ts-ignore */}
           <PressableScale onPress={handleNextWeek} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold">▶</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>▶</Typography>
           </PressableScale>
         </View>
 
@@ -204,8 +214,8 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             let bottomBarColor = 'transparent';
             if (total > 0) {
               bottomBarColor = rate === 1
-                ? BRUTALIST_THEME.colors.success
-                : rate > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
+                ? theme.colors.success
+                : rate > 0 ? theme.colors.warning : theme.colors.danger;
             }
             return (
               <PressableScale
@@ -232,11 +242,11 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             {weekCells.map((cell) => {
               const { total, rate } = appActions.getDayStats(cell.dateString);
               const percentage = Math.round(rate * 100);
-              let barColor: string = BRUTALIST_THEME.colors.paper;
+              let barColor: string = theme.colors.paper;
               if (total > 0) {
                 barColor = rate === 1
-                  ? BRUTALIST_THEME.colors.success
-                  : rate > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
+                  ? theme.colors.success
+                  : rate > 0 ? theme.colors.warning : theme.colors.danger;
               }
               const barHeight = total > 0 ? Math.max(10, rate * 90) : 4;
               return (
@@ -284,12 +294,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.navHeader}>
           {/* @ts-ignore */}
           <PressableScale onPress={handlePrevMonth} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold">◀</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>◀</Typography>
           </PressableScale>
           <Typography variant="bodyBold" style={styles.navLabel}>{monthLabel}</Typography>
           {/* @ts-ignore */}
           <PressableScale onPress={handleNextMonth} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold">▶</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>▶</Typography>
           </PressableScale>
         </View>
 
@@ -307,15 +317,15 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
           {monthCells.map((cell, idx) => {
             const isToday = isSameDay(cell.date, new Date());
             const { total, rate } = appActions.getDayStats(cell.dateString);
-            let cellBg: string = BRUTALIST_THEME.colors.paper;
+            let cellBg: string = theme.colors.paper;
             let cellOpacity = 1;
             if (!cell.isCurrentMonth) {
-              cellBg = '#EAEAEA';
+              cellBg = theme.colors.background;
               cellOpacity = 0.4;
             } else if (total > 0) {
-              if (rate === 1) cellBg = BRUTALIST_THEME.colors.success;
-              else if (rate > 0) cellBg = BRUTALIST_THEME.colors.warning;
-              else if (cell.date <= new Date()) cellBg = '#FCA5A5';
+              if (rate === 1) cellBg = theme.colors.success;
+              else if (rate > 0) cellBg = theme.colors.warning;
+              else if (cell.date <= new Date()) cellBg = theme.colors.danger;
             }
             return (
               <PressableScale
@@ -329,7 +339,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                 // @ts-ignore
                 activeScale={0.9}
               >
-                <Typography variant="mono" style={styles.calendarCellText}>{cell.dayNumber}</Typography>
+                <Typography variant="mono" style={styles.calendarCellText} color={theme.colors.text}>{cell.dayNumber}</Typography>
               </PressableScale>
             );
           })}
@@ -342,11 +352,11 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
           <Typography variant="bodyBold" uppercase style={styles.chartTitle}>Habit Breakdown</Typography>
           {habitBreakdown.map(({ habit, scheduledCount, completedCount, rate }) => {
             const percentage = Math.round(rate * 100);
-            let barColor: string = BRUTALIST_THEME.colors.paper;
+            let barColor: string = theme.colors.paper;
             if (scheduledCount > 0) {
               barColor = rate === 1
-                ? BRUTALIST_THEME.colors.success
-                : rate > 0 ? BRUTALIST_THEME.colors.warning : BRUTALIST_THEME.colors.danger;
+                ? theme.colors.success
+                : rate > 0 ? theme.colors.warning : theme.colors.danger;
             }
             return (
               <View key={habit.id} style={styles.breakdownItem}>
@@ -380,7 +390,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         </View>
       )}
       {selectedDayStats.total === 0 ? (
-        <BrutalistCard style={styles.emptyCard}>
+        <BrutalistCard style={styles.emptyCard} backgroundColor={theme.colors.background}>
           <Typography variant="bodyBold" style={styles.emptyText}>NO HABITS SCHEDULED</Typography>
         </BrutalistCard>
       ) : (
@@ -419,102 +429,102 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   );
 });
 
-const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
+const styles = StyleSheet.create((theme) => ({
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 12, backgroundColor: theme.colors.background },
   header: { marginBottom: 16 },
-  subtitle: { fontSize: 10, color: BRUTALIST_THEME.colors.textMuted, marginTop: 4 },
+  subtitle: { fontSize: 10, color: theme.colors.textMuted, marginTop: 4 },
   switcherContainer: {
     flexDirection: 'row',
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
-    backgroundColor: '#FFFFFF',
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
     marginBottom: 16,
     overflow: 'hidden',
   },
-  switcherButton: { flex: 1, paddingVertical: 10, alignItems: 'center', backgroundColor: '#FFFFFF' },
-  switcherButtonActive: { backgroundColor: BRUTALIST_THEME.colors.warning },
-  switcherButtonSeparator: { borderLeftWidth: BRUTALIST_THEME.borderWidth, borderColor: BRUTALIST_THEME.colors.border },
-  switcherText: { fontSize: 12, fontFamily: BRUTALIST_THEME.fonts.heading, color: BRUTALIST_THEME.colors.textMuted },
-  switcherTextActive: { color: BRUTALIST_THEME.colors.text },
+  switcherButton: { flex: 1, paddingVertical: 10, alignItems: 'center', backgroundColor: theme.colors.paper },
+  switcherButtonActive: { backgroundColor: theme.colors.warning },
+  switcherButtonSeparator: { borderLeftWidth: theme.borderWidth, borderColor: theme.colors.border },
+  switcherText: { fontSize: 12, fontFamily: theme.fonts.heading, color: theme.colors.textMuted },
+  switcherTextActive: { color: theme.colors.text },
   scrollView: { flex: 1, marginTop: 8 },
   scrollViewContent: { paddingBottom: 120 },
   viewSection: { marginBottom: 20 },
   navHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
   navButton: {
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
     paddingHorizontal: 12, paddingVertical: 6,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.paper,
   },
-  navLabel: { fontSize: 13, fontFamily: BRUTALIST_THEME.fonts.mono, textAlign: 'center' },
+  navLabel: { fontSize: 13, fontFamily: theme.fonts.mono, textAlign: 'center' },
   weekStrip: {
     flexDirection: 'row', justifyContent: 'space-between',
-    borderWidth: BRUTALIST_THEME.borderWidth, borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius, backgroundColor: '#FFFFFF', overflow: 'hidden',
+    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, overflow: 'hidden',
   },
   weekDayCell: {
     flex: 1, aspectRatio: 0.8, alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 6, borderRightWidth: 1.5, borderColor: BRUTALIST_THEME.colors.border, position: 'relative',
+    paddingVertical: 6, borderRightWidth: 1.5, borderColor: theme.colors.border, position: 'relative',
   },
-  weekDayCellToday: { backgroundColor: '#FFFBEB' },
-  weekDayLabel: { fontSize: 9, fontFamily: BRUTALIST_THEME.fonts.heading, color: BRUTALIST_THEME.colors.textMuted },
-  weekDateLabel: { fontSize: 15, fontFamily: BRUTALIST_THEME.fonts.mono, fontWeight: 'bold', marginTop: 2 },
+  weekDayCellToday: { backgroundColor: theme.colors.background },
+  weekDayLabel: { fontSize: 9, fontFamily: theme.fonts.heading, color: theme.colors.textMuted },
+  weekDateLabel: { fontSize: 15, fontFamily: theme.fonts.mono, fontWeight: 'bold', marginTop: 2 },
   weekStatusIndicator: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 4 },
-  infoText: { marginTop: 8, color: BRUTALIST_THEME.colors.textMuted, fontSize: 10, textAlign: 'center', fontStyle: 'italic' },
+  infoText: { marginTop: 8, color: theme.colors.textMuted, fontSize: 10, textAlign: 'center', fontStyle: 'italic' },
   chartContainer: {
     marginTop: 20, padding: 14,
-    borderWidth: BRUTALIST_THEME.borderWidth, borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius, backgroundColor: '#FFFFFF',
+    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper,
   },
-  chartTitle: { fontSize: 14, fontFamily: BRUTALIST_THEME.fonts.heading, marginBottom: 14, textAlign: 'center' },
+  chartTitle: { fontSize: 14, fontFamily: theme.fonts.heading, marginBottom: 14, textAlign: 'center' },
   chartRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 120, paddingBottom: 4 },
   chartBarWrapper: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
-  chartPercentageText: { fontSize: 8, color: BRUTALIST_THEME.colors.textMuted, marginBottom: 4 },
-  chartBar: { width: 20, borderWidth: 2, borderColor: BRUTALIST_THEME.colors.border, borderRadius: 3, borderBottomWidth: 0 },
+  chartPercentageText: { fontSize: 8, color: theme.colors.textMuted, marginBottom: 4 },
+  chartBar: { width: 20, borderWidth: 2, borderColor: theme.colors.border, borderRadius: 3, borderBottomWidth: 0 },
   chartBarLabel: { fontSize: 10, marginTop: 6, fontWeight: 'bold' },
   calendarHeaderRow: { flexDirection: 'row', marginBottom: 6 },
   calendarHeaderCell: { width: '14.285%', alignItems: 'center', justifyContent: 'center' },
-  calendarHeaderCellText: { fontSize: 11, fontWeight: 'bold', color: BRUTALIST_THEME.colors.textMuted },
+  calendarHeaderCellText: { fontSize: 11, fontWeight: 'bold', color: theme.colors.textMuted },
   calendarGrid: {
     flexDirection: 'row', flexWrap: 'wrap',
-    borderWidth: BRUTALIST_THEME.borderWidth, borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius, backgroundColor: '#FFFFFF', overflow: 'hidden',
+    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, overflow: 'hidden',
   },
   calendarCell: {
     width: '14.285%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center',
-    borderWidth: 0.75, borderColor: BRUTALIST_THEME.colors.border,
+    borderWidth: 0.75, borderColor: theme.colors.border,
   },
-  calendarCellToday: { borderWidth: 2, borderColor: BRUTALIST_THEME.colors.warning },
+  calendarCellToday: { borderWidth: 2, borderColor: theme.colors.warning },
   calendarCellText: { fontSize: 13 },
   breakdownContainer: {
     marginTop: 20, padding: 14,
-    borderWidth: BRUTALIST_THEME.borderWidth, borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius, backgroundColor: '#FFFFFF',
+    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper,
   },
   breakdownItem: { marginBottom: 12 },
   breakdownTextRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   breakdownHabitTitle: { fontSize: 12, flex: 1, marginRight: 8 },
-  breakdownFraction: { fontSize: 10, color: BRUTALIST_THEME.colors.textMuted },
+  breakdownFraction: { fontSize: 10, color: theme.colors.textMuted },
   progressBarOuter: {
-    height: 12, borderWidth: 1.5, borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius, backgroundColor: '#FFFFFF', overflow: 'hidden', marginTop: 4,
+    height: 12, borderWidth: 1.5, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, overflow: 'hidden', marginTop: 4,
   },
   progressBarInner: { height: '100%' },
   detailsSection: { marginTop: 4, minHeight: 100 },
   detailsStatRow: { alignItems: 'center', marginBottom: 12 },
-  detailsSubtitle: { fontSize: 11, color: BRUTALIST_THEME.colors.textMuted },
+  detailsSubtitle: { fontSize: 11, color: theme.colors.textMuted },
   cardSpacing: { marginVertical: 6 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   checkbox: {
-    width: 24, height: 24, borderWidth: 2.5, borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center',
+    width: 24, height: 24, borderWidth: 2.5, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, justifyContent: 'center', alignItems: 'center',
   },
-  checkboxChecked: { backgroundColor: '#FFFFFF' },
+  checkboxChecked: { backgroundColor: theme.colors.border },
   checkboxTick: { fontSize: 14, lineHeight: 18 },
   textContainer: { flex: 1, justifyContent: 'center' },
-  customStrike: { position: 'absolute', top: '50%', left: 0, height: 2, backgroundColor: '#000000', marginTop: -1 },
+  customStrike: { position: 'absolute', top: '50%', left: 0, height: 2, backgroundColor: theme.colors.text, marginTop: -1 },
   emptyCard: { paddingVertical: 20, alignItems: 'center', justifyContent: 'center' },
-  emptyText: { color: BRUTALIST_THEME.colors.textMuted, fontSize: 12, textAlign: 'center' },
-});
+  emptyText: { color: theme.colors.textMuted, fontSize: 12, textAlign: 'center' },
+}));

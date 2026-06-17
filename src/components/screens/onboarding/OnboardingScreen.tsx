@@ -6,6 +6,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import PagerView from 'react-native-pager-view';
 import { appActions } from '@/state/store';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useUnistyles } from 'react-native-unistyles';
 import { TOTAL_SLIDES } from './constants';
 import { styles } from './styles';
 import { OnboardingHeader } from './OnboardingHeader';
@@ -17,6 +18,7 @@ import { BlueprintSlide } from './BlueprintSlide';
 import { GetStartedSlide } from './GetStartedSlide';
 
 export function OnboardingScreen() {
+  useUnistyles();
   const pagerRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const activeIndex = useSharedValue(0);

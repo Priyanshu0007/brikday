@@ -7,6 +7,7 @@ import {
   type SharedValue,
 } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
+import { useUnistyles } from 'react-native-unistyles';
 import { styles } from './styles';
 
 interface SlideContentProps {
@@ -16,6 +17,7 @@ interface SlideContentProps {
 }
 
 export function SlideContent({ index, activeIndex, children }: SlideContentProps) {
+  useUnistyles();
   const animatedStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       activeIndex.value,

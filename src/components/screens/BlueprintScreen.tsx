@@ -1,100 +1,100 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { observer } from '@legendapp/state/react';
 import { blueprintState$, appActions } from '@/state/store';
-import { BRUTALIST_THEME } from '@/ui/theme';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 
 export const BlueprintScreen = observer(function BlueprintScreen() {
   const projects = blueprintState$.get();
+  const { theme } = useUnistyles();
 
   // Separate active vs decaying projects for a kanban feel
   const activeProjects = projects.filter((p) => !p.neglected);
   const neglectedProjects = projects.filter((p) => p.neglected);
 
-const ProjectCard = observer(({ projectId }: { projectId: string }) => {
-  const project$ = blueprintState$.find((p) => p.id.get() === projectId);
-  if (!project$) return null;
+  const ProjectCard = observer(({ projectId }: { projectId: string }) => {
+    const project$ = blueprintState$.find((p) => p.id.get() === projectId);
+    if (!project$) return null;
 
-  const neglected = project$.neglected.get();
-  const category = project$.category.get();
-  const title = project$.title.get();
+    const neglected = project$.neglected.get();
+    const category = project$.category.get();
+    const title = project$.title.get();
+
+    return (
+      <BrutalistCard
+        neglected={neglected}
+        backgroundColor={theme.colors.background}
+        style={stylesheet.cardSpacing}
+      >
+        <View style={stylesheet.cardHeader}>
+          <Typography
+            variant="mono"
+            style={stylesheet.categoryBadge}
+            color={neglected ? '#FFFFFF' : theme.colors.textMuted}
+          >
+            {category}
+          </Typography>
+          
+          <Typography
+            variant="mono"
+            style={[stylesheet.statusIndicator, neglected && stylesheet.decayText]}
+            color={neglected ? '#FFFFFF' : theme.colors.text}
+          >
+            {neglected ? '● IGNORED' : '● ACTIVE'}
+          </Typography>
+        </View>
+
+        <Typography
+          variant="h3"
+          color={neglected ? '#FFFFFF' : theme.colors.text}
+          style={stylesheet.projectTitle}
+        >
+          {title}
+        </Typography>
+
+        {neglected ? (
+          <Typography variant="caption" style={{ color: '#FFD2D2', marginBottom: 12 }}>
+            ⚠️ You haven't worked on this recently.
+          </Typography>
+        ) : (
+          <Typography variant="caption" style={{ color: theme.colors.textMuted, marginBottom: 12 }}>
+            ✓ Doing great. Keep it up!
+          </Typography>
+        )}
+
+        {/* Accountability trigger toggle button */}
+        <BrutalistButton
+          onPress={() => appActions.toggleProjectNeglect(projectId)}
+          backgroundColor={neglected ? theme.colors.success : theme.colors.danger}
+          size="sm"
+        >
+          {neglected ? 'WORK ON IT' : 'IGNORE PROJECT'}
+        </BrutalistButton>
+      </BrutalistCard>
+    );
+  });
 
   return (
-    <BrutalistCard
-      neglected={neglected}
-      backgroundColor="#FFFFFF"
-      style={styles.cardSpacing}
-    >
-      <View style={styles.cardHeader}>
-        <Typography
-          variant="mono"
-          style={styles.categoryBadge}
-          color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.textMuted}
-        >
-          {category}
-        </Typography>
-        
-        <Typography
-          variant="mono"
-          style={[styles.statusIndicator, neglected && styles.decayText]}
-          color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
-        >
-          {neglected ? '● IGNORED' : '● ACTIVE'}
-        </Typography>
-      </View>
-
-      <Typography
-        variant="h3"
-        color={neglected ? '#FFFFFF' : BRUTALIST_THEME.colors.text}
-        style={styles.projectTitle}
-      >
-        {title}
-      </Typography>
-
-      {neglected ? (
-        <Typography variant="caption" style={{ color: '#FFD2D2', marginBottom: 12 }}>
-          ⚠️ You haven't worked on this recently.
-        </Typography>
-      ) : (
-        <Typography variant="caption" style={{ color: BRUTALIST_THEME.colors.textMuted, marginBottom: 12 }}>
-          ✓ Doing great. Keep it up!
-        </Typography>
-      )}
-
-      {/* Accountability trigger toggle button */}
-      <BrutalistButton
-        onPress={() => appActions.toggleProjectNeglect(projectId)}
-        backgroundColor={neglected ? BRUTALIST_THEME.colors.success : BRUTALIST_THEME.colors.danger}
-        size="sm"
-      >
-        {neglected ? 'WORK ON IT' : 'IGNORE PROJECT'}
-      </BrutalistButton>
-    </BrutalistCard>
-  );
-});
-
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={stylesheet.container} contentContainerStyle={stylesheet.scrollContent}>
       {/* Title */}
-      <View style={styles.header}>
+      <View style={stylesheet.header}>
         <Typography variant="h2" uppercase>
           PROJECTS
         </Typography>
-        <Typography variant="mono" style={styles.subtitle}>
+        <Typography variant="mono" style={stylesheet.subtitle}>
           YOUR PROJECTS AND TASKS
         </Typography>
       </View>
 
       {/* Kanban Layout columns */}
-      <View style={styles.kanbanLayout}>
+      <View style={stylesheet.kanbanLayout}>
         {/* Column 1: Neglected / Decaying */}
         {neglectedProjects.length > 0 && (
-          <View style={styles.column}>
-            <View style={[styles.columnHeader, { backgroundColor: BRUTALIST_THEME.colors.danger }]}>
+          <View style={stylesheet.column}>
+            <View style={[stylesheet.columnHeader, { backgroundColor: theme.colors.danger }]}>
               <Typography variant="bodyBold" color="#FFFFFF" uppercase>
                 IGNORED PROJECTS ({neglectedProjects.length})
               </Typography>
@@ -104,9 +104,9 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
         )}
 
         {/* Column 2: Operational */}
-        <View style={styles.column}>
-          <View style={[styles.columnHeader, { backgroundColor: BRUTALIST_THEME.colors.success }]}>
-            <Typography variant="bodyBold" color="#000000" uppercase>
+        <View style={stylesheet.column}>
+          <View style={[stylesheet.columnHeader, { backgroundColor: theme.colors.success }]}>
+            <Typography variant="bodyBold" color={theme.colors.background} uppercase>
               ACTIVE PROJECTS ({activeProjects.length})
             </Typography>
           </View>
@@ -117,9 +117,10 @@ const ProjectCard = observer(({ projectId }: { projectId: string }) => {
   );
 });
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 10,
-    color: BRUTALIST_THEME.colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 4,
   },
   kanbanLayout: {
@@ -141,9 +142,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   columnHeader: {
-    borderWidth: BRUTALIST_THEME.borderWidth,
-    borderColor: BRUTALIST_THEME.colors.border,
-    borderRadius: BRUTALIST_THEME.borderRadius,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
     paddingVertical: 6,
     paddingHorizontal: 12,
     marginBottom: 10,
@@ -172,4 +173,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 6,
   },
-});
+}));
