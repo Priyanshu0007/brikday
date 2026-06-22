@@ -24,12 +24,14 @@ Do **NOT** reference Expo SDK 51/52/53 patterns — many APIs have changed.
 | Language         | TypeScript 6 (strict mode)                                    |
 | Navigation       | `expo-router` v56 (file-based routing)                        |
 | State Management | `@legendapp/state` v3 (observables + `observer` HOC)          |
-| Persistence      | `react-native-mmkv` (via Legend State sync plugin + raw MMKV) |
+| Lists            | `@legendapp/list` v3 (optimized list rendering)               |
+| Persistence      | `react-native-mmkv` v4 (via Legend State sync plugin + raw MMKV) |
 | Styling          | `react-native-unistyles` v3 (themes, breakpoints, Babel plugin) |
 | Animations       | `react-native-reanimated` v4                                  |
 | Gestures         | `react-native-gesture-handler` v2                             |
-| Pressables       | `pressto` (animated pressable factory with worklets)          |
+| Pressables       | `pressto` (`PressableScale` + `createAnimatedPressable`)      |
 | Haptics          | `react-native-pulsar` (via `Presets.System.*`)                |
+| Safe Areas       | `react-native-safe-area-context` v5                           |
 | Fonts            | `@expo-google-fonts/*` — Space Grotesk, Plus Jakarta Sans, Space Mono |
 | Package Manager  | **Bun** (use `bun` not `npm`/`yarn`)                          |
 
@@ -55,7 +57,9 @@ src/
 │   │   ├── LoginScreen.tsx      # Username login screen
 │   │   └── SettingsScreen.tsx   # Settings/profile screen
 │   ├── ui/                      # Shared lower-level UI components (collapsible, etc.)
-│   ├── animated-icon.tsx        # Animated splash/icon component
+│   ├── animated-icon.tsx        # Animated splash/icon component (native)
+│   ├── animated-icon.web.tsx    # Animated splash/icon component (web)
+│   ├── external-link.tsx        # External link helper component
 │   ├── themed-text.tsx          # Legacy themed text (prefer Typography)
 │   ├── themed-view.tsx          # Legacy themed view
 │   ├── hint-row.tsx             # Onboarding hint row
@@ -96,7 +100,8 @@ src/
 │   ├── use-color-scheme.web.ts  # Web color scheme hook
 │   └── use-theme.ts             # Theme convenience hook
 ├── utils/
-│   └── date.ts                  # Date helpers (getLocalDateString, isHabitActiveOnDate, etc.)
+│   └── date.ts                  # Date helpers (getLocalDateString, isHabitActiveOnDate,
+│                                #   parseLocalDateString, getWeekDates, getMonthGrid, etc.)
 └── global.css                   # Web-only CSS font fallbacks
 ```
 
@@ -147,6 +152,7 @@ Configured in `tsconfig.json`:
 - `todayLog$` is an in-memory observable (NOT persisted via Legend State sync).
 - Individual day logs are stored as raw MMKV strings: `mmkvStorage.getString('log:YYYY-MM-DD')`.
 - `logIndex$` (list of all logged date strings) IS persisted via Legend State sync.
+- The raw MMKV instance is created via `createMMKV({ id: 'brikday-storage' })` in `dailyLogSlice.ts`.
 - This pattern exists because per-day logs are keyed dynamically and don't fit the single-key sync model.
 
 ---
@@ -242,12 +248,24 @@ Available types: `light | medium | heavy | soft | rigid | success | warning | er
 
 ### Pressable Animations (Pressto)
 
-Interactive cards use `createAnimatedPressable` from `pressto`:
+`pressto` provides two APIs used in this project:
+
+**1. `PressableScale`** — A simple scale-on-press wrapper used for tab bar items, back buttons, and lightweight interactive elements:
+
+```tsx
+import { PressableScale } from 'pressto';
+
+<PressableScale onPress={handlePress} activeScale={0.93}>
+  <Typography variant="mono">Label</Typography>
+</PressableScale>
+```
+
+**2. `createAnimatedPressable`** — A factory for custom press animations. Used in `BrutalistCard` and `BrutalistButton` for the neo-brutalist shadow-offset effect:
 
 ```ts
 import { createAnimatedPressable } from 'pressto';
 
-const PressableCard = createAnimatedPressable((progress) => {
+const PressableBrutalist = createAnimatedPressable((progress) => {
   'worklet';
   return {
     transform: [
@@ -258,7 +276,7 @@ const PressableCard = createAnimatedPressable((progress) => {
 });
 ```
 
-The `progress` value goes from 0 → 1 on press. Keep offset at **4px** for cards (matches shadow).
+The `progress` value goes from 0 → 1 on press. Keep offset at **4px** for standard cards/buttons (matches shadow).
 
 ---
 
@@ -272,9 +290,10 @@ The `progress` value goes from 0 → 1 on press. Keep offset at **4px** for card
   - `blueprint` → BlueprintScreen
   - `analytics` → AnalyticsScreen
 - Tab state is managed via `uiState$.activeTab` (Legend State observable, not expo-router).
+  - **Note**: Tab switching sets `uiState$.activeTab` directly in the component (a known exception to the `appActions`-only rule, since it's trivial UI state).
 - **Auth flow**: `authState$.status` drives which screen renders:
   - `'onboarding'` → OnboardingScreen (PagerView slides)
-  - `'login'` → LoginScreen
+  - `'login'` → LoginScreen *(currently bypassed in dev — routes to AppDashboard)*
   - `'authenticated'` → Main tabbed interface
 
 ---
