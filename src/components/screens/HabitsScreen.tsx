@@ -9,6 +9,7 @@ import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
+import { VoxelTower } from '@/components/ui/VoxelTower';
 
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
@@ -131,6 +132,8 @@ export const HabitsScreen = observer(function HabitsScreen() {
           YOUR DAILY HABITS
         </Typography>
       </View>
+
+      <VoxelTower />
 
       {!log ? (
         <ScrollView 
