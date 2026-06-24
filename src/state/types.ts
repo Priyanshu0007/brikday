@@ -40,11 +40,18 @@ export interface VaultGoal {
   transactions?: SavingTransaction[];
 }
 
+export interface Milestone {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface Project {
   id: string;
   title: string;
   category: string;
   neglected: boolean;
+  milestones?: Milestone[];
 }
 
 export interface UserProfile {

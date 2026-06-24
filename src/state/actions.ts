@@ -248,6 +248,7 @@ export const appActions = {
       title: title.toUpperCase(),
       category: category.toUpperCase() || 'GENERAL',
       neglected,
+      milestones: [],
     };
     blueprintState$.push(newProject);
   },
@@ -263,6 +264,57 @@ export const appActions = {
     const index = projects.findIndex((p) => p.id === id);
     if (index !== -1) {
       blueprintState$[index].delete();
+    }
+  },
+  addMilestone(projectId: string, title: string) {
+    if (!title.trim()) return;
+    const project = blueprintState$.find((p) => p.id.get() === projectId);
+    if (project) {
+      const currentMilestones = project.milestones.get() || [];
+      project.milestones.set([...currentMilestones, {
+        id: `m_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        title: title.trim(),
+        completed: false,
+      }]);
+    }
+  },
+  toggleMilestone(projectId: string, milestoneId: string) {
+    const project = blueprintState$.find((p) => p.id.get() === projectId);
+    if (project) {
+      const milestones = project.milestones.get() || [];
+      const milestoneIndex = milestones.findIndex((m) => m.id === milestoneId);
+      if (milestoneIndex !== -1) {
+        const newMilestones = [...milestones];
+        newMilestones[milestoneIndex] = {
+          ...newMilestones[milestoneIndex],
+          completed: !newMilestones[milestoneIndex].completed,
+        };
+        project.milestones.set(newMilestones);
+      }
+    }
+  },
+  editMilestone(projectId: string, milestoneId: string, newTitle: string) {
+    if (!newTitle.trim()) return;
+    const project = blueprintState$.find((p) => p.id.get() === projectId);
+    if (project) {
+      const milestones = project.milestones.get() || [];
+      const milestoneIndex = milestones.findIndex((m) => m.id === milestoneId);
+      if (milestoneIndex !== -1) {
+        const newMilestones = [...milestones];
+        newMilestones[milestoneIndex] = {
+          ...newMilestones[milestoneIndex],
+          title: newTitle.trim(),
+        };
+        project.milestones.set(newMilestones);
+      }
+    }
+  },
+  deleteMilestone(projectId: string, milestoneId: string) {
+    const project = blueprintState$.find((p) => p.id.get() === projectId);
+    if (project) {
+      const milestones = project.milestones.get() || [];
+      const newMilestones = milestones.filter((m) => m.id !== milestoneId);
+      project.milestones.set(newMilestones);
     }
   },
   toggleProjectNeglect(id: string) {
