@@ -11,6 +11,7 @@ import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { GoalCard } from './GoalCard';
 import { GoalHistorySheet } from './GoalHistorySheet';
+import { VaultSimulatorSheet } from './VaultSimulatorSheet';
 import { stylesheet } from './styles';
 
 export const VaultScreen = observer(function VaultScreen() {
@@ -19,6 +20,7 @@ export const VaultScreen = observer(function VaultScreen() {
 
   const [addSavingVisible, setAddSavingVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
+  const [simulateVisible, setSimulateVisible] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
 
   const [amountInput, setAmountInput] = useState('');
@@ -45,6 +47,11 @@ export const VaultScreen = observer(function VaultScreen() {
     setHistoryVisible(true);
   };
 
+  const handleSimulatePress = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    setSimulateVisible(true);
+  };
+
   const handleSaveTransactionSubmit = () => {
     if (!selectedGoalId) return;
     const parsedAmount = parseFloat(amountInput);
@@ -68,6 +75,7 @@ export const VaultScreen = observer(function VaultScreen() {
         goalId={item}
         onAddSaving={handleAddSavingPress}
         onViewTransactions={handleViewTransactionsPress}
+        onSimulate={handleSimulatePress}
       />
     ),
     [handleAddSavingPress, handleViewTransactionsPress],
@@ -141,6 +149,13 @@ export const VaultScreen = observer(function VaultScreen() {
         goalId={selectedGoalId}
         visible={historyVisible}
         onClose={() => setHistoryVisible(false)}
+      />
+
+      {/* Simulator Bottom Sheet */}
+      <VaultSimulatorSheet
+        goalId={selectedGoalId}
+        visible={simulateVisible}
+        onClose={() => setSimulateVisible(false)}
       />
     </View>
   );

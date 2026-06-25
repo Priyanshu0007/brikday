@@ -12,10 +12,12 @@ export const GoalCard = observer(({
   goalId,
   onAddSaving,
   onViewTransactions,
+  onSimulate,
 }: {
   goalId: string;
   onAddSaving: (id: string) => void;
   onViewTransactions: (id: string) => void;
+  onSimulate: (id: string) => void;
 }) => {
   const { theme } = useUnistyles();
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
@@ -83,6 +85,24 @@ export const GoalCard = observer(({
               </Typography>
             </BrutalistButton>
           </View>
+        </View>
+
+        {/* Simulate Button Row */}
+        <View style={{ marginTop: 12 }}>
+          <BrutalistButton
+            onPress={() => onSimulate(goalId)}
+            backgroundColor={theme.colors.text}
+            size="sm"
+          >
+            <Typography
+              variant="bodyBold"
+              style={[stylesheet.buttonText, { color: theme.colors.background }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              SIMULATE TIMELINE
+            </Typography>
+          </BrutalistButton>
         </View>
       </View>
     </BrutalistCard>
