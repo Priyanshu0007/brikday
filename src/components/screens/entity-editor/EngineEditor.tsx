@@ -70,9 +70,9 @@ export const EngineEditor = observer(() => {
         <BrutalistCard key={habit.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
           <View style={stylesheet.listItemRow}>
             <View style={stylesheet.listItemContent}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 2 }}>
                 <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
-                <Typography variant="bodyBold">{habit.title}</Typography>
+                <Typography variant="bodyBold" style={{ flex: 1, flexWrap: 'wrap' }}>{habit.title}</Typography>
               </View>
               <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
                 HOW OFTEN: {habit.scheduleType === 'alternate_days' ? 'EVERY OTHER DAY' : habit.scheduleType === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY'}
