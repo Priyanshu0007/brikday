@@ -71,6 +71,9 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
             </Typography>
           </Animated.View>
         </View>
+        <View style={styles.emojiSquare}>
+          <Typography style={styles.emojiText}>{entry.emoji || '⚡'}</Typography>
+        </View>
         <View style={styles.textContainer}>
           <View style={{ alignSelf: 'flex-start' }}>
             <AnimatedTypography variant="bodyBold" style={[textAnimatedStyle]}>
@@ -361,6 +364,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             return (
               <View key={habit.id} style={styles.breakdownItem}>
                 <View style={styles.breakdownTextRow}>
+                  <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
                   <Typography variant="bodyBold" style={styles.breakdownHabitTitle} numberOfLines={1}>
                     {habit.title}
                   </Typography>
@@ -523,6 +527,11 @@ const styles = StyleSheet.create((theme) => ({
   },
   checkboxChecked: { backgroundColor: theme.colors.border },
   checkboxTick: { fontSize: 14, lineHeight: 18 },
+  emojiSquare: {
+    width: 28, height: 28, borderWidth: 2, borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, justifyContent: 'center', alignItems: 'center',
+  },
+  emojiText: { fontSize: 14 },
   textContainer: { flex: 1, justifyContent: 'center' },
   customStrike: { position: 'absolute', top: '50%', left: 0, height: 2, backgroundColor: theme.colors.text, marginTop: -1 },
   emptyCard: { paddingVertical: 20, alignItems: 'center', justifyContent: 'center' },

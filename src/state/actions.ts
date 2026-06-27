@@ -49,6 +49,7 @@ export const appActions = {
         entries: activeHabits.map(h => ({
           habitId: h.id,
           title: h.title,
+          emoji: h.emoji,
           completed: false,
           completedAt: undefined,
         })),
@@ -79,11 +80,12 @@ export const appActions = {
       }
     }
   },
-  addHabit(title: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
+  addHabit(title: string, emoji?: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
     if (!title.trim()) return;
     const newHabit: HabitTemplate = {
       id: `h_${Date.now()}`,
       title: title.toUpperCase(),
+      emoji,
       scheduleType,
       specificDays,
       startDate,
@@ -98,6 +100,7 @@ export const appActions = {
         const newEntry: DailyHabitEntry = {
           habitId: newHabit.id,
           title: newHabit.title,
+          emoji: newHabit.emoji,
           completed: false,
           completedAt: undefined,
         };
@@ -110,9 +113,21 @@ export const appActions = {
     const habit = habitTemplates$.find((h) => h.id.get() === id);
     if (habit) {
       if (updates.title !== undefined) habit.title.set(updates.title);
+      if (updates.emoji !== undefined) habit.emoji.set(updates.emoji);
       if (updates.scheduleType !== undefined) habit.scheduleType.set(updates.scheduleType);
       if (updates.specificDays !== undefined) habit.specificDays.set(updates.specificDays);
       if (updates.startDate !== undefined) habit.startDate.set(updates.startDate);
+
+      const todayStr = getLocalDateString();
+      const currentLog = todayLog$.get();
+      if (currentLog && currentLog.date === todayStr) {
+        const entryIndex = currentLog.entries.findIndex(e => e.habitId === id);
+        if (entryIndex !== -1) {
+          if (updates.title !== undefined) todayLog$.entries[entryIndex].title.set(updates.title);
+          if (updates.emoji !== undefined) todayLog$.entries[entryIndex].emoji.set(updates.emoji);
+          mmkvStorage.set(`log:${todayStr}`, JSON.stringify(todayLog$.get()));
+        }
+      }
     }
   },
   deleteHabit(id: string) {

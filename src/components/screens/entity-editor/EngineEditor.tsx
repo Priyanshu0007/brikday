@@ -8,6 +8,7 @@ import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
+import { EmojiPicker } from '@/ui/EmojiPicker';
 import { DayPicker } from './DayPicker';
 import { stylesheet } from './styles';
 
@@ -20,6 +21,7 @@ export const EngineEditor = observer(() => {
 
   // Form State
   const [title, setTitle] = useState('');
+  const [emoji, setEmoji] = useState<string | undefined>(undefined);
   const [scheduleType, setScheduleType] = useState<ScheduleType>('daily');
   const [specificDays, setSpecificDays] = useState<number[]>([]);
 
@@ -27,6 +29,7 @@ export const EngineEditor = observer(() => {
     const habit = habits.find((h) => h.id === id);
     if (habit) {
       setTitle(habit.title);
+      setEmoji(habit.emoji);
       setScheduleType(habit.scheduleType);
       setSpecificDays(habit.specificDays || []);
       setEditingId(id);
@@ -36,6 +39,7 @@ export const EngineEditor = observer(() => {
 
   const handleAdd = () => {
     setTitle('');
+    setEmoji(undefined);
     setScheduleType('daily');
     setSpecificDays([]);
     setEditingId(null);
@@ -44,9 +48,9 @@ export const EngineEditor = observer(() => {
 
   const handleSave = () => {
     if (isAdding) {
-      appActions.addHabit(title, scheduleType, specificDays);
+      appActions.addHabit(title, emoji, scheduleType, specificDays);
     } else if (editingId) {
-      appActions.updateHabit(editingId, { title, scheduleType, specificDays });
+      appActions.updateHabit(editingId, { title, emoji, scheduleType, specificDays });
     }
     setEditingId(null);
     setIsAdding(false);
@@ -66,7 +70,10 @@ export const EngineEditor = observer(() => {
         <BrutalistCard key={habit.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
           <View style={stylesheet.listItemRow}>
             <View style={stylesheet.listItemContent}>
-              <Typography variant="bodyBold">{habit.title}</Typography>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
+                <Typography variant="bodyBold">{habit.title}</Typography>
+              </View>
               <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
                 HOW OFTEN: {habit.scheduleType === 'alternate_days' ? 'EVERY OTHER DAY' : habit.scheduleType === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY'}
               </Typography>
@@ -96,6 +103,11 @@ export const EngineEditor = observer(() => {
             placeholder="e.g. 100 PUSHUPS"
           />
           
+          <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
+            EMOJI ICON
+          </Typography>
+          <EmojiPicker selectedEmoji={emoji} onSelect={setEmoji} />
+
           <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
             HOW OFTEN
           </Typography>

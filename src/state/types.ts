@@ -14,6 +14,7 @@ export interface HabitTemplate {
 export interface DailyHabitEntry {
   habitId: string;
   title: string;
+  emoji?: string;
   completed: boolean;
   completedAt?: number;
 }

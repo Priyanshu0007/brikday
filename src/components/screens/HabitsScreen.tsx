@@ -21,6 +21,7 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
   if (entryIndex === -1) return null;
 
   const title = todayLog$.entries[entryIndex].title.get();
+  const emoji = todayLog$.entries[entryIndex].emoji.get();
   const isCompleted = todayLog$.entries[entryIndex].completed.get();
   
   // neglected status only depends on yesterday, and is cleared when completed today
@@ -75,6 +76,9 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
                 ✓
               </Typography>
             </Animated.View>
+          </View>
+          <View style={styles.emojiSquare}>
+            <Typography style={styles.emojiText}>{emoji || '⚡'}</Typography>
           </View>
           
           <View style={styles.textContainer}>
@@ -173,7 +177,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
                   <View style={styles.previewGrid}>
                     {activeToday.map((habit) => (
                       <View key={habit.id} style={styles.habitBadge}>
-                        <Typography variant="caption" style={styles.habitBadgeBullet}>⚡</Typography>
+                        <Typography variant="caption" style={styles.habitBadgeBullet}>{habit.emoji || '⚡'}</Typography>
                         <Typography variant="mono" style={styles.habitBadgeText} numberOfLines={1}>
                           {habit.title}
                         </Typography>
@@ -259,6 +263,19 @@ const styles = StyleSheet.create((theme) => ({
   checkboxTick: {
     fontSize: 14,
     lineHeight: 18,
+  },
+  emojiSquare: {
+    width: 28,
+    height: 28,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emojiText: {
+    fontSize: 14,
   },
   textContainer: {
     flex: 1,
