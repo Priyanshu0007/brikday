@@ -29,6 +29,7 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
   const todayStr = getLocalDateString();
   const isPast = dateStr < todayStr;
   const isNeglected = !isCompleted && isPast;
+  const note = entry.note;
 
   const { theme } = useUnistyles();
 
@@ -84,6 +85,11 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
           {isNeglected && (
             <Typography variant="caption" style={{ color: '#FFEEEE', marginTop: 2 }}>
               ✕ Missed
+            </Typography>
+          )}
+          {note && (
+            <Typography variant="caption" style={{ color: theme.colors.textMuted, marginTop: 4, fontFamily: theme.fonts.mono }}>
+              📝 {note}
             </Typography>
           )}
         </View>

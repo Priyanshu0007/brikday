@@ -1,20 +1,25 @@
-import React from 'react';
-import { View, ScrollView } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
-import { observer } from '@legendapp/state/react';
-import { LegendList } from '@legendapp/list/react-native';
-import { todayLog$, appActions, habitTemplates$ } from '@/state/store';
-import { Typography } from '@/ui/Typography';
-import { BrutalistCard } from '@/ui/BrutalistCard';
-import { BrutalistButton } from '@/ui/BrutalistButton';
-import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
 import { VoxelTower } from '@/components/ui/VoxelTower';
+import { appActions, habitTemplates$, todayLog$ } from '@/state/store';
+import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
+import { BrutalistButton } from '@/ui/BrutalistButton';
+import { BrutalistCard } from '@/ui/BrutalistCard';
+import { BrutalistInput } from '@/ui/BrutalistInput';
 import { ConfettiOverlay } from '@/ui/ConfettiOverlay';
+import { Typography } from '@/ui/Typography';
+import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
+import { LegendList } from '@legendapp/list/react-native';
+import { observer } from '@legendapp/state/react';
+import React from 'react';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
-const HabitItem = observer(({ habitId, onComplete }: { habitId: string, onComplete?: () => void }) => {
+const HabitItem = observer(({ habitId, onComplete, onAddNote }: { habitId: string, onComplete?: () => void, onAddNote?: (id: string) => void }) => {
   const log = todayLog$.get();
+  const swipeableRef = React.useRef<Swipeable>(null);
+  
   if (!log) return null;
 
   const entryIndex = log.entries.findIndex(e => e.habitId === habitId);
@@ -23,11 +28,33 @@ const HabitItem = observer(({ habitId, onComplete }: { habitId: string, onComple
   const title = todayLog$.entries[entryIndex].title.get();
   const emoji = todayLog$.entries[entryIndex].emoji.get();
   const isCompleted = todayLog$.entries[entryIndex].completed.get();
-  
+  const note = todayLog$.entries[entryIndex].note.get();
+
   // neglected status only depends on yesterday, and is cleared when completed today
   const isNeglected = React.useMemo(() => appActions.isHabitNeglected(habitId) && !isCompleted, [habitId, isCompleted]);
 
   const { theme } = useUnistyles();
+
+  const renderRightActions = React.useCallback(
+    () => {
+      return (
+        <View style={styles.swipeActionContainer}>
+          <TouchableOpacity
+            style={styles.swipeActionButton}
+            onPress={() => {
+              swipeableRef.current?.close();
+              onAddNote?.(habitId);
+            }}
+          >
+            <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+              NOTES
+            </Typography>
+          </TouchableOpacity>
+        </View>
+      );
+    },
+    [habitId, onAddNote, theme]
+  );
 
   // Reanimated styles
   const textAnimatedStyle = useAnimatedStyle(() => {
@@ -58,60 +85,81 @@ const HabitItem = observer(({ habitId, onComplete }: { habitId: string, onComple
   }, [isCompleted]);
 
   return (
-    <BrutalistCard
-      accentColor={isCompleted ? theme.colors.success : undefined}
-      neglected={isNeglected}
-      style={styles.cardSpacing}
-      onPress={() => {
-        const wasCompleted = appActions.isAllCompletedToday();
-        appActions.toggleHabit(habitId);
-        if (!wasCompleted && appActions.isAllCompletedToday()) {
-          onComplete?.();
-        }
-      }}
+    <Swipeable
+      ref={swipeableRef}
+      renderRightActions={renderRightActions}
+      containerStyle={styles.cardSpacing}
     >
+      <BrutalistCard
+        accentColor={isCompleted ? theme.colors.success : undefined}
+        neglected={isNeglected}
+        style={{ marginVertical: 0 }}
+        onPress={() => {
+          const wasCompleted = appActions.isAllCompletedToday();
+          appActions.toggleHabit(habitId);
+          if (!wasCompleted && appActions.isAllCompletedToday()) {
+            onComplete?.();
+          }
+        }}
+      >
       <View style={styles.itemRow}>
-          {/* Custom styled checkbox indicator */}
-          <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
-            <Animated.View style={tickAnimatedStyle}>
-              <Typography
-                variant="bodyBold"
-                color={isCompleted ? theme.colors.background : theme.colors.text}
-                style={styles.checkboxTick}
-              >
-                ✓
-              </Typography>
-            </Animated.View>
-          </View>
-          <View style={styles.emojiSquare}>
-            <Typography style={styles.emojiText}>{emoji || '⚡'}</Typography>
-          </View>
-          
-          <View style={styles.textContainer}>
-            <View style={{ alignSelf: 'flex-start' }}>
-              <AnimatedTypography
-                variant="bodyBold"
-                style={[textAnimatedStyle]}
-              >
-                {title}
-              </AnimatedTypography>
-              {/* Custom Animated Strikethrough Line */}
-              <Animated.View style={[styles.customStrike, strikeAnimatedStyle]} />
-            </View>
-            
-            {isNeglected && (
-              <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
-                ⚠️ You missed this yesterday.
-              </Typography>
-            )}
-          </View>
+        {/* Custom styled checkbox indicator */}
+        <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
+          <Animated.View style={tickAnimatedStyle}>
+            <Typography
+              variant="bodyBold"
+              color={isCompleted ? theme.colors.background : theme.colors.text}
+              style={styles.checkboxTick}
+            >
+              ✓
+            </Typography>
+          </Animated.View>
         </View>
-      </BrutalistCard>
+        <View style={styles.emojiSquare}>
+          <Typography style={styles.emojiText}>{emoji || '⚡'}</Typography>
+        </View>
+
+        <View style={styles.textContainer}>
+          <View style={{ alignSelf: 'flex-start' }}>
+            <AnimatedTypography
+              variant="bodyBold"
+              style={[textAnimatedStyle]}
+            >
+              {title}
+            </AnimatedTypography>
+            {/* Custom Animated Strikethrough Line */}
+            <Animated.View style={[styles.customStrike, strikeAnimatedStyle]} />
+          </View>
+
+          {isNeglected && (
+            <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
+              ⚠️ You missed this yesterday.
+            </Typography>
+          )}
+          {note ? (
+            <TouchableOpacity
+              style={{ marginTop: 4, paddingVertical: 4 }}
+              onPress={(e) => {
+                e.stopPropagation();
+                onAddNote?.(habitId);
+              }}
+            >
+              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
+                📝 {note}
+              </Typography>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      </View>
+    </BrutalistCard>
+    </Swipeable>
   );
 });
 
 export const HabitsScreen = observer(function HabitsScreen() {
   const [showConfetti, setShowConfetti] = React.useState(false);
+  const [selectedHabitForNote, setSelectedHabitForNote] = React.useState<string | null>(null);
+  const [draftNote, setDraftNote] = React.useState('');
   const log = todayLog$.get();
   const habitIds = log?.entries.map(e => e.habitId) || [];
 
@@ -125,9 +173,23 @@ export const HabitsScreen = observer(function HabitsScreen() {
     return `${getDayName(today)} // ${getMonthShortName(today)} ${today.getDate()}`;
   }, []);
 
+  const handleOpenNoteSheet = React.useCallback((habitId: string) => {
+    const log = todayLog$.get();
+    const entry = log?.entries.find(e => e.habitId === habitId);
+    setDraftNote(entry?.note || '');
+    setSelectedHabitForNote(habitId);
+  }, []);
+
+  const handleSaveNote = () => {
+    if (selectedHabitForNote) {
+      appActions.addHabitNote(selectedHabitForNote, draftNote.trim());
+      setSelectedHabitForNote(null);
+    }
+  };
+
   const renderItem = React.useCallback(
-    ({ item }: { item: string }) => <HabitItem habitId={item} onComplete={() => setShowConfetti(true)} />,
-    []
+    ({ item }: { item: string }) => <HabitItem habitId={item} onComplete={() => setShowConfetti(true)} onAddNote={handleOpenNoteSheet} />,
+    [handleOpenNoteSheet]
   );
 
   const { theme } = useUnistyles();
@@ -148,7 +210,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
       <VoxelTower />
 
       {!log ? (
-        <ScrollView 
+        <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContainer}
         >
@@ -176,11 +238,11 @@ export const HabitsScreen = observer(function HabitsScreen() {
               {/* Habit Preview Section */}
               <View style={styles.previewSection}>
                 <Typography variant="mono" style={styles.previewTitle}>
-                  {activeToday.length > 0 
+                  {activeToday.length > 0
                     ? `TODAY'S BUILD LIST (${activeToday.length})`
                     : 'NO HABITS SCHEDULED'}
                 </Typography>
-                
+
                 {activeToday.length > 0 ? (
                   <View style={styles.previewGrid}>
                     {activeToday.map((habit) => (
@@ -199,7 +261,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
                 )}
               </View>
 
-              <BrutalistButton 
+              <BrutalistButton
                 onPress={() => appActions.generateDailyLogIfMissing()}
                 backgroundColor={theme.colors.success}
                 style={styles.startBtn}
@@ -221,6 +283,29 @@ export const HabitsScreen = observer(function HabitsScreen() {
           style={styles.list}
         />
       )}
+
+      <BrutalistBottomSheet
+        visible={!!selectedHabitForNote}
+        onClose={() => setSelectedHabitForNote(null)}
+        title="HABIT NOTE"
+      >
+        <View style={{ marginBottom: 24 }}>
+          <BrutalistInput
+            multiline
+            placeholder="Add some details..."
+            value={draftNote}
+            onChangeText={setDraftNote}
+            style={{ minHeight: 80, textAlignVertical: 'top' }}
+          />
+          <BrutalistButton
+            onPress={handleSaveNote}
+            backgroundColor={theme.colors.success}
+            style={{ marginTop: 16 }}
+          >
+            SAVE NOTE
+          </BrutalistButton>
+        </View>
+      </BrutalistBottomSheet>
     </View>
   );
 });
@@ -246,6 +331,22 @@ const styles = StyleSheet.create((theme) => ({
   },
   listContent: {
     paddingBottom: 100, // Extra space to clear tab bar
+  },
+  swipeActionContainer: {
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    paddingLeft: 8,
+    paddingBottom: 4, // Align with card shadow offset
+  },
+  swipeActionButton: {
+    flex: 1,
+    backgroundColor: theme.colors.text,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: theme.borderRadius,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
   },
   cardSpacing: {
     marginVertical: 6,

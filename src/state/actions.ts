@@ -89,6 +89,18 @@ export const appActions = {
     
     return currentLog.entries.every(e => e.completed);
   },
+  addHabitNote(habitId: string, note: string) {
+    const todayStr = getLocalDateString();
+    const currentLog = todayLog$.get();
+    
+    if (currentLog && currentLog.date === todayStr) {
+      const entryIndex = currentLog.entries.findIndex(e => e.habitId === habitId);
+      if (entryIndex !== -1) {
+        todayLog$.entries[entryIndex].note.set(note);
+        mmkvStorage.set(`log:${todayStr}`, JSON.stringify(todayLog$.get()));
+      }
+    }
+  },
   addHabit(title: string, emoji?: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
     if (!title.trim()) return;
     const newHabit: HabitTemplate = {

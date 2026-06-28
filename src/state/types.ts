@@ -17,6 +17,7 @@ export interface DailyHabitEntry {
   emoji?: string;
   completed: boolean;
   completedAt?: number;
+  note?: string;
 }
 
 export interface DailyLog {
