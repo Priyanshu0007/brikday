@@ -1,26 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, LayoutChangeEvent } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
-  withSpring, 
   withTiming,
-  runOnJS, 
-  interpolate,
-  Extrapolation
+  runOnJS
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { vaultState$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
-import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { stylesheet } from './styles';
 
-interface VaultSimulatorSheetProps {
+interface VaultSimulatorProps {
   goalId: string | null;
-  visible: boolean;
-  onClose: () => void;
 }
 
 const AnimatedBar = ({ heightPercent, isFuture }: { heightPercent: number; isFuture: boolean }) => {
@@ -58,7 +52,6 @@ const CustomSlider = ({
   prefix?: string;
   suffix?: string;
 }) => {
-  const { theme } = useUnistyles();
   const [trackWidth, setTrackWidth] = useState(0);
   const thumbSize = 40;
   
@@ -67,17 +60,20 @@ const CustomSlider = ({
   const [internalValue, setInternalValue] = useState(value);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!isDragging.value) {
       setInternalValue(value);
     }
-  }, [value]); // Sync when parent value changes from outside
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   useEffect(() => {
     if (trackWidth > 0 && !isDragging.value) {
       const percentage = (value - min) / (max - min);
       translateX.value = percentage * (trackWidth - thumbSize);
     }
-  }, [value, min, max, trackWidth, translateX]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, min, max, trackWidth, translateX, isDragging.value]);
 
   const updateInternalValue = (pos: number) => {
     const percentage = Math.max(0, Math.min(1, pos / (trackWidth - thumbSize)));
@@ -94,14 +90,17 @@ const CustomSlider = ({
   const panGesture = Gesture.Pan()
     .activeOffsetX([-10, 10])
     .onBegin(() => {
+      // eslint-disable-next-line react-hooks/immutability
       isDragging.value = true;
     })
     .onChange((event) => {
       const newX = translateX.value + event.changeX;
+      // eslint-disable-next-line react-hooks/immutability
       translateX.value = Math.max(0, Math.min(newX, trackWidth - thumbSize));
       runOnJS(updateInternalValue)(translateX.value);
     })
     .onFinalize(() => {
+      // eslint-disable-next-line react-hooks/immutability
       isDragging.value = false;
       runOnJS(commitValue)(translateX.value);
     });
@@ -131,8 +130,7 @@ const CustomSlider = ({
   );
 };
 
-export const VaultSimulatorSheet = observer(({ goalId, visible, onClose }: VaultSimulatorSheetProps) => {
-  const { theme } = useUnistyles();
+export const VaultSimulator = observer(({ goalId }: VaultSimulatorProps) => {
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
   
   const [weeklySavings, setWeeklySavings] = useState(50);
@@ -142,18 +140,16 @@ export const VaultSimulatorSheet = observer(({ goalId, visible, onClose }: Vault
   const target = goal$?.target?.get() ?? 0;
   const remaining = Math.max(0, target - saved);
 
-  // Math calculation
   const calculatedMath = useMemo(() => {
     if (remaining === 0) return { weeks: 0, date: new Date(), chartData: [] };
     if (weeklySavings === 0) return { weeks: Infinity, date: null, chartData: [] };
 
-    let n = 0; // weeks
-    const r = (interestRate / 100) / 52; // weekly interest rate
+    let n = 0; 
+    const r = (interestRate / 100) / 52; 
 
     if (r === 0) {
       n = remaining / weeklySavings;
     } else {
-      // Future Value of Annuity formula solved for n: n = ln((A * r / P) + 1) / ln(1 + r)
       const A = remaining;
       const P = weeklySavings;
       const numerator = Math.log((A * r / P) + 1);
@@ -165,7 +161,6 @@ export const VaultSimulatorSheet = observer(({ goalId, visible, onClose }: Vault
     const date = new Date();
     date.setDate(date.getDate() + (weeks * 7));
 
-    // Generate chart data
     const chartBars = weeks === Infinity ? 12 : Math.min(12, weeks + 1);
     const data = [];
     const stepWeeks = weeks === Infinity ? 4 : Math.max(1, Math.floor(weeks / Math.max(1, chartBars - 1)));
@@ -197,55 +192,49 @@ export const VaultSimulatorSheet = observer(({ goalId, visible, onClose }: Vault
   if (!goal$ || !goalId) return null;
 
   return (
-    <BrutalistBottomSheet
-      visible={visible}
-      onClose={onClose}
-      title="SIMULATOR"
-    >
-      <View style={stylesheet.simulatorContent}>
-        {/* Projection Display */}
-        <View style={stylesheet.projectionContainer}>
-          <Typography variant="mono" style={stylesheet.projectionDate}>
-            {formatDate(calculatedMath.date)}
-          </Typography>
-          <Typography variant="bodyBold" style={stylesheet.projectionWeeks}>
-            IN {calculatedMath.weeks === Infinity ? '∞' : calculatedMath.weeks} WEEKS
-          </Typography>
+    <View style={stylesheet.simulatorContent}>
+      {/* Projection Display */}
+      <View style={stylesheet.projectionContainer}>
+        <Typography variant="mono" style={stylesheet.projectionDate}>
+          {formatDate(calculatedMath.date)}
+        </Typography>
+        <Typography variant="bodyBold" style={stylesheet.projectionWeeks}>
+          IN {calculatedMath.weeks === Infinity ? '∞' : calculatedMath.weeks} WEEKS
+        </Typography>
 
-          {/* Dynamic Chart */}
-          <View style={stylesheet.chartContainer}>
-            <View style={stylesheet.chartTargetLine} />
-            <Typography variant="mono" style={stylesheet.chartTargetText}>TARGET</Typography>
+        {/* Dynamic Chart */}
+        <View style={stylesheet.chartContainer}>
+          <View style={stylesheet.chartTargetLine} />
+          <Typography variant="mono" style={stylesheet.chartTargetText}>TARGET</Typography>
 
-            {calculatedMath.chartData.map((val, index) => {
-              const heightPercent = target > 0 ? (val / target) * 100 : 0;
-              const isFuture = val > saved;
-              return (
-                <AnimatedBar key={index} heightPercent={heightPercent} isFuture={isFuture} />
-              );
-            })}
-          </View>
+          {calculatedMath.chartData.map((val, index) => {
+            const heightPercent = target > 0 ? (val / target) * 100 : 0;
+            const isFuture = val > saved;
+            return (
+              <AnimatedBar key={index} heightPercent={heightPercent} isFuture={isFuture} />
+            );
+          })}
         </View>
-
-        {/* Sliders */}
-        <CustomSlider
-          label="WEEKLY SAVINGS"
-          min={0}
-          max={1000}
-          value={weeklySavings}
-          onChange={setWeeklySavings}
-          prefix="$"
-        />
-
-        <CustomSlider
-          label="INTEREST RATE (APY)"
-          min={0}
-          max={20}
-          value={interestRate}
-          onChange={setInterestRate}
-          suffix="%"
-        />
       </View>
-    </BrutalistBottomSheet>
+
+      {/* Sliders */}
+      <CustomSlider
+        label="WEEKLY SAVINGS"
+        min={0}
+        max={1000}
+        value={weeklySavings}
+        onChange={setWeeklySavings}
+        prefix="$"
+      />
+
+      <CustomSlider
+        label="INTEREST RATE (APY)"
+        min={0}
+        max={20}
+        value={interestRate}
+        onChange={setInterestRate}
+        suffix="%"
+      />
+    </View>
   );
 });

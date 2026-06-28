@@ -242,4 +242,71 @@ export const stylesheet = StyleSheet.create((theme) => ({
   chartBarFuture: {
     backgroundColor: theme.colors.warning,
   },
+  detailContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  detailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 16,
+    gap: 12,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: theme.colors.paper,
+  },
+  detailTitle: {
+    flex: 1,
+    marginTop: 2, // Minor optical alignment adjustment to match the box center
+  },
+  detailProgressContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  detailTabBar: {
+    flexDirection: 'row',
+    borderBottomWidth: 3,
+    borderColor: theme.colors.border,
+  },
+  detailTab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.background,
+    borderBottomWidth: 4,
+    borderBottomColor: 'transparent',
+  },
+  detailTabActive: {
+    borderBottomColor: theme.colors.text,
+  },
+  detailTabText: {
+    color: theme.colors.textMuted,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  detailTabTextActive: {
+    color: theme.colors.text,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  detailContent: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  stickyFooter: {
+    padding: 16,
+    borderTopWidth: 2,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
+  },
 }));

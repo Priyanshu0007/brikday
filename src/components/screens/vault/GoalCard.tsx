@@ -10,14 +10,10 @@ import { stylesheet } from './styles';
 
 export const GoalCard = observer(({
   goalId,
-  onAddSaving,
-  onViewTransactions,
-  onSimulate,
+  onPress,
 }: {
   goalId: string;
-  onAddSaving: (id: string) => void;
-  onViewTransactions: (id: string) => void;
-  onSimulate: (id: string) => void;
+  onPress: (id: string) => void;
 }) => {
   const { theme } = useUnistyles();
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
@@ -31,7 +27,11 @@ export const GoalCard = observer(({
   const percentage = Math.round(progress * 100);
 
   return (
-    <BrutalistCard style={stylesheet.cardSpacing} backgroundColor={theme.colors.background}>
+    <BrutalistCard 
+      style={stylesheet.cardSpacing} 
+      backgroundColor={theme.colors.background}
+      onPress={() => onPress(goalId)}
+    >
       <View style={stylesheet.sliderContainer}>
         <View style={stylesheet.sliderHeader}>
           <Typography variant="bodyBold">{title}</Typography>
@@ -51,59 +51,6 @@ export const GoalCard = observer(({
           </View>
         </View>
 
-        {/* Action Buttons */}
-        <View style={stylesheet.buttonRow}>
-          <View style={{ flex: 1 }}>
-            <BrutalistButton
-              onPress={() => onAddSaving(goalId)}
-              backgroundColor={theme.colors.success}
-              size="sm"
-            >
-              <Typography
-                variant="bodyBold"
-                style={stylesheet.buttonText}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                + ADD MONEY
-              </Typography>
-            </BrutalistButton>
-          </View>
-          <View style={{ flex: 1 }}>
-            <BrutalistButton
-              onPress={() => onViewTransactions(goalId)}
-              backgroundColor={theme.colors.warning}
-              size="sm"
-            >
-              <Typography
-                variant="bodyBold"
-                style={stylesheet.buttonText}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                HISTORY
-              </Typography>
-            </BrutalistButton>
-          </View>
-        </View>
-
-        {/* Simulate Button Row */}
-        <View style={{ marginTop: 12 }}>
-          <BrutalistButton
-            onPress={() => onSimulate(goalId)}
-            backgroundColor={theme.colors.text}
-            size="sm"
-          >
-            <Typography
-              variant="bodyBold"
-              style={[stylesheet.buttonText, { color: theme.colors.background }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              SIMULATE TIMELINE
-            </Typography>
-          </BrutalistButton>
-        </View>
       </View>
     </BrutalistCard>
   );

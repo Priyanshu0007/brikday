@@ -1,31 +1,16 @@
 "use no memo";
-import React, { useState } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { useUnistyles } from 'react-native-unistyles';
-import { vaultState$, appActions } from '@/state/store';
+import { vaultState$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
-import { BrutalistButton } from '@/ui/BrutalistButton';
-import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
-import { BrutalistInput } from '@/ui/BrutalistInput';
 import { GoalCard } from './GoalCard';
-import { GoalHistorySheet } from './GoalHistorySheet';
-import { VaultSimulatorSheet } from './VaultSimulatorSheet';
 import { stylesheet } from './styles';
+import { router } from 'expo-router';
 
 export const VaultScreen = observer(function VaultScreen() {
   const goals = vaultState$.get();
-  const { theme } = useUnistyles();
-
-  const [addSavingVisible, setAddSavingVisible] = useState(false);
-  const [historyVisible, setHistoryVisible] = useState(false);
-  const [simulateVisible, setSimulateVisible] = useState(false);
-  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
-
-  const [amountInput, setAmountInput] = useState('');
-  const [sourceInput, setSourceInput] = useState('');
-  const [commentInput, setCommentInput] = useState('');
 
   // Stable ID array — only recomputes when goals are added/removed, NOT on saved changes
   const goalIds = React.useMemo(
@@ -34,54 +19,20 @@ export const VaultScreen = observer(function VaultScreen() {
     [goals.length],
   );
 
-  const handleAddSavingPress = (goalId: string) => {
-    setSelectedGoalId(goalId);
-    setAmountInput('');
-    setSourceInput('');
-    setCommentInput('');
-    setAddSavingVisible(true);
-  };
+  const handleGoalPress = React.useCallback((goalId: string) => {
+    router.push(`/vault/${goalId}`);
+  }, []);
 
-  const handleViewTransactionsPress = (goalId: string) => {
-    setSelectedGoalId(goalId);
-    setHistoryVisible(true);
-  };
-
-  const handleSimulatePress = (goalId: string) => {
-    setSelectedGoalId(goalId);
-    setSimulateVisible(true);
-  };
-
-  const handleSaveTransactionSubmit = () => {
-    if (!selectedGoalId) return;
-    const parsedAmount = parseFloat(amountInput);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      Alert.alert('Invalid Input', 'Please enter a valid positive savings amount.');
-      return;
-    }
-    appActions.addSavingTransaction(
-      selectedGoalId,
-      parsedAmount,
-      sourceInput || 'Manual Savings',
-      commentInput || ''
-    );
-    setAddSavingVisible(false);
-  };
-
-  // Stable render function — never recreated
   const renderGoalItem = React.useCallback(
     ({ item }: { item: string }) => (
       <GoalCard
         goalId={item}
-        onAddSaving={handleAddSavingPress}
-        onViewTransactions={handleViewTransactionsPress}
-        onSimulate={handleSimulatePress}
+        onPress={handleGoalPress}
       />
     ),
-    [handleAddSavingPress, handleViewTransactionsPress],
+    [handleGoalPress],
   );
 
-  const selectedGoal = goals.find((g) => g.id === selectedGoalId);
 
   return (
     <View style={stylesheet.container}>
@@ -105,58 +56,6 @@ export const VaultScreen = observer(function VaultScreen() {
         style={stylesheet.list}
       />
 
-      {/* Add Saving Bottom Sheet */}
-      {selectedGoal && (
-        <BrutalistBottomSheet
-          visible={addSavingVisible}
-          onClose={() => setAddSavingVisible(false)}
-          title={`SAVE FOR ${selectedGoal.title}`}
-        >
-          <ScrollView contentContainerStyle={stylesheet.formContent} keyboardShouldPersistTaps="handled">
-            <BrutalistInput
-              label="Amount ($)"
-              placeholder="e.g. 500"
-              keyboardType="numeric"
-              value={amountInput}
-              onChangeText={setAmountInput}
-            />
-            <BrutalistInput
-              label="Saved From"
-              placeholder="e.g. Freelance project, Salary bonus"
-              value={sourceInput}
-              onChangeText={setSourceInput}
-            />
-            <BrutalistInput
-              label="Comments"
-              placeholder="Any additional notes"
-              value={commentInput}
-              onChangeText={setCommentInput}
-            />
-            
-            <BrutalistButton
-              onPress={handleSaveTransactionSubmit}
-              backgroundColor={theme.colors.success}
-              style={stylesheet.submitBtn}
-            >
-              SAVE MONEY
-            </BrutalistButton>
-          </ScrollView>
-        </BrutalistBottomSheet>
-      )}
-
-      {/* History Bottom Sheet */}
-      <GoalHistorySheet
-        goalId={selectedGoalId}
-        visible={historyVisible}
-        onClose={() => setHistoryVisible(false)}
-      />
-
-      {/* Simulator Bottom Sheet */}
-      <VaultSimulatorSheet
-        goalId={selectedGoalId}
-        visible={simulateVisible}
-        onClose={() => setSimulateVisible(false)}
-      />
     </View>
   );
 });
