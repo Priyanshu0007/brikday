@@ -80,6 +80,15 @@ export const appActions = {
       }
     }
   },
+  isAllCompletedToday(): boolean {
+    const currentLog = todayLog$.get();
+    if (!currentLog || currentLog.entries.length === 0) return false;
+    
+    const todayStr = getLocalDateString();
+    if (currentLog.date !== todayStr) return false;
+    
+    return currentLog.entries.every(e => e.completed);
+  },
   addHabit(title: string, emoji?: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
     if (!title.trim()) return;
     const newHabit: HabitTemplate = {

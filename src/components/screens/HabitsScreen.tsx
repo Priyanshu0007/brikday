@@ -10,10 +10,10 @@ import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
 import { VoxelTower } from '@/components/ui/VoxelTower';
-
+import { ConfettiOverlay } from '@/ui/ConfettiOverlay';
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
-const HabitItem = observer(({ habitId }: { habitId: string }) => {
+const HabitItem = observer(({ habitId, onComplete }: { habitId: string, onComplete?: () => void }) => {
   const log = todayLog$.get();
   if (!log) return null;
 
@@ -62,7 +62,13 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
       accentColor={isCompleted ? theme.colors.success : undefined}
       neglected={isNeglected}
       style={styles.cardSpacing}
-      onPress={() => appActions.toggleHabit(habitId)}
+      onPress={() => {
+        const wasCompleted = appActions.isAllCompletedToday();
+        appActions.toggleHabit(habitId);
+        if (!wasCompleted && appActions.isAllCompletedToday()) {
+          onComplete?.();
+        }
+      }}
     >
       <View style={styles.itemRow}>
           {/* Custom styled checkbox indicator */}
@@ -105,6 +111,7 @@ const HabitItem = observer(({ habitId }: { habitId: string }) => {
 });
 
 export const HabitsScreen = observer(function HabitsScreen() {
+  const [showConfetti, setShowConfetti] = React.useState(false);
   const log = todayLog$.get();
   const habitIds = log?.entries.map(e => e.habitId) || [];
 
@@ -119,7 +126,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
   }, []);
 
   const renderItem = React.useCallback(
-    ({ item }: { item: string }) => <HabitItem habitId={item} />,
+    ({ item }: { item: string }) => <HabitItem habitId={item} onComplete={() => setShowConfetti(true)} />,
     []
   );
 
@@ -127,6 +134,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
 
   return (
     <View style={styles.container}>
+      <ConfettiOverlay isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
       {/* Title block */}
       <View style={styles.header}>
         <Typography variant="h2" uppercase>
