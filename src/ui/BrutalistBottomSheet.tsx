@@ -44,6 +44,7 @@ export function BrutalistBottomSheet({
       }}
       backgroundColor={theme.colors.paper}
       cornerRadius={theme.borderRadius}
+      grabber={false}
     >
       <View style={stylesheet.sheetContent}>
         {/* Header */}
