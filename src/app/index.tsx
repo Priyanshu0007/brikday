@@ -205,6 +205,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   profileIcon: {
     fontSize: 18,
+    lineHeight: 22,
   },
   headerSub: {
     marginTop: 2,
@@ -241,6 +242,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   tabIcon: {
     fontSize: 20,
+    lineHeight: 24,
     marginBottom: 2,
   },
   tabLabel: {

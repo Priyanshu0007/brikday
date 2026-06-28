@@ -328,6 +328,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   badgeEmoji: {
     fontSize: 32,
+    lineHeight: 38,
   },
   dateTag: {
     backgroundColor: theme.colors.border,
