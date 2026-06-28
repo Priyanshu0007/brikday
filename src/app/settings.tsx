@@ -20,7 +20,6 @@ export default function SettingsRoute() {
             styles.backButton,
             { backgroundColor: theme.colors.paper, borderColor: theme.colors.border },
           ]}
-          activeScale={0.9}
         >
           <Typography variant="bodyBold">◀ BACK</Typography>
         </PressableScale>

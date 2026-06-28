@@ -40,8 +40,6 @@ const DashboardHeader = observer(() => {
               styles.profileButton,
               { backgroundColor: theme.colors.paper, borderColor: theme.colors.border },
             ]}
-            // @ts-ignore
-            activeScale={0.9}
           >
             <Typography
               variant="bodyBold"
@@ -123,8 +121,6 @@ const AppDashboard = observer(() => {
                   { backgroundColor: theme.colors.paper, borderColor: theme.colors.border },
                 ],
               ]}
-              // @ts-ignore
-              activeScale={0.93}
             >
               <Typography variant="mono" style={styles.tabIcon}>
                 {tab.icon}

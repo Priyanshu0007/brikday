@@ -65,7 +65,6 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
         <PressableScale
           onPress={() => router.back()}
           style={stylesheet.backButton}
-          activeScale={0.9}
         >
           <Typography variant="bodyBold">◀ BACK</Typography>
         </PressableScale>

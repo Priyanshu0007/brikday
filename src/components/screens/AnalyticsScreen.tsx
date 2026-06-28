@@ -191,8 +191,6 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
               isActive && styles.switcherButtonActive,
               mode === 'month' && styles.switcherButtonSeparator,
             ]}
-            // @ts-ignore
-            activeScale={0.96}
           >
             <Typography
               variant="bodyBold"
@@ -220,7 +218,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         {/* Nav */}
         <View style={styles.navHeader}>
           {/* @ts-ignore */}
-          <PressableScale onPress={handlePrevWeek} style={styles.navButton} activeScale={0.9}>
+          <PressableScale onPress={handlePrevWeek} style={styles.navButton}>
             <Typography variant="bodyBold" color={theme.colors.text}>
               ◀
             </Typography>
@@ -229,7 +227,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             {rangeLabel}
           </Typography>
           {/* @ts-ignore */}
-          <PressableScale onPress={handleNextWeek} style={styles.navButton} activeScale={0.9}>
+          <PressableScale onPress={handleNextWeek} style={styles.navButton}>
             <Typography variant="bodyBold" color={theme.colors.text}>
               ▶
             </Typography>
@@ -259,8 +257,6 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                   isToday && styles.weekDayCellToday,
                   idx === 6 && { borderRightWidth: 0 },
                 ]}
-                // @ts-ignore
-                activeScale={0.93}
               >
                 <Typography variant="caption" style={styles.weekDayLabel}>
                   {cell.dayName.substring(0, 1)}
@@ -304,8 +300,6 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                   key={cell.dateString}
                   onPress={() => handleOpenDayHistory(cell.date)}
                   style={styles.chartBarWrapper}
-                  // @ts-ignore
-                  activeScale={0.93}
                 >
                   {total > 0 && (
                     <Typography variant="mono" style={styles.chartPercentageText}>
@@ -353,7 +347,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         {/* Nav */}
         <View style={styles.navHeader}>
           {/* @ts-ignore */}
-          <PressableScale onPress={handlePrevMonth} style={styles.navButton} activeScale={0.9}>
+          <PressableScale onPress={handlePrevMonth} style={styles.navButton}>
             <Typography variant="bodyBold" color={theme.colors.text}>
               ◀
             </Typography>
@@ -362,7 +356,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             {monthLabel}
           </Typography>
           {/* @ts-ignore */}
-          <PressableScale onPress={handleNextMonth} style={styles.navButton} activeScale={0.9}>
+          <PressableScale onPress={handleNextMonth} style={styles.navButton}>
             <Typography variant="bodyBold" color={theme.colors.text}>
               ▶
             </Typography>
@@ -406,8 +400,6 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                   { backgroundColor: cellBg, opacity: cellOpacity },
                   isToday && styles.calendarCellToday,
                 ]}
-                // @ts-ignore
-                activeScale={0.9}
               >
                 <Typography
                   variant="mono"
