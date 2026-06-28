@@ -2,7 +2,8 @@ import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
-import { vaultState$, SavingTransaction } from '@/state/store';
+import { vaultState$, SavingTransaction, userState$ } from '@/state/store';
+import { getCurrencySymbol } from '@/constants/currency';
 import { Typography } from '@/ui/Typography';
 import { stylesheet } from './styles';
 
@@ -19,6 +20,9 @@ export const GoalHistoryList = observer(({
 
   const transactions = goal$.transactions.get() || [];
 
+  const currencyCode = userState$.currencyCode.get() || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
+
   return (
     <ScrollView contentContainerStyle={stylesheet.historyListContent} showsVerticalScrollIndicator={false}>
       {transactions.length === 0 ? (
@@ -32,7 +36,7 @@ export const GoalHistoryList = observer(({
           <View key={tx.id} style={stylesheet.txnItem}>
             <View style={stylesheet.txnHeader}>
               <Typography variant="bodyBold" style={stylesheet.txnAmount}>
-                +${tx.amount.toLocaleString()}
+                +{currencySymbol}{tx.amount.toLocaleString()}
               </Typography>
               <Typography variant="mono" style={stylesheet.txnDate}>
                 {new Date(tx.date).toLocaleDateString(undefined, {

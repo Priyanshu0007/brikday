@@ -342,4 +342,7 @@ export const appActions = {
     if (username.trim()) userState$.username.set(username);
     if (role.trim()) userState$.role.set(role);
   },
+  updateCurrency(code: string) {
+    userState$.currencyCode.set(code);
+  },
 };

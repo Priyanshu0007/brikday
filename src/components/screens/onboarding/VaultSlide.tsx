@@ -3,6 +3,9 @@ import { View } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
+import { observer } from '@legendapp/state/react';
+import { userState$ } from '@/state/store';
+import { getCurrencySymbol } from '@/constants/currency';
 import { SlideContent } from './SlideContent';
 import { styles } from './styles';
 import { useUnistyles } from 'react-native-unistyles';
@@ -11,8 +14,10 @@ interface VaultSlideProps {
   activeIndex: SharedValue<number>;
 }
 
-export function VaultSlide({ activeIndex }: VaultSlideProps) {
+export const VaultSlide = observer(({ activeIndex }: VaultSlideProps) => {
   const { theme } = useUnistyles();
+  const currencyCode = userState$.currencyCode.get() || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
 
   return (
     <SlideContent index={2} activeIndex={activeIndex}>
@@ -35,8 +40,8 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
               <View style={[styles.progressBarFill, { width: '60%', backgroundColor: theme.colors.warning }]} />
             </View>
             <View style={styles.progressRow}>
-              <Typography variant="caption">$2,100 saved</Typography>
-              <Typography variant="caption" style={styles.progressRight}>$3,500 goal</Typography>
+              <Typography variant="caption">{currencySymbol}2,100 saved</Typography>
+              <Typography variant="caption" style={styles.progressRight}>{currencySymbol}3,500 goal</Typography>
             </View>
           </BrutalistCard>
 
@@ -46,7 +51,7 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
               <View style={[styles.progressBarFill, { width: '100%', backgroundColor: theme.colors.success }]} />
             </View>
             <View style={styles.progressRow}>
-              <Typography variant="caption">$1,500 saved</Typography>
+              <Typography variant="caption">{currencySymbol}1,500 saved</Typography>
               <Typography variant="caption" style={styles.progressRight}>✅ READY TO BUY</Typography>
             </View>
           </BrutalistCard>
@@ -59,4 +64,4 @@ export function VaultSlide({ activeIndex }: VaultSlideProps) {
         </View>
       </SlideContent>
   );
-}
+});

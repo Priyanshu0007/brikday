@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, LayoutChangeEvent } from 'react-native';
+import { View, LayoutChangeEvent, Text } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
 import Animated, { 
@@ -9,7 +9,8 @@ import Animated, {
   runOnJS
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { vaultState$ } from '@/state/store';
+import { vaultState$, userState$ } from '@/state/store';
+import { getCurrencySymbol } from '@/constants/currency';
 import { Typography } from '@/ui/Typography';
 import { stylesheet } from './styles';
 
@@ -52,6 +53,7 @@ const CustomSlider = ({
   prefix?: string;
   suffix?: string;
 }) => {
+  const { theme } = useUnistyles();
   const [trackWidth, setTrackWidth] = useState(0);
   const thumbSize = 40;
   
@@ -118,7 +120,7 @@ const CustomSlider = ({
       <View style={stylesheet.sliderLabelRow}>
         <Typography variant="bodyBold">{label}</Typography>
         <Typography variant="mono" style={stylesheet.sliderValueBadge}>
-          {prefix}{internalValue}{suffix}
+          {prefix ? <Text style={{ fontFamily: theme.fonts.body }}>{prefix}</Text> : null}{internalValue}{suffix}
         </Typography>
       </View>
       <View style={stylesheet.customSliderTrack} onLayout={handleTrackLayout}>
@@ -133,6 +135,9 @@ const CustomSlider = ({
 export const VaultSimulator = observer(({ goalId }: VaultSimulatorProps) => {
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
   
+  const currencyCode = userState$.currencyCode.get() || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
+
   const [weeklySavings, setWeeklySavings] = useState(50);
   const [interestRate, setInterestRate] = useState(5);
 
@@ -224,7 +229,7 @@ export const VaultSimulator = observer(({ goalId }: VaultSimulatorProps) => {
         max={1000}
         value={weeklySavings}
         onChange={setWeeklySavings}
-        prefix="$"
+        prefix={currencySymbol}
       />
 
       <CustomSlider

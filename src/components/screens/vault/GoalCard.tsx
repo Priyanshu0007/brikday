@@ -1,8 +1,9 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
-import { vaultState$ } from '@/state/store';
+import { vaultState$, userState$ } from '@/state/store';
+import { getCurrencySymbol } from '@/constants/currency';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
@@ -26,6 +27,9 @@ export const GoalCard = observer(({
   const progress = target > 0 ? saved / target : 0;
   const percentage = Math.round(progress * 100);
 
+  const currencyCode = userState$.currencyCode.get() || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
+
   return (
     <BrutalistCard 
       style={stylesheet.cardSpacing} 
@@ -41,7 +45,7 @@ export const GoalCard = observer(({
         </View>
 
         <Typography variant="caption" style={stylesheet.savedCaption}>
-          ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED
+          <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>{saved.toLocaleString()} / <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>{target.toLocaleString()} SAVED
         </Typography>
 
         {/* Static Progress Bar */}

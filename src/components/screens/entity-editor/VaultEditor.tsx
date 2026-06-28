@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
-import { vaultState$, appActions } from '@/state/store';
+import { vaultState$, appActions, userState$ } from '@/state/store';
+import { getCurrencySymbol } from '@/constants/currency';
 import { useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -13,6 +14,9 @@ import { stylesheet } from './styles';
 export const VaultEditor = observer(() => {
   const { theme } = useUnistyles();
   const goals = vaultState$.get();
+  const currencyCode = userState$.currencyCode.get() || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
+  
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -64,7 +68,7 @@ export const VaultEditor = observer(() => {
             <View style={stylesheet.listItemContent}>
               <Typography variant="bodyBold">{goal.title}</Typography>
               <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                TARGET: ${goal.target.toLocaleString()}
+                TARGET: {currencySymbol}{goal.target.toLocaleString()}
               </Typography>
             </View>
             <View style={stylesheet.listItemActions}>
@@ -92,7 +96,7 @@ export const VaultEditor = observer(() => {
             placeholder="e.g. M4 MACBOOK PRO"
           />
           <BrutalistInput
-            label="GOAL AMOUNT ($)"
+            label={`GOAL AMOUNT (${currencySymbol})`}
             value={target}
             onChangeText={setTarget}
             keyboardType="numeric"

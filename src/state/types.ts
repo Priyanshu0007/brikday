@@ -59,6 +59,7 @@ export interface UserProfile {
   username: string;
   role: string;
   isLoggedIn: boolean;
+  currencyCode: string;
 }
 
 export interface StatsProfile {

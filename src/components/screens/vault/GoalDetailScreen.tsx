@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { View, ScrollView, Alert, Pressable } from 'react-native';
+import { View, ScrollView, Alert, Pressable, Text } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appActions, vaultState$ } from '@/state/store';
+import { appActions, vaultState$, userState$ } from '@/state/store';
+import { getCurrencySymbol } from '@/constants/currency';
 import { Typography } from '@/ui/Typography';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
@@ -35,6 +36,9 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
 
   const progress = target > 0 ? saved / target : 0;
   const percentage = Math.round(progress * 100);
+
+  const currencyCode = userState$.currencyCode.get() || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
 
   const handleSaveTransactionSubmit = () => {
     const parsedAmount = parseFloat(amountInput);
@@ -71,7 +75,7 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
         <View style={stylesheet.sliderHeader}>
           <Typography variant="h2">{percentage}%</Typography>
           <Typography variant="mono" style={stylesheet.savedCaption}>
-            ${saved.toLocaleString()} / ${target.toLocaleString()} SAVED
+            <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>{saved.toLocaleString()} / <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>{target.toLocaleString()} SAVED
           </Typography>
         </View>
         <View style={stylesheet.staticTrackContainer}>
@@ -135,7 +139,7 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
       >
         <ScrollView contentContainerStyle={stylesheet.formContent} keyboardShouldPersistTaps="handled">
           <BrutalistInput
-            label="Amount ($)"
+            label={`Amount (${currencySymbol})`}
             placeholder="e.g. 500"
             keyboardType="numeric"
             value={amountInput}

@@ -9,6 +9,7 @@ import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
+import { CURRENCY_OPTIONS } from '@/constants/currency';
 
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -35,6 +36,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
 
   // Accordion state
   const [themeAccordionOpen, setThemeAccordionOpen] = useState(false);
+  const [currencyAccordionOpen, setCurrencyAccordionOpen] = useState(false);
 
   const handleOpenSheet = (type: 'profile') => {
     setSheetType(type);
@@ -61,7 +63,19 @@ export const SettingsScreen = observer(function SettingsScreen() {
     setThemeAccordionOpen(false);
   };
 
+  const toggleCurrencyAccordion = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCurrencyAccordionOpen(!currencyAccordionOpen);
+  };
+
+  const selectCurrency = (code: string) => {
+    appActions.updateCurrency(code);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCurrencyAccordionOpen(false);
+  };
+
   const currentTheme = uiState$.theme.get() || 'system';
+  const currentCurrency = user.currencyCode || 'USD';
 
   return (
     <View style={stylesheet.outerContainer}>
@@ -172,6 +186,43 @@ export const SettingsScreen = observer(function SettingsScreen() {
                       {option.label}
                     </Typography>
                     {currentTheme === option.value && (
+                      <Typography variant="bodyBold" color={theme.colors.text}>✓</Typography>
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </BrutalistCard>
+
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <Pressable onPress={toggleCurrencyAccordion} style={stylesheet.accordionHeader}>
+              <View style={stylesheet.actionTextWrapper}>
+                <Typography variant="bodyBold">CURRENCY</Typography>
+                <Typography variant="caption">Current: {CURRENCY_OPTIONS.find(c => c.value === currentCurrency)?.label || 'Dollar ($)'}</Typography>
+              </View>
+              <Typography variant="bodyBold" style={{ fontSize: 20 }}>
+                {currencyAccordionOpen ? '[-]' : '[+]'}
+              </Typography>
+            </Pressable>
+            
+            {currencyAccordionOpen && (
+              <View style={stylesheet.accordionContent}>
+                {CURRENCY_OPTIONS.map((option) => (
+                  <Pressable 
+                    key={option.value}
+                    style={[
+                      stylesheet.accordionOption, 
+                      currentCurrency === option.value && stylesheet.accordionOptionSelected
+                    ]}
+                    onPress={() => selectCurrency(option.value)}
+                  >
+                    <Typography 
+                      variant="bodyBold" 
+                      color={currentCurrency === option.value ? theme.colors.text : theme.colors.textMuted}
+                    >
+                      {option.label}
+                    </Typography>
+                    {currentCurrency === option.value && (
                       <Typography variant="bodyBold" color={theme.colors.text}>✓</Typography>
                     )}
                   </Pressable>

@@ -1,8 +1,11 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, ScrollView, Pressable } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
+import { observer } from '@legendapp/state/react';
+import { appActions, userState$ } from '@/state/store';
+import { CURRENCY_OPTIONS } from '@/constants/currency';
 import { useUnistyles } from 'react-native-unistyles';
 import { SlideContent } from './SlideContent';
 import { styles } from './styles';
@@ -11,8 +14,10 @@ interface GetStartedSlideProps {
   activeIndex: SharedValue<number>;
 }
 
-export function GetStartedSlide({ activeIndex }: GetStartedSlideProps) {
-  useUnistyles();
+export const GetStartedSlide = observer(({ activeIndex }: GetStartedSlideProps) => {
+  const { theme } = useUnistyles();
+  const currentCurrency = userState$.currencyCode.get() || 'USD';
+
   return (
     <SlideContent index={4} activeIndex={activeIndex}>
         <View style={styles.finalEmoji}>
@@ -47,6 +52,37 @@ export function GetStartedSlide({ activeIndex }: GetStartedSlideProps) {
           </BrutalistCard>
         </View>
 
+        <View style={{ marginTop: 24, width: '100%', alignItems: 'center' }}>
+          <Typography variant="bodyBold" style={{ marginBottom: 12 }}>
+            SELECT YOUR CURRENCY
+          </Typography>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}>
+            {CURRENCY_OPTIONS.map((c) => (
+              <Pressable
+                key={c.value}
+                onPress={() => appActions.updateCurrency(c.value)}
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 16,
+                  borderWidth: theme.borderWidth,
+                  borderColor: theme.colors.border,
+                  backgroundColor: currentCurrency === c.value ? theme.colors.primary : theme.colors.background,
+                  borderRadius: theme.borderRadius,
+                  shadowColor: theme.colors.shadow,
+                  shadowOffset: currentCurrency === c.value ? { width: 0, height: 0 } : { width: 2, height: 2 },
+                  shadowOpacity: 1,
+                  shadowRadius: 0,
+                  transform: [{ translateY: currentCurrency === c.value ? 2 : 0 }, { translateX: currentCurrency === c.value ? 2 : 0 }],
+                }}
+              >
+                <Typography variant="bodyBold" color={currentCurrency === c.value ? theme.colors.background : theme.colors.text}>
+                  {c.label}
+                </Typography>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
         <View style={styles.motivationBox}>
           <Typography variant="mono" style={styles.motivationText}>
             "DISCIPLINE IS THE BRIDGE BETWEEN{'\n'}GOALS AND ACCOMPLISHMENT"
@@ -54,4 +90,4 @@ export function GetStartedSlide({ activeIndex }: GetStartedSlideProps) {
         </View>
       </SlideContent>
   );
-}
+});
