@@ -20,74 +20,95 @@ export const GetStartedSlide = observer(({ activeIndex }: GetStartedSlideProps) 
 
   return (
     <SlideContent index={4} activeIndex={activeIndex}>
-        <View style={styles.finalEmoji}>
-          <Typography variant="h1" style={styles.emojiTextLarge}>🔥</Typography>
-        </View>
-
-        <Typography variant="h2" style={[styles.slideTitle, { textAlign: 'center' }]}>
-          Ready to Build?
+      <View style={styles.finalEmoji}>
+        <Typography variant="h1" style={styles.emojiTextLarge}>
+          🔥
         </Typography>
-        <Typography variant="body" style={[styles.slideDescription, { textAlign: 'center' }]}>
-          Every brick you place today compounds into the life you want tomorrow. No shortcuts, no excuses — just raw consistency.
+      </View>
+
+      <Typography variant="h2" style={[styles.slideTitle, { textAlign: 'center' }]}>
+        Ready to Build?
+      </Typography>
+      <Typography variant="body" style={[styles.slideDescription, { textAlign: 'center' }]}>
+        Every brick you place today compounds into the life you want tomorrow. No shortcuts, no
+        excuses — just raw consistency.
+      </Typography>
+
+      <View style={styles.summaryContainer}>
+        <BrutalistCard>
+          <View style={styles.summaryRow}>
+            <Typography variant="bodyBold" style={styles.summaryEmoji}>
+              ⚡
+            </Typography>
+            <Typography variant="body">Set up your daily habits</Typography>
+          </View>
+        </BrutalistCard>
+        <BrutalistCard>
+          <View style={styles.summaryRow}>
+            <Typography variant="bodyBold" style={styles.summaryEmoji}>
+              🪙
+            </Typography>
+            <Typography variant="body">Create your first savings goal</Typography>
+          </View>
+        </BrutalistCard>
+        <BrutalistCard>
+          <View style={styles.summaryRow}>
+            <Typography variant="bodyBold" style={styles.summaryEmoji}>
+              🧱
+            </Typography>
+            <Typography variant="body">Add projects to your list</Typography>
+          </View>
+        </BrutalistCard>
+      </View>
+
+      <View style={{ marginTop: 24, width: '100%', alignItems: 'center' }}>
+        <Typography variant="bodyBold" style={{ marginBottom: 12 }}>
+          SELECT YOUR CURRENCY
         </Typography>
-
-        <View style={styles.summaryContainer}>
-          <BrutalistCard>
-            <View style={styles.summaryRow}>
-              <Typography variant="bodyBold" style={styles.summaryEmoji}>⚡</Typography>
-              <Typography variant="body">Set up your daily habits</Typography>
-            </View>
-          </BrutalistCard>
-          <BrutalistCard>
-            <View style={styles.summaryRow}>
-              <Typography variant="bodyBold" style={styles.summaryEmoji}>🪙</Typography>
-              <Typography variant="body">Create your first savings goal</Typography>
-            </View>
-          </BrutalistCard>
-          <BrutalistCard>
-            <View style={styles.summaryRow}>
-              <Typography variant="bodyBold" style={styles.summaryEmoji}>🧱</Typography>
-              <Typography variant="body">Add projects to your list</Typography>
-            </View>
-          </BrutalistCard>
-        </View>
-
-        <View style={{ marginTop: 24, width: '100%', alignItems: 'center' }}>
-          <Typography variant="bodyBold" style={{ marginBottom: 12 }}>
-            SELECT YOUR CURRENCY
-          </Typography>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}>
-            {CURRENCY_OPTIONS.map((c) => (
-              <Pressable
-                key={c.value}
-                onPress={() => appActions.updateCurrency(c.value)}
-                style={{
-                  paddingVertical: 10,
-                  paddingHorizontal: 16,
-                  borderWidth: theme.borderWidth,
-                  borderColor: theme.colors.border,
-                  backgroundColor: currentCurrency === c.value ? theme.colors.primary : theme.colors.background,
-                  borderRadius: theme.borderRadius,
-                  shadowColor: theme.colors.shadow,
-                  shadowOffset: currentCurrency === c.value ? { width: 0, height: 0 } : { width: 2, height: 2 },
-                  shadowOpacity: 1,
-                  shadowRadius: 0,
-                  transform: [{ translateY: currentCurrency === c.value ? 2 : 0 }, { translateX: currentCurrency === c.value ? 2 : 0 }],
-                }}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}
+        >
+          {CURRENCY_OPTIONS.map((c) => (
+            <Pressable
+              key={c.value}
+              onPress={() => appActions.updateCurrency(c.value)}
+              style={{
+                paddingVertical: 10,
+                paddingHorizontal: 16,
+                borderWidth: theme.borderWidth,
+                borderColor: theme.colors.border,
+                backgroundColor:
+                  currentCurrency === c.value ? theme.colors.primary : theme.colors.background,
+                borderRadius: theme.borderRadius,
+                shadowColor: theme.colors.shadow,
+                shadowOffset:
+                  currentCurrency === c.value ? { width: 0, height: 0 } : { width: 2, height: 2 },
+                shadowOpacity: 1,
+                shadowRadius: 0,
+                transform: [
+                  { translateY: currentCurrency === c.value ? 2 : 0 },
+                  { translateX: currentCurrency === c.value ? 2 : 0 },
+                ],
+              }}
+            >
+              <Typography
+                variant="bodyBold"
+                color={currentCurrency === c.value ? theme.colors.background : theme.colors.text}
               >
-                <Typography variant="bodyBold" color={currentCurrency === c.value ? theme.colors.background : theme.colors.text}>
-                  {c.label}
-                </Typography>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
+                {c.label}
+              </Typography>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
 
-        <View style={styles.motivationBox}>
-          <Typography variant="mono" style={styles.motivationText}>
-            "DISCIPLINE IS THE BRIDGE BETWEEN{'\n'}GOALS AND ACCOMPLISHMENT"
-          </Typography>
-        </View>
-      </SlideContent>
+      <View style={styles.motivationBox}>
+        <Typography variant="mono" style={styles.motivationText}>
+          "DISCIPLINE IS THE BRIDGE BETWEEN{'\n'}GOALS AND ACCOMPLISHMENT"
+        </Typography>
+      </View>
+    </SlideContent>
   );
 });

@@ -15,46 +15,55 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
   useUnistyles();
   return (
     <SlideContent index={0} activeIndex={activeIndex}>
-        <View style={styles.welcomeEmoji}>
-          <Typography variant="h1" style={styles.emojiText}>🧱</Typography>
+      <View style={styles.welcomeEmoji}>
+        <Typography variant="h1" style={styles.emojiText}>
+          🧱
+        </Typography>
+      </View>
+
+      <Typography variant="h2" style={styles.slideTitle}>
+        What is Brickday?
+      </Typography>
+      <Typography variant="body" style={styles.slideDescription}>
+        Brickday is a tool to help you stay on track. It helps you build good habits, save money
+        without debt, and complete your projects.
+      </Typography>
+
+      <BrutalistCard>
+        <View style={styles.conceptRow}>
+          <Typography variant="bodyBold" style={styles.conceptIcon}>
+            ⚡
+          </Typography>
+          <View style={styles.conceptText}>
+            <Typography variant="bodyBold">HABITS</Typography>
+            <Typography variant="caption">Daily habits & streaks</Typography>
+          </View>
         </View>
+      </BrutalistCard>
 
-        <Typography variant="h2" style={styles.slideTitle}>
-          What is Brickday?
-        </Typography>
-        <Typography variant="body" style={styles.slideDescription}>
-          Brickday is a tool to help you stay on track. It helps you build good habits, save money without debt, and complete your projects.
-        </Typography>
-
-        <BrutalistCard>
-          <View style={styles.conceptRow}>
-            <Typography variant="bodyBold" style={styles.conceptIcon}>⚡</Typography>
-            <View style={styles.conceptText}>
-              <Typography variant="bodyBold">HABITS</Typography>
-              <Typography variant="caption">Daily habits & streaks</Typography>
-            </View>
+      <BrutalistCard>
+        <View style={styles.conceptRow}>
+          <Typography variant="bodyBold" style={styles.conceptIcon}>
+            🪙
+          </Typography>
+          <View style={styles.conceptText}>
+            <Typography variant="bodyBold">SAVINGS</Typography>
+            <Typography variant="caption">Save & pay in full — zero EMI</Typography>
           </View>
-        </BrutalistCard>
+        </View>
+      </BrutalistCard>
 
-        <BrutalistCard>
-          <View style={styles.conceptRow}>
-            <Typography variant="bodyBold" style={styles.conceptIcon}>🪙</Typography>
-            <View style={styles.conceptText}>
-              <Typography variant="bodyBold">SAVINGS</Typography>
-              <Typography variant="caption">Save & pay in full — zero EMI</Typography>
-            </View>
+      <BrutalistCard>
+        <View style={styles.conceptRow}>
+          <Typography variant="bodyBold" style={styles.conceptIcon}>
+            🧱
+          </Typography>
+          <View style={styles.conceptText}>
+            <Typography variant="bodyBold">PROJECTS</Typography>
+            <Typography variant="caption">Projects & goals tracker</Typography>
           </View>
-        </BrutalistCard>
-
-        <BrutalistCard>
-          <View style={styles.conceptRow}>
-            <Typography variant="bodyBold" style={styles.conceptIcon}>🧱</Typography>
-            <View style={styles.conceptText}>
-              <Typography variant="bodyBold">PROJECTS</Typography>
-              <Typography variant="caption">Projects & goals tracker</Typography>
-            </View>
-          </View>
-        </BrutalistCard>
-      </SlideContent>
+        </View>
+      </BrutalistCard>
+    </SlideContent>
   );
 }

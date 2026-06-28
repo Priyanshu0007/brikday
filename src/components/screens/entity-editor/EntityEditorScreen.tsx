@@ -17,13 +17,13 @@ export const EntityEditorScreen = observer(() => {
   const [activeTab, setActiveTab] = useState<'engine' | 'vault' | 'blueprint'>('engine');
   const pagerRef = useRef<PagerView>(null);
   const tabs = ['engine', 'vault', 'blueprint'] as const;
-  const tabLabels: Record<typeof tabs[number], string> = {
+  const tabLabels: Record<(typeof tabs)[number], string> = {
     engine: 'HABITS',
     vault: 'SAVINGS',
     blueprint: 'PROJECTS',
   };
 
-  const handleTabPress = (tab: typeof tabs[number], index: number) => {
+  const handleTabPress = (tab: (typeof tabs)[number], index: number) => {
     setActiveTab(tab);
     pagerRef.current?.setPage(index);
   };
@@ -32,7 +32,11 @@ export const EntityEditorScreen = observer(() => {
     <SafeAreaView style={stylesheet.modalContainer} edges={['top', 'bottom']}>
       <View style={stylesheet.header}>
         <Typography variant="h2">YOUR DATA</Typography>
-        <BrutalistButton onPress={() => router.back()} size="sm" backgroundColor={theme.colors.danger}>
+        <BrutalistButton
+          onPress={() => router.back()}
+          size="sm"
+          backgroundColor={theme.colors.danger}
+        >
           CLOSE
         </BrutalistButton>
       </View>
@@ -44,7 +48,10 @@ export const EntityEditorScreen = observer(() => {
             style={[stylesheet.tab, activeTab === tab && stylesheet.tabActive]}
             onPress={() => handleTabPress(tab, index)}
           >
-            <Typography variant="bodyBold" style={[stylesheet.tabText, activeTab === tab && stylesheet.tabTextActive]}>
+            <Typography
+              variant="bodyBold"
+              style={[stylesheet.tabText, activeTab === tab && stylesheet.tabTextActive]}
+            >
               {tabLabels[tab]}
             </Typography>
           </Pressable>

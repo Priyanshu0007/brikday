@@ -18,22 +18,22 @@ Do **NOT** reference Expo SDK 51/52/53 patterns — many APIs have changed.
 
 ## Tech Stack at a Glance
 
-| Layer            | Technology                                                    |
-| ---------------- | ------------------------------------------------------------- |
-| Framework        | Expo SDK 56 (Managed → CNG prebuild)                         |
-| Language         | TypeScript 6 (strict mode)                                    |
-| Navigation       | `expo-router` v56 (file-based routing)                        |
-| State Management | `@legendapp/state` v3 (observables + `observer` HOC)          |
-| Lists            | `@legendapp/list` v3 (optimized list rendering)               |
-| Persistence      | `react-native-mmkv` v4 (via Legend State sync plugin + raw MMKV) |
-| Styling          | `react-native-unistyles` v3 (themes, breakpoints, Babel plugin) |
-| Animations       | `react-native-reanimated` v4                                  |
-| Gestures         | `react-native-gesture-handler` v2                             |
-| Pressables       | `pressto` (`PressableScale` + `createAnimatedPressable`)      |
-| Haptics          | `react-native-pulsar` (via `Presets.System.*`)                |
-| Safe Areas       | `react-native-safe-area-context` v5                           |
+| Layer            | Technology                                                            |
+| ---------------- | --------------------------------------------------------------------- |
+| Framework        | Expo SDK 56 (Managed → CNG prebuild)                                  |
+| Language         | TypeScript 6 (strict mode)                                            |
+| Navigation       | `expo-router` v56 (file-based routing)                                |
+| State Management | `@legendapp/state` v3 (observables + `observer` HOC)                  |
+| Lists            | `@legendapp/list` v3 (optimized list rendering)                       |
+| Persistence      | `react-native-mmkv` v4 (via Legend State sync plugin + raw MMKV)      |
+| Styling          | `react-native-unistyles` v3 (themes, breakpoints, Babel plugin)       |
+| Animations       | `react-native-reanimated` v4                                          |
+| Gestures         | `react-native-gesture-handler` v2                                     |
+| Pressables       | `pressto` (`PressableScale` + `createAnimatedPressable`)              |
+| Haptics          | `react-native-pulsar` (via `Presets.System.*`)                        |
+| Safe Areas       | `react-native-safe-area-context` v5                                   |
 | Fonts            | `@expo-google-fonts/*` — Space Grotesk, Plus Jakarta Sans, Space Mono |
-| Package Manager  | **Bun** (use `bun` not `npm`/`yarn`)                          |
+| Package Manager  | **Bun** (use `bun` not `npm`/`yarn`)                                  |
 
 ---
 
@@ -213,13 +213,13 @@ const { theme } = useUnistyles();
 
 Always prefer `src/ui/` primitives over raw `View`/`Text`:
 
-| Component            | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `<Typography>`       | All text rendering — `variant` prop for size/weight |
-| `<BrutalistCard>`    | Pressable card with shadow — supports `onPress`, `hapticFeedback`, `neglected` |
-| `<BrutalistButton>`  | Pressable button with brutalist styling           |
-| `<BrutalistInput>`   | Styled text input                                 |
-| `<BrutalistBottomSheet>` | Bottom sheet wrapper (uses `react-native-true-sheet`) |
+| Component                | Purpose                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| `<Typography>`           | All text rendering — `variant` prop for size/weight                            |
+| `<BrutalistCard>`        | Pressable card with shadow — supports `onPress`, `hapticFeedback`, `neglected` |
+| `<BrutalistButton>`      | Pressable button with brutalist styling                                        |
+| `<BrutalistInput>`       | Styled text input                                                              |
+| `<BrutalistBottomSheet>` | Bottom sheet wrapper (uses `react-native-true-sheet`)                          |
 
 ### Typography Variants
 
@@ -239,8 +239,8 @@ Use `triggerHaptic()` from `@/ui/haptics` — wraps `react-native-pulsar`:
 
 ```ts
 import { triggerHaptic } from '@/ui/haptics';
-triggerHaptic('soft');   // default for cards
-triggerHaptic('light');  // subtle taps
+triggerHaptic('soft'); // default for cards
+triggerHaptic('light'); // subtle taps
 triggerHaptic('success'); // completion feedback
 ```
 
@@ -257,7 +257,7 @@ import { PressableScale } from 'pressto';
 
 <PressableScale onPress={handlePress} activeScale={0.93}>
   <Typography variant="mono">Label</Typography>
-</PressableScale>
+</PressableScale>;
 ```
 
 **2. `createAnimatedPressable`** — A factory for custom press animations. Used in `BrutalistCard` and `BrutalistButton` for the neo-brutalist shadow-offset effect:
@@ -268,10 +268,7 @@ import { createAnimatedPressable } from 'pressto';
 const PressableBrutalist = createAnimatedPressable((progress) => {
   'worklet';
   return {
-    transform: [
-      { translateX: progress * 4 },
-      { translateY: progress * 4 },
-    ],
+    transform: [{ translateX: progress * 4 }, { translateY: progress * 4 }],
   };
 });
 ```
@@ -293,7 +290,7 @@ The `progress` value goes from 0 → 1 on press. Keep offset at **4px** for stan
   - **Note**: Tab switching sets `uiState$.activeTab` directly in the component (a known exception to the `appActions`-only rule, since it's trivial UI state).
 - **Auth flow**: `authState$.status` drives which screen renders:
   - `'onboarding'` → OnboardingScreen (PagerView slides)
-  - `'login'` → LoginScreen *(currently bypassed in dev — routes to AppDashboard)*
+  - `'login'` → LoginScreen _(currently bypassed in dev — routes to AppDashboard)_
   - `'authenticated'` → Main tabbed interface
 
 ---
@@ -400,15 +397,15 @@ When creating a new component or screen:
 
 ## File Naming Conventions
 
-| Type             | Convention            | Example                      |
-| ---------------- | --------------------- | ---------------------------- |
-| Routes           | `kebab-case.tsx`      | `settings.tsx`, `editor.tsx` |
+| Type              | Convention           | Example                      |
+| ----------------- | -------------------- | ---------------------------- |
+| Routes            | `kebab-case.tsx`     | `settings.tsx`, `editor.tsx` |
 | Screen components | `PascalCase.tsx`     | `HabitsScreen.tsx`           |
-| UI primitives    | `PascalCase.tsx`      | `BrutalistCard.tsx`          |
-| State slices     | `camelCaseSlice.ts`   | `habitsSlice.ts`             |
-| Style files      | `styles.ts`           | Co-located with screen       |
-| Utilities        | `camelCase.ts`        | `date.ts`                    |
-| Barrel exports   | `index.ts`            | Re-exports from directory    |
+| UI primitives     | `PascalCase.tsx`     | `BrutalistCard.tsx`          |
+| State slices      | `camelCaseSlice.ts`  | `habitsSlice.ts`             |
+| Style files       | `styles.ts`          | Co-located with screen       |
+| Utilities         | `camelCase.ts`       | `date.ts`                    |
+| Barrel exports    | `index.ts`           | Re-exports from directory    |
 | Platform-specific | `*.web.tsx` / `*.ts` | `use-color-scheme.web.ts`    |
 
 ---

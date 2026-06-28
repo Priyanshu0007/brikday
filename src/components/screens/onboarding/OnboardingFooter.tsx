@@ -44,10 +44,7 @@ export function OnboardingFooter({ currentPage, activeIndex, onNext }: Onboardin
       </Typography>
 
       {/* Action Button */}
-      <BrutalistButton
-        onPress={onNext}
-        backgroundColor={getButtonColor()}
-      >
+      <BrutalistButton onPress={onNext} backgroundColor={getButtonColor()}>
         {getButtonLabel()}
       </BrutalistButton>
 

@@ -22,7 +22,7 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
 
   const pagerRef = useRef<PagerView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   const [addSavingVisible, setAddSavingVisible] = useState(false);
   const [amountInput, setAmountInput] = useState('');
   const [sourceInput, setSourceInput] = useState('');
@@ -50,7 +50,7 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
       goalId,
       parsedAmount,
       sourceInput || 'Manual Savings',
-      commentInput || ''
+      commentInput || '',
     );
     setAddSavingVisible(false);
     setAmountInput('');
@@ -62,7 +62,11 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
     <SafeAreaView style={stylesheet.detailContainer} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={stylesheet.detailHeader}>
-        <PressableScale onPress={() => router.back()} style={stylesheet.backButton} activeScale={0.9}>
+        <PressableScale
+          onPress={() => router.back()}
+          style={stylesheet.backButton}
+          activeScale={0.9}
+        >
           <Typography variant="bodyBold">◀ BACK</Typography>
         </PressableScale>
         <Typography variant="h3" uppercase style={stylesheet.detailTitle} numberOfLines={2}>
@@ -75,7 +79,10 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
         <View style={stylesheet.sliderHeader}>
           <Typography variant="h2">{percentage}%</Typography>
           <Typography variant="mono" style={stylesheet.savedCaption}>
-            <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>{saved.toLocaleString()} / <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>{target.toLocaleString()} SAVED
+            <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>
+            {saved.toLocaleString()} /{' '}
+            <Text style={{ fontFamily: theme.fonts.body }}>{currencySymbol}</Text>
+            {target.toLocaleString()} SAVED
           </Typography>
         </View>
         <View style={stylesheet.staticTrackContainer}>
@@ -88,15 +95,20 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
       {/* Tabs */}
       <View style={stylesheet.detailTabBar}>
         {['HISTORY', 'SIMULATE'].map((tab, idx) => (
-          <Pressable 
+          <Pressable
             key={tab}
             onPress={() => {
               setActiveIndex(idx);
               pagerRef.current?.setPage(idx);
-            }} 
+            }}
             style={[stylesheet.detailTab, activeIndex === idx && stylesheet.detailTabActive]}
           >
-            <Typography variant="mono" style={activeIndex === idx ? stylesheet.detailTabTextActive : stylesheet.detailTabText}>
+            <Typography
+              variant="mono"
+              style={
+                activeIndex === idx ? stylesheet.detailTabTextActive : stylesheet.detailTabText
+              }
+            >
               {tab}
             </Typography>
           </Pressable>
@@ -137,7 +149,10 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
         onClose={() => setAddSavingVisible(false)}
         title={`SAVE FOR ${title.toUpperCase()}`}
       >
-        <ScrollView contentContainerStyle={stylesheet.formContent} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={stylesheet.formContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <BrutalistInput
             label={`Amount (${currencySymbol})`}
             placeholder="e.g. 500"
@@ -157,7 +172,7 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
             value={commentInput}
             onChangeText={setCommentInput}
           />
-          
+
           <BrutalistButton
             onPress={handleSaveTransactionSubmit}
             backgroundColor={theme.colors.success}

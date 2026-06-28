@@ -8,20 +8,14 @@ import { triggerHaptic, HapticFeedbackType } from './haptics';
 const PressableBrutalist4 = createAnimatedPressable((progress) => {
   'worklet';
   return {
-    transform: [
-      { translateX: progress * 4 },
-      { translateY: progress * 4 },
-    ],
+    transform: [{ translateX: progress * 4 }, { translateY: progress * 4 }],
   };
 });
 
 const PressableBrutalist8 = createAnimatedPressable((progress) => {
   'worklet';
   return {
-    transform: [
-      { translateX: progress * 8 },
-      { translateY: progress * 8 },
-    ],
+    transform: [{ translateX: progress * 8 }, { translateY: progress * 8 }],
   };
 });
 
@@ -45,14 +39,12 @@ export function BrutalistCard({
   hapticFeedback = 'soft',
 }: BrutalistCardProps) {
   const { theme } = useUnistyles();
-  
+
   const finalBackgroundColor = backgroundColor || theme.colors.paper;
 
   // When neglected, the card decays: turns background to danger red, but keeps same shadow offset for alignment.
-  const activeBgColor = neglected 
-    ? theme.colors.danger 
-    : (accentColor || finalBackgroundColor);
-  
+  const activeBgColor = neglected ? theme.colors.danger : accentColor || finalBackgroundColor;
+
   const offset = 4;
 
   const animatedCardStyle = useAnimatedStyle(() => {
@@ -70,13 +62,7 @@ export function BrutalistCard({
   const PressableWrapper = onPress ? PressableBrutalist4 : View;
 
   return (
-    <View 
-      style={[
-        stylesheet.cardWrapper, 
-        style, 
-        { paddingRight: offset, paddingBottom: offset }
-      ]}
-    >
+    <View style={[stylesheet.cardWrapper, style, { paddingRight: offset, paddingBottom: offset }]}>
       {/* Shadow layer behind */}
       <View
         style={[
@@ -89,18 +75,11 @@ export function BrutalistCard({
           },
         ]}
       />
-      
+
       {/* Foreground card layer */}
       {/* @ts-ignore */}
       <PressableWrapper onPress={onPress ? handlePress : undefined}>
-        <Animated.View
-          style={[
-            stylesheet.card,
-            animatedCardStyle,
-          ]}
-        >
-          {children}
-        </Animated.View>
+        <Animated.View style={[stylesheet.card, animatedCardStyle]}>{children}</Animated.View>
       </PressableWrapper>
     </View>
   );

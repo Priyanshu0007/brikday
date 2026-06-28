@@ -36,9 +36,7 @@ export function SlideContent({ index, activeIndex, children }: SlideContentProps
 
   return (
     <View style={styles.slideOuter}>
-      <Animated.View style={[styles.slideInner, animatedStyle]}>
-        {children}
-      </Animated.View>
+      <Animated.View style={[styles.slideInner, animatedStyle]}>{children}</Animated.View>
     </View>
   );
 }

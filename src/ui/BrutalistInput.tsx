@@ -38,14 +38,9 @@ export function BrutalistInput({
           {label}
         </Typography>
       )}
-      
+
       {/* Outer box holding both foreground and background layers */}
-      <View 
-        style={[
-          stylesheet.inputOuter, 
-          { paddingRight: offset, paddingBottom: offset }
-        ]}
-      >
+      <View style={[stylesheet.inputOuter, { paddingRight: offset, paddingBottom: offset }]}>
         {/* Shadow layer behind */}
         <View
           style={[
@@ -58,7 +53,7 @@ export function BrutalistInput({
             },
           ]}
         />
-        
+
         {/* Foreground input container */}
         <View style={stylesheet.inputContainer}>
           <TextInput

@@ -6,10 +6,36 @@ import { Typography } from '@/ui/Typography';
 import { triggerHaptic } from '@/ui/haptics';
 
 const COMMON_EMOJIS = [
-  '💪', '🏃‍♂️', '📚', '🧘', '💧', '🎨', '💻', '🏋️',
-  '🍳', '✍️', '🎵', '🌿', '🍎', '💤', '🧠', '💸',
-  '🧹', '🚲', '🎸', '📱', '☀️', '☕', '🚀', '🎯',
-  '🧘‍♀️', '🧗', '🔥', '💡', '📖', '📅'
+  '💪',
+  '🏃‍♂️',
+  '📚',
+  '🧘',
+  '💧',
+  '🎨',
+  '💻',
+  '🏋️',
+  '🍳',
+  '✍️',
+  '🎵',
+  '🌿',
+  '🍎',
+  '💤',
+  '🧠',
+  '💸',
+  '🧹',
+  '🚲',
+  '🎸',
+  '📱',
+  '☀️',
+  '☕',
+  '🚀',
+  '🎯',
+  '🧘‍♀️',
+  '🧗',
+  '🔥',
+  '💡',
+  '📖',
+  '📅',
 ];
 
 interface EmojiPickerProps {
@@ -33,7 +59,7 @@ export const EmojiPicker = ({ onSelect, selectedEmoji }: EmojiPickerProps) => {
 
   const renderItem = ({ item }: { item: string }) => {
     const isSelected = selectedEmoji === item;
-    
+
     return (
       <BrutalistCard
         onPress={() => handleSelect(item)}
@@ -79,5 +105,5 @@ const styles = StyleSheet.create((theme) => ({
   },
   emojiText: {
     fontSize: 24,
-  }
+  },
 }));

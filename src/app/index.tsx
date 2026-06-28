@@ -36,11 +36,19 @@ const DashboardHeader = observer(() => {
               triggerHaptic('selection');
               router.push('/settings');
             }}
-            style={[styles.profileButton, { backgroundColor: theme.colors.paper, borderColor: theme.colors.border }]}
+            style={[
+              styles.profileButton,
+              { backgroundColor: theme.colors.paper, borderColor: theme.colors.border },
+            ]}
             // @ts-ignore
             activeScale={0.9}
           >
-            <Typography variant="bodyBold" style={[styles.profileIcon, { color: theme.colors.text }]}>👤</Typography>
+            <Typography
+              variant="bodyBold"
+              style={[styles.profileIcon, { color: theme.colors.text }]}
+            >
+              👤
+            </Typography>
           </PressableScale>
         </View>
       </View>
@@ -89,12 +97,19 @@ const AppDashboard = observer(() => {
       <DashboardHeader />
 
       {/* Screen Area */}
-      <View style={styles.screenArea}>
-        {renderActiveScreen()}
-      </View>
+      <View style={styles.screenArea}>{renderActiveScreen()}</View>
 
       {/* Stark Neo-Brutalist Tab Bar */}
-      <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+      <View
+        style={[
+          styles.tabBar,
+          {
+            paddingBottom: Math.max(insets.bottom, 8),
+            backgroundColor: theme.colors.background,
+            borderColor: theme.colors.border,
+          },
+        ]}
+      >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -103,7 +118,10 @@ const AppDashboard = observer(() => {
               onPress={() => handleTabPress(tab.id)}
               style={[
                 styles.tabButton,
-                isActive && [styles.tabButtonActive, { backgroundColor: theme.colors.paper, borderColor: theme.colors.border }],
+                isActive && [
+                  styles.tabButtonActive,
+                  { backgroundColor: theme.colors.paper, borderColor: theme.colors.border },
+                ],
               ]}
               // @ts-ignore
               activeScale={0.93}
@@ -142,11 +160,7 @@ export default observer(function HomeScreen() {
     }
   };
 
-  return (
-    <View style={styles.root}>
-      {renderContent()}
-    </View>
-  );
+  return <View style={styles.root}>{renderContent()}</View>;
 });
 
 const styles = StyleSheet.create((theme) => ({

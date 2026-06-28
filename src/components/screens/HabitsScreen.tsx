@@ -16,27 +16,38 @@ import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 const AnimatedTypography = Animated.createAnimatedComponent(Typography);
 
-const HabitItem = observer(({ habitId, onComplete, onAddNote }: { habitId: string, onComplete?: () => void, onAddNote?: (id: string) => void }) => {
-  const log = todayLog$.get();
-  const swipeableRef = React.useRef<Swipeable>(null);
-  
-  if (!log) return null;
+const HabitItem = observer(
+  ({
+    habitId,
+    onComplete,
+    onAddNote,
+  }: {
+    habitId: string;
+    onComplete?: () => void;
+    onAddNote?: (id: string) => void;
+  }) => {
+    const log = todayLog$.get();
+    const swipeableRef = React.useRef<Swipeable>(null);
 
-  const entryIndex = log.entries.findIndex(e => e.habitId === habitId);
-  if (entryIndex === -1) return null;
+    if (!log) return null;
 
-  const title = todayLog$.entries[entryIndex].title.get();
-  const emoji = todayLog$.entries[entryIndex].emoji.get();
-  const isCompleted = todayLog$.entries[entryIndex].completed.get();
-  const note = todayLog$.entries[entryIndex].note.get();
+    const entryIndex = log.entries.findIndex((e) => e.habitId === habitId);
+    if (entryIndex === -1) return null;
 
-  // neglected status only depends on yesterday, and is cleared when completed today
-  const isNeglected = React.useMemo(() => appActions.isHabitNeglected(habitId) && !isCompleted, [habitId, isCompleted]);
+    const title = todayLog$.entries[entryIndex].title.get();
+    const emoji = todayLog$.entries[entryIndex].emoji.get();
+    const isCompleted = todayLog$.entries[entryIndex].completed.get();
+    const note = todayLog$.entries[entryIndex].note.get();
 
-  const { theme } = useUnistyles();
+    // neglected status only depends on yesterday, and is cleared when completed today
+    const isNeglected = React.useMemo(
+      () => appActions.isHabitNeglected(habitId) && !isCompleted,
+      [habitId, isCompleted],
+    );
 
-  const renderRightActions = React.useCallback(
-    () => {
+    const { theme } = useUnistyles();
+
+    const renderRightActions = React.useCallback(() => {
       return (
         <View style={styles.swipeActionContainer}>
           <TouchableOpacity
@@ -46,126 +57,124 @@ const HabitItem = observer(({ habitId, onComplete, onAddNote }: { habitId: strin
               onAddNote?.(habitId);
             }}
           >
-            <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+            <Typography
+              variant="caption"
+              style={{ color: theme.colors.background, fontWeight: 'bold' }}
+            >
               NOTES
             </Typography>
           </TouchableOpacity>
         </View>
       );
-    },
-    [habitId, onAddNote, theme]
-  );
+    }, [habitId, onAddNote, theme]);
 
-  // Reanimated styles
-  const textAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      color: withTiming(
-        isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
-        { duration: 200 }
-      ),
-      opacity: withTiming(isCompleted ? 0.75 : 1, { duration: 200 }),
-    };
-  }, [isCompleted, isNeglected, theme.colors.text]);
+    // Reanimated styles
+    const textAnimatedStyle = useAnimatedStyle(() => {
+      return {
+        color: withTiming(isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text, {
+          duration: 200,
+        }),
+        opacity: withTiming(isCompleted ? 0.75 : 1, { duration: 200 }),
+      };
+    }, [isCompleted, isNeglected, theme.colors.text]);
 
-  const strikeAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      width: withTiming(isCompleted ? '100%' : '0%', { duration: 300 }),
-      backgroundColor: withTiming(
-        isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
-        { duration: 200 }
-      ),
-    };
-  }, [isCompleted, isNeglected, theme.colors.text]);
+    const strikeAnimatedStyle = useAnimatedStyle(() => {
+      return {
+        width: withTiming(isCompleted ? '100%' : '0%', { duration: 300 }),
+        backgroundColor: withTiming(
+          isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
+          { duration: 200 },
+        ),
+      };
+    }, [isCompleted, isNeglected, theme.colors.text]);
 
-  const tickAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
-      transform: [{ scale: withSpring(isCompleted ? 1 : 0.5) }],
-    };
-  }, [isCompleted]);
+    const tickAnimatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
+        transform: [{ scale: withSpring(isCompleted ? 1 : 0.5) }],
+      };
+    }, [isCompleted]);
 
-  return (
-    <Swipeable
-      ref={swipeableRef}
-      renderRightActions={renderRightActions}
-      containerStyle={styles.cardSpacing}
-    >
-      <BrutalistCard
-        accentColor={isCompleted ? theme.colors.success : undefined}
-        neglected={isNeglected}
-        style={{ marginVertical: 0 }}
-        onPress={() => {
-          const wasCompleted = appActions.isAllCompletedToday();
-          appActions.toggleHabit(habitId);
-          if (!wasCompleted && appActions.isAllCompletedToday()) {
-            onComplete?.();
-          }
-        }}
+    return (
+      <Swipeable
+        ref={swipeableRef}
+        renderRightActions={renderRightActions}
+        containerStyle={styles.cardSpacing}
       >
-      <View style={styles.itemRow}>
-        {/* Custom styled checkbox indicator */}
-        <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
-          <Animated.View style={tickAnimatedStyle}>
-            <Typography
-              variant="bodyBold"
-              color={isCompleted ? theme.colors.background : theme.colors.text}
-              style={styles.checkboxTick}
-            >
-              ✓
-            </Typography>
-          </Animated.View>
-        </View>
-        <View style={styles.emojiSquare}>
-          <Typography style={styles.emojiText}>{emoji || '⚡'}</Typography>
-        </View>
+        <BrutalistCard
+          accentColor={isCompleted ? theme.colors.success : undefined}
+          neglected={isNeglected}
+          style={{ marginVertical: 0 }}
+          onPress={() => {
+            const wasCompleted = appActions.isAllCompletedToday();
+            appActions.toggleHabit(habitId);
+            if (!wasCompleted && appActions.isAllCompletedToday()) {
+              onComplete?.();
+            }
+          }}
+        >
+          <View style={styles.itemRow}>
+            {/* Custom styled checkbox indicator */}
+            <View style={[styles.checkbox, isCompleted && styles.checkboxChecked]}>
+              <Animated.View style={tickAnimatedStyle}>
+                <Typography
+                  variant="bodyBold"
+                  color={isCompleted ? theme.colors.background : theme.colors.text}
+                  style={styles.checkboxTick}
+                >
+                  ✓
+                </Typography>
+              </Animated.View>
+            </View>
+            <View style={styles.emojiSquare}>
+              <Typography style={styles.emojiText}>{emoji || '⚡'}</Typography>
+            </View>
 
-        <View style={styles.textContainer}>
-          <View style={{ alignSelf: 'flex-start' }}>
-            <AnimatedTypography
-              variant="bodyBold"
-              style={[textAnimatedStyle]}
-            >
-              {title}
-            </AnimatedTypography>
-            {/* Custom Animated Strikethrough Line */}
-            <Animated.View style={[styles.customStrike, strikeAnimatedStyle]} />
+            <View style={styles.textContainer}>
+              <View style={{ alignSelf: 'flex-start' }}>
+                <AnimatedTypography variant="bodyBold" style={[textAnimatedStyle]}>
+                  {title}
+                </AnimatedTypography>
+                {/* Custom Animated Strikethrough Line */}
+                <Animated.View style={[styles.customStrike, strikeAnimatedStyle]} />
+              </View>
+
+              {isNeglected && (
+                <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
+                  ⚠️ You missed this yesterday.
+                </Typography>
+              )}
+              {note ? (
+                <TouchableOpacity
+                  style={{ marginTop: 4, paddingVertical: 4 }}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    onAddNote?.(habitId);
+                  }}
+                >
+                  <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
+                    📝 {note}
+                  </Typography>
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
-
-          {isNeglected && (
-            <Typography variant="caption" style={{ color: '#FFD2D2', marginTop: 2 }}>
-              ⚠️ You missed this yesterday.
-            </Typography>
-          )}
-          {note ? (
-            <TouchableOpacity
-              style={{ marginTop: 4, paddingVertical: 4 }}
-              onPress={(e) => {
-                e.stopPropagation();
-                onAddNote?.(habitId);
-              }}
-            >
-              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                📝 {note}
-              </Typography>
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-    </BrutalistCard>
-    </Swipeable>
-  );
-});
+        </BrutalistCard>
+      </Swipeable>
+    );
+  },
+);
 
 export const HabitsScreen = observer(function HabitsScreen() {
   const [showConfetti, setShowConfetti] = React.useState(false);
   const [selectedHabitForNote, setSelectedHabitForNote] = React.useState<string | null>(null);
   const [draftNote, setDraftNote] = React.useState('');
   const log = todayLog$.get();
-  const habitIds = log?.entries.map(e => e.habitId) || [];
+  const habitIds = log?.entries.map((e) => e.habitId) || [];
 
   const templates = habitTemplates$.get() || [];
   const activeToday = React.useMemo(() => {
-    return templates.filter(t => isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
+    return templates.filter((t) => isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
   }, [templates]);
 
   const todayStr = React.useMemo(() => {
@@ -175,7 +184,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
 
   const handleOpenNoteSheet = React.useCallback((habitId: string) => {
     const log = todayLog$.get();
-    const entry = log?.entries.find(e => e.habitId === habitId);
+    const entry = log?.entries.find((e) => e.habitId === habitId);
     setDraftNote(entry?.note || '');
     setSelectedHabitForNote(habitId);
   }, []);
@@ -188,8 +197,14 @@ export const HabitsScreen = observer(function HabitsScreen() {
   };
 
   const renderItem = React.useCallback(
-    ({ item }: { item: string }) => <HabitItem habitId={item} onComplete={() => setShowConfetti(true)} onAddNote={handleOpenNoteSheet} />,
-    [handleOpenNoteSheet]
+    ({ item }: { item: string }) => (
+      <HabitItem
+        habitId={item}
+        onComplete={() => setShowConfetti(true)}
+        onAddNote={handleOpenNoteSheet}
+      />
+    ),
+    [handleOpenNoteSheet],
   );
 
   const { theme } = useUnistyles();
@@ -247,7 +262,9 @@ export const HabitsScreen = observer(function HabitsScreen() {
                   <View style={styles.previewGrid}>
                     {activeToday.map((habit) => (
                       <View key={habit.id} style={styles.habitBadge}>
-                        <Typography variant="caption" style={styles.habitBadgeBullet}>{habit.emoji || '⚡'}</Typography>
+                        <Typography variant="caption" style={styles.habitBadgeBullet}>
+                          {habit.emoji || '⚡'}
+                        </Typography>
                         <Typography variant="mono" style={styles.habitBadgeText} numberOfLines={1}>
                           {habit.title}
                         </Typography>
@@ -256,7 +273,8 @@ export const HabitsScreen = observer(function HabitsScreen() {
                   </View>
                 ) : (
                   <Typography variant="body" style={styles.noHabitsText}>
-                    You don't have any habits scheduled for today. Add templates in settings or manage them!
+                    You don't have any habits scheduled for today. Add templates in settings or
+                    manage them!
                   </Typography>
                 )}
               </View>

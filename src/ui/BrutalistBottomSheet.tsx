@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/immutability */
-"use no memo";
+'use no memo';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
@@ -55,9 +55,7 @@ export function BrutalistBottomSheet({
         </View>
 
         {/* Content - wrapped in GestureHandlerRootView for pressto buttons */}
-        <GestureHandlerRootView style={stylesheet.content}>
-          {children}
-        </GestureHandlerRootView>
+        <GestureHandlerRootView style={stylesheet.content}>{children}</GestureHandlerRootView>
       </View>
     </TrueSheet>
   );

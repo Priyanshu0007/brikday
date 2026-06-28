@@ -4,7 +4,15 @@ import { habitTemplates$ } from './slices/habitsSlice';
 import { todayLog$, logIndex$, mmkvStorage } from './slices/dailyLogSlice';
 import { vaultState$ } from './slices/vaultSlice';
 import { blueprintState$ } from './slices/blueprintSlice';
-import { HabitTemplate, ScheduleType, SavingTransaction, VaultGoal, Project, DailyLog, DailyHabitEntry } from './types';
+import {
+  HabitTemplate,
+  ScheduleType,
+  SavingTransaction,
+  VaultGoal,
+  Project,
+  DailyLog,
+  DailyHabitEntry,
+} from './types';
 import { getLocalDateString, isHabitActiveOnDate } from '@/utils/date';
 
 export const appActions = {
@@ -25,7 +33,7 @@ export const appActions = {
   loadTodayLog() {
     const todayStr = getLocalDateString();
     const existingStr = mmkvStorage.getString(`log:${todayStr}`);
-    
+
     if (existingStr) {
       todayLog$.set(JSON.parse(existingStr));
     } else {
@@ -36,17 +44,17 @@ export const appActions = {
     const todayStr = getLocalDateString();
     const logKey = `log:${todayStr}`;
     const existingStr = mmkvStorage.getString(logKey);
-    
+
     if (existingStr) {
       const existing: DailyLog = JSON.parse(existingStr);
       todayLog$.set(existing);
     } else {
       const templates = habitTemplates$.get() || [];
-      const activeHabits = templates.filter(t => isHabitActiveOnDate(t, new Date()));
-      
+      const activeHabits = templates.filter((t) => isHabitActiveOnDate(t, new Date()));
+
       const newLog: DailyLog = {
         date: todayStr,
-        entries: activeHabits.map(h => ({
+        entries: activeHabits.map((h) => ({
           habitId: h.id,
           title: h.title,
           emoji: h.emoji,
@@ -55,10 +63,10 @@ export const appActions = {
         })),
         generatedAt: Date.now(),
       };
-      
+
       mmkvStorage.set(logKey, JSON.stringify(newLog));
       todayLog$.set(newLog);
-      
+
       const index = logIndex$.get() || [];
       if (!index.includes(todayStr)) {
         logIndex$.set([...index, todayStr]);
@@ -68,14 +76,14 @@ export const appActions = {
   toggleHabit(id: string) {
     const todayStr = getLocalDateString();
     const currentLog = todayLog$.get();
-    
+
     if (currentLog && currentLog.date === todayStr) {
-      const entryIndex = currentLog.entries.findIndex(e => e.habitId === id);
+      const entryIndex = currentLog.entries.findIndex((e) => e.habitId === id);
       if (entryIndex !== -1) {
         const completed = !currentLog.entries[entryIndex].completed;
         todayLog$.entries[entryIndex].completed.set(completed);
         todayLog$.entries[entryIndex].completedAt.set(completed ? Date.now() : undefined);
-        
+
         mmkvStorage.set(`log:${todayStr}`, JSON.stringify(todayLog$.get()));
       }
     }
@@ -83,25 +91,31 @@ export const appActions = {
   isAllCompletedToday(): boolean {
     const currentLog = todayLog$.get();
     if (!currentLog || currentLog.entries.length === 0) return false;
-    
+
     const todayStr = getLocalDateString();
     if (currentLog.date !== todayStr) return false;
-    
-    return currentLog.entries.every(e => e.completed);
+
+    return currentLog.entries.every((e) => e.completed);
   },
   addHabitNote(habitId: string, note: string) {
     const todayStr = getLocalDateString();
     const currentLog = todayLog$.get();
-    
+
     if (currentLog && currentLog.date === todayStr) {
-      const entryIndex = currentLog.entries.findIndex(e => e.habitId === habitId);
+      const entryIndex = currentLog.entries.findIndex((e) => e.habitId === habitId);
       if (entryIndex !== -1) {
         todayLog$.entries[entryIndex].note.set(note);
         mmkvStorage.set(`log:${todayStr}`, JSON.stringify(todayLog$.get()));
       }
     }
   },
-  addHabit(title: string, emoji?: string, scheduleType: ScheduleType = 'daily', specificDays: number[] = [], startDate: number = Date.now()) {
+  addHabit(
+    title: string,
+    emoji?: string,
+    scheduleType: ScheduleType = 'daily',
+    specificDays: number[] = [],
+    startDate: number = Date.now(),
+  ) {
     if (!title.trim()) return;
     const newHabit: HabitTemplate = {
       id: `h_${Date.now()}`,
@@ -113,7 +127,7 @@ export const appActions = {
       createdAt: Date.now(),
     };
     habitTemplates$.push(newHabit);
-    
+
     const todayStr = getLocalDateString();
     if (isHabitActiveOnDate(newHabit, new Date())) {
       const currentLog = todayLog$.get();
@@ -142,7 +156,7 @@ export const appActions = {
       const todayStr = getLocalDateString();
       const currentLog = todayLog$.get();
       if (currentLog && currentLog.date === todayStr) {
-        const entryIndex = currentLog.entries.findIndex(e => e.habitId === id);
+        const entryIndex = currentLog.entries.findIndex((e) => e.habitId === id);
         if (entryIndex !== -1) {
           if (updates.title !== undefined) todayLog$.entries[entryIndex].title.set(updates.title);
           if (updates.emoji !== undefined) todayLog$.entries[entryIndex].emoji.set(updates.emoji);
@@ -160,9 +174,9 @@ export const appActions = {
     const todayStr = getLocalDateString();
     const currentLog = todayLog$.get();
     if (currentLog && currentLog.date === todayStr) {
-      const entryIndex = currentLog.entries.findIndex(e => e.habitId === id);
+      const entryIndex = currentLog.entries.findIndex((e) => e.habitId === id);
       if (entryIndex !== -1) {
-        const newEntries = currentLog.entries.filter(e => e.habitId !== id);
+        const newEntries = currentLog.entries.filter((e) => e.habitId !== id);
         todayLog$.entries.set(newEntries);
         mmkvStorage.set(`log:${todayStr}`, JSON.stringify(todayLog$.get()));
       }
@@ -172,42 +186,42 @@ export const appActions = {
     const date = new Date();
     date.setDate(date.getDate() - 1);
     const yesterdayStr = getLocalDateString(date);
-    
+
     const yesterdayLogStr = mmkvStorage.getString(`log:${yesterdayStr}`);
     if (!yesterdayLogStr) return false;
-    
+
     const yesterdayLog: DailyLog = JSON.parse(yesterdayLogStr);
-    const entry = yesterdayLog.entries.find(e => e.habitId === habitId);
+    const entry = yesterdayLog.entries.find((e) => e.habitId === habitId);
     return entry ? !entry.completed : false;
   },
   calculateStreak(): number {
     let streak = 0;
     let date = new Date();
     date.setDate(date.getDate() - 1);
-    
+
     while (true) {
       const dateStr = getLocalDateString(date);
       const logStr = mmkvStorage.getString(`log:${dateStr}`);
-      
+
       if (!logStr) break;
       const log: DailyLog = JSON.parse(logStr);
       if (log.entries.length === 0) break;
-      
-      const allCompleted = log.entries.every(e => e.completed);
+
+      const allCompleted = log.entries.every((e) => e.completed);
       if (!allCompleted) break;
-      
+
       streak++;
       date.setDate(date.getDate() - 1);
     }
-    
+
     return streak;
   },
   getDayStats(dateStr: string) {
     const logStr = mmkvStorage.getString(`log:${dateStr}`);
     if (!logStr) return { completed: 0, total: 0, rate: 0, entries: [] };
-    
+
     const log: DailyLog = JSON.parse(logStr);
-    const completed = log.entries.filter(e => e.completed).length;
+    const completed = log.entries.filter((e) => e.completed).length;
     return {
       completed,
       total: log.entries.length,
@@ -216,16 +230,16 @@ export const appActions = {
     };
   },
   getHabitHistory(habitId: string, dateRange: string[]) {
-    return dateRange.map(dateStr => {
+    return dateRange.map((dateStr) => {
       const logStr = mmkvStorage.getString(`log:${dateStr}`);
       if (!logStr) return { date: dateStr, completed: false, isScheduled: false };
-      
+
       const log: DailyLog = JSON.parse(logStr);
-      const entry = log.entries.find(e => e.habitId === habitId);
-      return { 
-        date: dateStr, 
+      const entry = log.entries.find((e) => e.habitId === habitId);
+      return {
+        date: dateStr,
         completed: entry?.completed ?? false,
-        isScheduled: !!entry 
+        isScheduled: !!entry,
       };
     });
   },
@@ -246,9 +260,9 @@ export const appActions = {
         comment: comment.trim(),
         date: Date.now(),
       };
-      
+
       goal.transactions.set([...currentTxns, newTransaction]);
-      
+
       goal.saved.set(goal.saved.get() + amount);
     }
   },
@@ -307,11 +321,14 @@ export const appActions = {
     const project = blueprintState$.find((p) => p.id.get() === projectId);
     if (project) {
       const currentMilestones = project.milestones.get() || [];
-      project.milestones.set([...currentMilestones, {
-        id: `m_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        title: title.trim(),
-        completed: false,
-      }]);
+      project.milestones.set([
+        ...currentMilestones,
+        {
+          id: `m_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          title: title.trim(),
+          completed: false,
+        },
+      ]);
     }
   },
   toggleMilestone(projectId: string, milestoneId: string) {

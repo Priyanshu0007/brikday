@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/immutability */
-"use no memo";
+'use no memo';
 import React, { useRef, useState, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -53,18 +53,24 @@ export function OnboardingScreen() {
           onPageSelected={onPageSelected}
           overdrag
         >
-          <View key="0" style={styles.page}><WelcomeSlide activeIndex={activeIndex} /></View>
-          <View key="1" style={styles.page}><EngineSlide activeIndex={activeIndex} /></View>
-          <View key="2" style={styles.page}><VaultSlide activeIndex={activeIndex} /></View>
-          <View key="3" style={styles.page}><BlueprintSlide activeIndex={activeIndex} /></View>
-          <View key="4" style={styles.page}><GetStartedSlide activeIndex={activeIndex} /></View>
+          <View key="0" style={styles.page}>
+            <WelcomeSlide activeIndex={activeIndex} />
+          </View>
+          <View key="1" style={styles.page}>
+            <EngineSlide activeIndex={activeIndex} />
+          </View>
+          <View key="2" style={styles.page}>
+            <VaultSlide activeIndex={activeIndex} />
+          </View>
+          <View key="3" style={styles.page}>
+            <BlueprintSlide activeIndex={activeIndex} />
+          </View>
+          <View key="4" style={styles.page}>
+            <GetStartedSlide activeIndex={activeIndex} />
+          </View>
         </PagerView>
 
-        <OnboardingFooter
-          currentPage={currentPage}
-          activeIndex={activeIndex}
-          onNext={goNext}
-        />
+        <OnboardingFooter currentPage={currentPage} activeIndex={activeIndex} onNext={goNext} />
       </View>
     </SafeAreaView>
   );

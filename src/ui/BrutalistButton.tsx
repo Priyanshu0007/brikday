@@ -8,10 +8,7 @@ import { Typography } from './Typography';
 const PressableBrutalist = createAnimatedPressable((progress) => {
   'worklet';
   return {
-    transform: [
-      { translateX: progress * 4 },
-      { translateY: progress * 4 },
-    ],
+    transform: [{ translateX: progress * 4 }, { translateY: progress * 4 }],
   };
 });
 
@@ -39,7 +36,7 @@ export function BrutalistButton({
   hapticFeedback = 'light',
 }: BrutalistButtonProps) {
   const { theme } = useUnistyles();
-  
+
   const finalBackgroundColor = backgroundColor || theme.colors.warning;
   const finalTextColor = textColor || theme.colors.text;
 
@@ -68,7 +65,7 @@ export function BrutalistButton({
       <View style={stylesheet.buttonOuter}>
         {/* Shadow Layer */}
         <View style={stylesheet.shadow} />
-        
+
         {/* @ts-ignore */}
         <PressableBrutalist
           // @ts-ignore
@@ -87,9 +84,9 @@ export function BrutalistButton({
             {loading ? (
               <ActivityIndicator color={finalTextColor} size="small" />
             ) : typeof children === 'string' ? (
-              <Typography 
-                variant="bodyBold" 
-                style={{ color: finalTextColor, textAlign: 'center' }} 
+              <Typography
+                variant="bodyBold"
+                style={{ color: finalTextColor, textAlign: 'center' }}
                 uppercase
                 numberOfLines={1}
                 adjustsFontSizeToFit

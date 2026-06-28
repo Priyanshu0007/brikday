@@ -4,7 +4,10 @@ import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import { useColorScheme, AppState, StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
-import { PlusJakartaSans_400Regular, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_700Bold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
 import { useUnistyles, UnistylesRuntime } from 'react-native-unistyles';
 import { observer } from '@legendapp/state/react';
@@ -22,9 +25,8 @@ export default observer(function TabLayout() {
 
   useEffect(() => {
     // Dynamically apply selected theme configuration to Unistyles
-    const activeTheme = userTheme === 'system'
-      ? (colorScheme === 'dark' ? 'dark' : 'light')
-      : userTheme;
+    const activeTheme =
+      userTheme === 'system' ? (colorScheme === 'dark' ? 'dark' : 'light') : userTheme;
 
     if (UnistylesRuntime.themeName !== activeTheme) {
       UnistylesRuntime.setTheme(activeTheme);
@@ -35,12 +37,12 @@ export default observer(function TabLayout() {
     if (__DEV__) {
       setupDevMenu();
     }
-    
+
     // Run one-time migration and init daily log
     migrateToLogSystem();
     appActions.loadTodayLog();
-    
-    const subscription = AppState.addEventListener('change', nextAppState => {
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {
         appActions.loadTodayLog();
       }
@@ -73,4 +75,4 @@ export default observer(function TabLayout() {
       </ThemeProvider>
     </GestureHandlerRootView>
   );
-})
+});

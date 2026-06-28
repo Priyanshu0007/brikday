@@ -54,11 +54,19 @@ export const BlueprintEditor = observer(() => {
 
   return (
     <View style={{ flex: 1 }}>
-      <BrutalistButton onPress={handleAdd} backgroundColor={theme.colors.success} style={{ marginBottom: 16 }}>
+      <BrutalistButton
+        onPress={handleAdd}
+        backgroundColor={theme.colors.success}
+        style={{ marginBottom: 16 }}
+      >
         + NEW PROJECT
       </BrutalistButton>
       {projects.map((project) => (
-        <BrutalistCard key={project.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
+        <BrutalistCard
+          key={project.id}
+          backgroundColor={theme.colors.background}
+          style={{ marginBottom: 8 }}
+        >
           <View style={stylesheet.listItemRow}>
             <View style={stylesheet.listItemContent}>
               <Typography variant="bodyBold">{project.title}</Typography>
@@ -67,10 +75,18 @@ export const BlueprintEditor = observer(() => {
               </Typography>
             </View>
             <View style={stylesheet.listItemActions}>
-              <BrutalistButton onPress={() => handleEdit(project.id)} size="sm" backgroundColor={theme.colors.warning}>
+              <BrutalistButton
+                onPress={() => handleEdit(project.id)}
+                size="sm"
+                backgroundColor={theme.colors.warning}
+              >
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => setDeletingId(project.id)} size="sm" backgroundColor={theme.colors.danger}>
+              <BrutalistButton
+                onPress={() => setDeletingId(project.id)}
+                size="sm"
+                backgroundColor={theme.colors.danger}
+              >
                 DEL
               </BrutalistButton>
             </View>
@@ -80,7 +96,10 @@ export const BlueprintEditor = observer(() => {
 
       <BrutalistBottomSheet
         visible={isAdding || editingId !== null}
-        onClose={() => { setEditingId(null); setIsAdding(false); }}
+        onClose={() => {
+          setEditingId(null);
+          setIsAdding(false);
+        }}
         title={isAdding ? 'NEW PROJECT' : 'EDIT PROJECT'}
       >
         <View style={stylesheet.formContainer}>
@@ -96,7 +115,11 @@ export const BlueprintEditor = observer(() => {
             onChangeText={setCategory}
             placeholder="e.g. WORK"
           />
-          <BrutalistButton onPress={handleSave} backgroundColor={theme.colors.success} style={{ marginTop: 20 }}>
+          <BrutalistButton
+            onPress={handleSave}
+            backgroundColor={theme.colors.success}
+            style={{ marginTop: 20 }}
+          >
             SAVE
           </BrutalistButton>
         </View>
@@ -112,10 +135,18 @@ export const BlueprintEditor = observer(() => {
             Are you sure you want to delete this project?
           </Typography>
           <View style={stylesheet.formActions}>
-            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={theme.colors.paper} style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => setDeletingId(null)}
+              backgroundColor={theme.colors.paper}
+              style={{ flex: 1 }}
+            >
               CANCEL
             </BrutalistButton>
-            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={theme.colors.danger} style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => deletingId && confirmDelete(deletingId)}
+              backgroundColor={theme.colors.danger}
+              style={{ flex: 1 }}
+            >
               DELETE
             </BrutalistButton>
           </View>

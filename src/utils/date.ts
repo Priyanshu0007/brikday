@@ -33,7 +33,7 @@ export const isHabitActiveOnDate = (habit: HabitTemplate, date: Date): boolean =
 
   // Habit was not yet created relative to the target date
   if (targetTime < startTime) return false;
-  
+
   // If archived before target date, it is not active
   if (habit.archivedAt && targetTime >= startOf(new Date(habit.archivedAt))) return false;
 
@@ -150,28 +150,47 @@ export const getMonthGrid = (anchorDate: Date): CalendarCell[] => {
  * Check if two date objects fall on the same day in local time.
  */
 export const isSameDay = (d1: Date, d2: Date): boolean => {
-  return d1.getFullYear() === d2.getFullYear() &&
-         d1.getMonth() === d2.getMonth() &&
-         d1.getDate() === d2.getDate();
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
 };
 
 /**
  * Returns full name of weekday (e.g. "MONDAY").
  */
 export const getDayName = (date: Date): string => {
-  return ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][date.getDay()];
+  return ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][
+    date.getDay()
+  ];
 };
 
 /**
  * Returns short abbreviation of month (e.g. "JUN").
  */
 export const getMonthShortName = (date: Date): string => {
-  return ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][date.getMonth()];
+  return ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][
+    date.getMonth()
+  ];
 };
 
 /**
  * Returns full name of month (e.g. "JUNE").
  */
 export const getMonthFullName = (date: Date): string => {
-  return ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'][date.getMonth()];
+  return [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER',
+  ][date.getMonth()];
 };

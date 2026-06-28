@@ -16,7 +16,7 @@ export const VaultEditor = observer(() => {
   const goals = vaultState$.get();
   const currencyCode = userState$.currencyCode.get() || 'USD';
   const currencySymbol = getCurrencySymbol(currencyCode);
-  
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -59,23 +59,40 @@ export const VaultEditor = observer(() => {
 
   return (
     <View style={{ flex: 1 }}>
-      <BrutalistButton onPress={handleAdd} backgroundColor={theme.colors.success} style={{ marginBottom: 16 }}>
+      <BrutalistButton
+        onPress={handleAdd}
+        backgroundColor={theme.colors.success}
+        style={{ marginBottom: 16 }}
+      >
         + NEW SAVINGS GOAL
       </BrutalistButton>
       {goals.map((goal) => (
-        <BrutalistCard key={goal.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
+        <BrutalistCard
+          key={goal.id}
+          backgroundColor={theme.colors.background}
+          style={{ marginBottom: 8 }}
+        >
           <View style={stylesheet.listItemRow}>
             <View style={stylesheet.listItemContent}>
               <Typography variant="bodyBold">{goal.title}</Typography>
               <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                TARGET: {currencySymbol}{goal.target.toLocaleString()}
+                TARGET: {currencySymbol}
+                {goal.target.toLocaleString()}
               </Typography>
             </View>
             <View style={stylesheet.listItemActions}>
-              <BrutalistButton onPress={() => handleEdit(goal.id)} size="sm" backgroundColor={theme.colors.warning}>
+              <BrutalistButton
+                onPress={() => handleEdit(goal.id)}
+                size="sm"
+                backgroundColor={theme.colors.warning}
+              >
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => setDeletingId(goal.id)} size="sm" backgroundColor={theme.colors.danger}>
+              <BrutalistButton
+                onPress={() => setDeletingId(goal.id)}
+                size="sm"
+                backgroundColor={theme.colors.danger}
+              >
                 DEL
               </BrutalistButton>
             </View>
@@ -85,7 +102,10 @@ export const VaultEditor = observer(() => {
 
       <BrutalistBottomSheet
         visible={isAdding || editingId !== null}
-        onClose={() => { setEditingId(null); setIsAdding(false); }}
+        onClose={() => {
+          setEditingId(null);
+          setIsAdding(false);
+        }}
         title={isAdding ? 'NEW SAVINGS GOAL' : 'EDIT SAVINGS GOAL'}
       >
         <View style={stylesheet.formContainer}>
@@ -102,7 +122,11 @@ export const VaultEditor = observer(() => {
             keyboardType="numeric"
             placeholder="e.g. 3500"
           />
-          <BrutalistButton onPress={handleSave} backgroundColor={theme.colors.success} style={{ marginTop: 20 }}>
+          <BrutalistButton
+            onPress={handleSave}
+            backgroundColor={theme.colors.success}
+            style={{ marginTop: 20 }}
+          >
             SAVE
           </BrutalistButton>
         </View>
@@ -118,10 +142,18 @@ export const VaultEditor = observer(() => {
             Are you sure you want to delete this savings goal?
           </Typography>
           <View style={stylesheet.formActions}>
-            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={theme.colors.paper} style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => setDeletingId(null)}
+              backgroundColor={theme.colors.paper}
+              style={{ flex: 1 }}
+            >
               CANCEL
             </BrutalistButton>
-            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={theme.colors.danger} style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => deletingId && confirmDelete(deletingId)}
+              backgroundColor={theme.colors.danger}
+              style={{ flex: 1 }}
+            >
               DELETE
             </BrutalistButton>
           </View>

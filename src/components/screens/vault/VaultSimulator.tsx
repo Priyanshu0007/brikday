@@ -2,11 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { View, LayoutChangeEvent, Text } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
   withTiming,
-  runOnJS
+  runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { vaultState$, userState$ } from '@/state/store';
@@ -25,26 +25,22 @@ const AnimatedBar = ({ heightPercent, isFuture }: { heightPercent: number; isFut
 
   return (
     <View style={stylesheet.chartBarWrapper}>
-      <Animated.View 
-        style={[
-          stylesheet.chartBar, 
-          animatedStyle,
-          isFuture && stylesheet.chartBarFuture
-        ]} 
+      <Animated.View
+        style={[stylesheet.chartBar, animatedStyle, isFuture && stylesheet.chartBarFuture]}
       />
     </View>
   );
 };
 
-const CustomSlider = ({ 
-  min, 
-  max, 
-  value, 
-  onChange, 
-  label, 
-  prefix = '', 
-  suffix = '' 
-}: { 
+const CustomSlider = ({
+  min,
+  max,
+  value,
+  onChange,
+  label,
+  prefix = '',
+  suffix = '',
+}: {
   min: number;
   max: number;
   value: number;
@@ -56,7 +52,7 @@ const CustomSlider = ({
   const { theme } = useUnistyles();
   const [trackWidth, setTrackWidth] = useState(0);
   const thumbSize = 40;
-  
+
   const translateX = useSharedValue(0);
   const isDragging = useSharedValue(false);
   const [internalValue, setInternalValue] = useState(value);
@@ -120,7 +116,9 @@ const CustomSlider = ({
       <View style={stylesheet.sliderLabelRow}>
         <Typography variant="bodyBold">{label}</Typography>
         <Typography variant="mono" style={stylesheet.sliderValueBadge}>
-          {prefix ? <Text style={{ fontFamily: theme.fonts.body }}>{prefix}</Text> : null}{internalValue}{suffix}
+          {prefix ? <Text style={{ fontFamily: theme.fonts.body }}>{prefix}</Text> : null}
+          {internalValue}
+          {suffix}
         </Typography>
       </View>
       <View style={stylesheet.customSliderTrack} onLayout={handleTrackLayout}>
@@ -134,7 +132,7 @@ const CustomSlider = ({
 
 export const VaultSimulator = observer(({ goalId }: VaultSimulatorProps) => {
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
-  
+
   const currencyCode = userState$.currencyCode.get() || 'USD';
   const currencySymbol = getCurrencySymbol(currencyCode);
 
@@ -149,32 +147,33 @@ export const VaultSimulator = observer(({ goalId }: VaultSimulatorProps) => {
     if (remaining === 0) return { weeks: 0, date: new Date(), chartData: [] };
     if (weeklySavings === 0) return { weeks: Infinity, date: null, chartData: [] };
 
-    let n = 0; 
-    const r = (interestRate / 100) / 52; 
+    let n = 0;
+    const r = interestRate / 100 / 52;
 
     if (r === 0) {
       n = remaining / weeklySavings;
     } else {
       const A = remaining;
       const P = weeklySavings;
-      const numerator = Math.log((A * r / P) + 1);
+      const numerator = Math.log((A * r) / P + 1);
       const denominator = Math.log(1 + r);
       n = numerator / denominator;
     }
 
     const weeks = Math.ceil(n);
     const date = new Date();
-    date.setDate(date.getDate() + (weeks * 7));
+    date.setDate(date.getDate() + weeks * 7);
 
     const chartBars = weeks === Infinity ? 12 : Math.min(12, weeks + 1);
     const data = [];
-    const stepWeeks = weeks === Infinity ? 4 : Math.max(1, Math.floor(weeks / Math.max(1, chartBars - 1)));
+    const stepWeeks =
+      weeks === Infinity ? 4 : Math.max(1, Math.floor(weeks / Math.max(1, chartBars - 1)));
 
     for (let i = 0; i < chartBars; i++) {
       const currentWeeks = i * stepWeeks;
       let fv = 0;
       if (r === 0) {
-        fv = saved + (weeklySavings * currentWeeks);
+        fv = saved + weeklySavings * currentWeeks;
       } else {
         const compoundedSaved = saved * Math.pow(1 + r, currentWeeks);
         const annuity = weeklySavings * ((Math.pow(1 + r, currentWeeks) - 1) / r);
@@ -210,14 +209,14 @@ export const VaultSimulator = observer(({ goalId }: VaultSimulatorProps) => {
         {/* Dynamic Chart */}
         <View style={stylesheet.chartContainer}>
           <View style={stylesheet.chartTargetLine} />
-          <Typography variant="mono" style={stylesheet.chartTargetText}>TARGET</Typography>
+          <Typography variant="mono" style={stylesheet.chartTargetText}>
+            TARGET
+          </Typography>
 
           {calculatedMath.chartData.map((val, index) => {
             const heightPercent = target > 0 ? (val / target) * 100 : 0;
             const isFuture = val > saved;
-            return (
-              <AnimatedBar key={index} heightPercent={heightPercent} isFuture={isFuture} />
-            );
+            return <AnimatedBar key={index} heightPercent={heightPercent} isFuture={isFuture} />;
           })}
         </View>
       </View>

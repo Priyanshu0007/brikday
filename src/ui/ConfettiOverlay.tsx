@@ -15,7 +15,7 @@ import { triggerHaptic } from './haptics';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const NUM_PARTICLES = 40;
 
-const Particle = ({ color, isActive }: { color: string, isActive: boolean }) => {
+const Particle = ({ color, isActive }: { color: string; isActive: boolean }) => {
   const config = React.useMemo(() => {
     const startX = Math.random() * SCREEN_WIDTH;
     const endX = startX + (Math.random() - 0.5) * 300;
@@ -27,7 +27,8 @@ const Particle = ({ color, isActive }: { color: string, isActive: boolean }) => 
     const width = isRect ? size * 1.5 : size;
 
     const rotationStart = Math.random() * 360;
-    const rotationEnd = rotationStart + (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
+    const rotationEnd =
+      rotationStart + (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
 
     const duration = 1500 + Math.random() * 1000;
     const delay = Math.random() * 200;
@@ -46,9 +47,24 @@ const Particle = ({ color, isActive }: { color: string, isActive: boolean }) => 
       translateX.value = config.startX;
       rotation.value = config.rotationStart;
 
-      translateY.value = withDelay(config.delay, withTiming(config.endY, { duration: config.duration, easing: Easing.bezier(0.25, 0.1, 0.25, 1) }));
-      translateX.value = withDelay(config.delay, withTiming(config.endX, { duration: config.duration, easing: Easing.bezier(0.25, 0.1, 0.25, 1) }));
-      rotation.value = withDelay(config.delay, withTiming(config.rotationEnd, { duration: config.duration, easing: Easing.linear }));
+      translateY.value = withDelay(
+        config.delay,
+        withTiming(config.endY, {
+          duration: config.duration,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        }),
+      );
+      translateX.value = withDelay(
+        config.delay,
+        withTiming(config.endX, {
+          duration: config.duration,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        }),
+      );
+      rotation.value = withDelay(
+        config.delay,
+        withTiming(config.rotationEnd, { duration: config.duration, easing: Easing.linear }),
+      );
     }
   }, [isActive, config, translateX, translateY, rotation, opacity]);
 
@@ -67,14 +83,25 @@ const Particle = ({ color, isActive }: { color: string, isActive: boolean }) => 
     <Animated.View
       style={[
         styles.particle,
-        { width: config.width, height: config.size, backgroundColor: color, borderColor: theme.colors.border },
+        {
+          width: config.width,
+          height: config.size,
+          backgroundColor: color,
+          borderColor: theme.colors.border,
+        },
         animatedStyle,
       ]}
     />
   );
 };
 
-export const ConfettiOverlay = ({ isActive, onComplete }: { isActive: boolean, onComplete?: () => void }) => {
+export const ConfettiOverlay = ({
+  isActive,
+  onComplete,
+}: {
+  isActive: boolean;
+  onComplete?: () => void;
+}) => {
   const { theme } = useUnistyles();
   const [particles, setParticles] = useState<string[]>([]);
 
@@ -95,7 +122,7 @@ export const ConfettiOverlay = ({ isActive, onComplete }: { isActive: boolean, o
       ];
 
       const newParticles = Array.from({ length: NUM_PARTICLES }).map(
-        () => colors[Math.floor(Math.random() * colors.length)]
+        () => colors[Math.floor(Math.random() * colors.length)],
       );
       setParticles(newParticles);
 
@@ -126,10 +153,7 @@ export const ConfettiOverlay = ({ isActive, onComplete }: { isActive: boolean, o
 
   const bannerStyle = useAnimatedStyle(() => ({
     opacity: bannerOpacity.value,
-    transform: [
-      { scale: bannerScale.value },
-      { translateY: bannerTranslateY.value },
-    ],
+    transform: [{ scale: bannerScale.value }, { translateY: bannerTranslateY.value }],
   }));
 
   if (!isActive) return null;

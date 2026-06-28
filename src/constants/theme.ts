@@ -20,13 +20,13 @@ export const Colors = {
   },
   dark: {
     background: '#090A0F', // Obsidian black
-    paper: '#161824',      // Deep slate/indigo card container
-    border: '#E2E8F0',     // Crisp slate off-white border
-    text: '#F8FAFC',       // Slate-50 bright text
-    textMuted: '#94A3B8',  // Slate-400 muted text
-    success: '#0DF289',    // High-voltage neon mint green
-    warning: '#FFD000',    // Bright vivid gold yellow
-    danger: '#FF3366',     // Electric neon rose red
+    paper: '#161824', // Deep slate/indigo card container
+    border: '#E2E8F0', // Crisp slate off-white border
+    text: '#F8FAFC', // Slate-50 bright text
+    textMuted: '#94A3B8', // Slate-400 muted text
+    success: '#0DF289', // High-voltage neon mint green
+    warning: '#FFD000', // Bright vivid gold yellow
+    danger: '#FF3366', // Electric neon rose red
   },
 } as const;
 

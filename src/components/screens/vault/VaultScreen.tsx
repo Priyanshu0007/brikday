@@ -1,4 +1,4 @@
-"use no memo";
+'use no memo';
 import React from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
@@ -24,15 +24,9 @@ export const VaultScreen = observer(function VaultScreen() {
   }, []);
 
   const renderGoalItem = React.useCallback(
-    ({ item }: { item: string }) => (
-      <GoalCard
-        goalId={item}
-        onPress={handleGoalPress}
-      />
-    ),
+    ({ item }: { item: string }) => <GoalCard goalId={item} onPress={handleGoalPress} />,
     [handleGoalPress],
   );
-
 
   return (
     <View style={stylesheet.container}>
@@ -55,7 +49,6 @@ export const VaultScreen = observer(function VaultScreen() {
         contentContainerStyle={stylesheet.listContent}
         style={stylesheet.list}
       />
-
     </View>
   );
 });

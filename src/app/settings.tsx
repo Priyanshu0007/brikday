@@ -14,9 +14,12 @@ export default function SettingsRoute() {
       {/* Back header */}
       <View style={styles.backHeader}>
         {/* @ts-ignore */}
-        <PressableScale 
-          onPress={() => router.back()} 
-          style={[styles.backButton, { backgroundColor: theme.colors.paper, borderColor: theme.colors.border }]} 
+        <PressableScale
+          onPress={() => router.back()}
+          style={[
+            styles.backButton,
+            { backgroundColor: theme.colors.paper, borderColor: theme.colors.border },
+          ]}
           activeScale={0.9}
         >
           <Typography variant="bodyBold">◀ BACK</Typography>

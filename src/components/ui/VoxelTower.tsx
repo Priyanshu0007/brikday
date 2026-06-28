@@ -1,7 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, runOnJS } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
 import { observer } from '@legendapp/state/react';
 import { todayLog$ } from '@/state/store';
 import { triggerHaptic } from '@/ui/haptics';
@@ -22,15 +27,19 @@ const VoxelBrick = ({ isCompleted }: { isCompleted: boolean }) => {
       if (translateY.value !== 0) {
         opacity.value = 1;
         // Drop animation
-        translateY.value = withSpring(0, {
-          damping: 12,
-          stiffness: 100,
-          mass: 1,
-        }, (finished) => {
-          if (finished) {
-            runOnJS(triggerHaptic)('rigid');
-          }
-        });
+        translateY.value = withSpring(
+          0,
+          {
+            damping: 12,
+            stiffness: 100,
+            mass: 1,
+          },
+          (finished) => {
+            if (finished) {
+              runOnJS(triggerHaptic)('rigid');
+            }
+          },
+        );
       }
     } else {
       // Revert instantly if unchecked
@@ -48,7 +57,9 @@ const VoxelBrick = ({ isCompleted }: { isCompleted: boolean }) => {
 
   return (
     <View style={styles.slot}>
-      <Animated.View style={[styles.brick, { backgroundColor: theme.colors.success }, animatedStyle]} />
+      <Animated.View
+        style={[styles.brick, { backgroundColor: theme.colors.success }, animatedStyle]}
+      />
     </View>
   );
 };
@@ -99,5 +110,5 @@ const styles = StyleSheet.create((theme) => ({
     shadowOpacity: 1,
     shadowRadius: 0,
     elevation: 3, // for android
-  }
+  },
 }));

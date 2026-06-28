@@ -74,7 +74,9 @@ export const setupDevMenu = () => {
       DevSettings.addMenuItem('Reset Current Day', () => {
         resetCurrentDay();
       });
-      console.log('[DevTool] Registered "Reset App & Storage" and "Reset Current Day" in DevSettings.');
+      console.log(
+        '[DevTool] Registered "Reset App & Storage" and "Reset Current Day" in DevSettings.',
+      );
     } catch {
       console.warn('[DevTool] Could not register with DevSettings.');
     }
@@ -97,7 +99,9 @@ export const setupDevMenu = () => {
           },
         },
       ]);
-      console.log('[DevTool] Registered "Reset App & Storage" and "Reset Current Day" in expo-dev-menu.');
+      console.log(
+        '[DevTool] Registered "Reset App & Storage" and "Reset Current Day" in expo-dev-menu.',
+      );
     } catch {
       // expo-dev-menu is not installed or available in this context
       console.log('[DevTool] expo-dev-menu not available or failed to register.');

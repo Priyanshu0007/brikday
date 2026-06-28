@@ -19,12 +19,17 @@ export function Typography({
 }: TypographyProps) {
   const { theme } = useUnistyles();
   const isHeading = ['h1', 'h2', 'h3'].includes(variant);
-  const textTransform = (uppercase || (isHeading && uppercase !== false) ? 'uppercase' : undefined) as TextStyle['textTransform'];
-  
+  const textTransform = (
+    uppercase || (isHeading && uppercase !== false) ? 'uppercase' : undefined
+  ) as TextStyle['textTransform'];
+
   const finalColor = color || theme.colors.text;
 
   return (
-    <Text style={[stylesheet.base, stylesheet[variant], { color: finalColor, textTransform }, style]} {...props}>
+    <Text
+      style={[stylesheet.base, stylesheet[variant], { color: finalColor, textTransform }, style]}
+      {...props}
+    >
       {children}
     </Text>
   );

@@ -11,7 +11,7 @@ import {
   getMonthGrid,
   getMonthShortName,
   getWeekDates,
-  isSameDay
+  isSameDay,
 } from '@/utils/date';
 import { observer } from '@legendapp/state/react';
 import { PressableScale } from 'pressto';
@@ -33,26 +33,34 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
 
   const { theme } = useUnistyles();
 
-  const textAnimatedStyle = useAnimatedStyle(() => ({
-    color: withTiming(
-      isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
-      { duration: 200 }
-    ),
-    opacity: withTiming(isCompleted ? 0.75 : 1, { duration: 200 }),
-  }), [isCompleted, isNeglected, theme.colors.text]);
+  const textAnimatedStyle = useAnimatedStyle(
+    () => ({
+      color: withTiming(isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text, {
+        duration: 200,
+      }),
+      opacity: withTiming(isCompleted ? 0.75 : 1, { duration: 200 }),
+    }),
+    [isCompleted, isNeglected, theme.colors.text],
+  );
 
-  const strikeAnimatedStyle = useAnimatedStyle(() => ({
-    width: withTiming(isCompleted ? '100%' : '0%', { duration: 300 }),
-    backgroundColor: withTiming(
-      isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
-      { duration: 200 }
-    ),
-  }), [isCompleted, isNeglected, theme.colors.text]);
+  const strikeAnimatedStyle = useAnimatedStyle(
+    () => ({
+      width: withTiming(isCompleted ? '100%' : '0%', { duration: 300 }),
+      backgroundColor: withTiming(
+        isCompleted ? '#000000' : isNeglected ? '#FFFFFF' : theme.colors.text,
+        { duration: 200 },
+      ),
+    }),
+    [isCompleted, isNeglected, theme.colors.text],
+  );
 
-  const tickAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
-    transform: [{ scale: withSpring(isCompleted ? 1 : 0.5) }],
-  }), [isCompleted]);
+  const tickAnimatedStyle = useAnimatedStyle(
+    () => ({
+      opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
+      transform: [{ scale: withSpring(isCompleted ? 1 : 0.5) }],
+    }),
+    [isCompleted],
+  );
 
   return (
     <BrutalistCard
@@ -88,7 +96,10 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
             </Typography>
           )}
           {note && (
-            <Typography variant="caption" style={{ color: theme.colors.textMuted, marginTop: 4, fontFamily: theme.fonts.mono }}>
+            <Typography
+              variant="caption"
+              style={{ color: theme.colors.textMuted, marginTop: 4, fontFamily: theme.fonts.mono }}
+            >
               📝 {note}
             </Typography>
           )}
@@ -117,7 +128,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const weekCells = React.useMemo(() => {
     const cells = getWeekDates(weekAnchorDate);
     const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    return cells.map(cell => ({
+    return cells.map((cell) => ({
       ...cell,
       dayName: dayNames[cell.date.getDay()],
     }));
@@ -158,7 +169,10 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   };
 
   const selectedDateString = getLocalDateString(selectedDate);
-  const selectedDayStats = React.useMemo(() => appActions.getDayStats(selectedDateString), [selectedDateString, isSheetVisible]);
+  const selectedDayStats = React.useMemo(
+    () => appActions.getDayStats(selectedDateString),
+    [selectedDateString, isSheetVisible],
+  );
 
   // ── Switcher ──
   const renderSwitcher = () => (
@@ -196,9 +210,10 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const renderWeekView = () => {
     const firstDay = weekCells[0]?.date;
     const lastDay = weekCells[6]?.date;
-    const rangeLabel = firstDay && lastDay
-      ? `${getMonthShortName(firstDay)} ${firstDay.getDate()} – ${getMonthShortName(lastDay)} ${lastDay.getDate()}, ${lastDay.getFullYear()}`
-      : 'WEEK VIEW';
+    const rangeLabel =
+      firstDay && lastDay
+        ? `${getMonthShortName(firstDay)} ${firstDay.getDate()} – ${getMonthShortName(lastDay)} ${lastDay.getDate()}, ${lastDay.getFullYear()}`
+        : 'WEEK VIEW';
 
     return (
       <View style={styles.viewSection}>
@@ -206,12 +221,18 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.navHeader}>
           {/* @ts-ignore */}
           <PressableScale onPress={handlePrevWeek} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold" color={theme.colors.text}>◀</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>
+              ◀
+            </Typography>
           </PressableScale>
-          <Typography variant="bodyBold" style={styles.navLabel}>{rangeLabel}</Typography>
+          <Typography variant="bodyBold" style={styles.navLabel}>
+            {rangeLabel}
+          </Typography>
           {/* @ts-ignore */}
           <PressableScale onPress={handleNextWeek} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold" color={theme.colors.text}>▶</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>
+              ▶
+            </Typography>
           </PressableScale>
         </View>
 
@@ -222,40 +243,60 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             const { total, rate } = appActions.getDayStats(cell.dateString);
             let bottomBarColor = 'transparent';
             if (total > 0) {
-              bottomBarColor = rate === 1
-                ? theme.colors.success
-                : rate > 0 ? theme.colors.warning : theme.colors.danger;
+              bottomBarColor =
+                rate === 1
+                  ? theme.colors.success
+                  : rate > 0
+                    ? theme.colors.warning
+                    : theme.colors.danger;
             }
             return (
               <PressableScale
                 key={cell.dateString}
                 onPress={() => handleOpenDayHistory(cell.date)}
-                style={[styles.weekDayCell, isToday && styles.weekDayCellToday, idx === 6 && { borderRightWidth: 0 }]}
+                style={[
+                  styles.weekDayCell,
+                  isToday && styles.weekDayCellToday,
+                  idx === 6 && { borderRightWidth: 0 },
+                ]}
                 // @ts-ignore
                 activeScale={0.93}
               >
-                <Typography variant="caption" style={styles.weekDayLabel}>{cell.dayName.substring(0, 1)}</Typography>
-                <Typography variant="bodyBold" style={styles.weekDateLabel}>{cell.dayNumber}</Typography>
-                {total > 0 && <View style={[styles.weekStatusIndicator, { backgroundColor: bottomBarColor }]} />}
+                <Typography variant="caption" style={styles.weekDayLabel}>
+                  {cell.dayName.substring(0, 1)}
+                </Typography>
+                <Typography variant="bodyBold" style={styles.weekDateLabel}>
+                  {cell.dayNumber}
+                </Typography>
+                {total > 0 && (
+                  <View style={[styles.weekStatusIndicator, { backgroundColor: bottomBarColor }]} />
+                )}
               </PressableScale>
             );
           })}
         </View>
 
-        <Typography variant="caption" style={styles.infoText}>💡 Tap a day to see its habit list.</Typography>
+        <Typography variant="caption" style={styles.infoText}>
+          💡 Tap a day to see its habit list.
+        </Typography>
 
         {/* Weekly bar chart */}
         <View style={styles.chartContainer}>
-          <Typography variant="bodyBold" uppercase style={styles.chartTitle}>Completion Rates</Typography>
+          <Typography variant="bodyBold" uppercase style={styles.chartTitle}>
+            Completion Rates
+          </Typography>
           <View style={styles.chartRow}>
             {weekCells.map((cell) => {
               const { total, rate } = appActions.getDayStats(cell.dateString);
               const percentage = Math.round(rate * 100);
               let barColor: string = theme.colors.paper;
               if (total > 0) {
-                barColor = rate === 1
-                  ? theme.colors.success
-                  : rate > 0 ? theme.colors.warning : theme.colors.danger;
+                barColor =
+                  rate === 1
+                    ? theme.colors.success
+                    : rate > 0
+                      ? theme.colors.warning
+                      : theme.colors.danger;
               }
               const barHeight = total > 0 ? Math.max(10, rate * 90) : 4;
               return (
@@ -267,10 +308,16 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                   activeScale={0.93}
                 >
                   {total > 0 && (
-                    <Typography variant="mono" style={styles.chartPercentageText}>{percentage}%</Typography>
+                    <Typography variant="mono" style={styles.chartPercentageText}>
+                      {percentage}%
+                    </Typography>
                   )}
-                  <View style={[styles.chartBar, { height: barHeight, backgroundColor: barColor }]} />
-                  <Typography variant="mono" style={styles.chartBarLabel}>{cell.dayName.substring(0, 1)}</Typography>
+                  <View
+                    style={[styles.chartBar, { height: barHeight, backgroundColor: barColor }]}
+                  />
+                  <Typography variant="mono" style={styles.chartBarLabel}>
+                    {cell.dayName.substring(0, 1)}
+                  </Typography>
                 </PressableScale>
               );
             })}
@@ -283,19 +330,23 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // ── Month View ──
   const renderMonthView = () => {
     const monthLabel = `${getMonthFullName(monthAnchorDate)} ${monthAnchorDate.getFullYear()}`;
-    const monthDays = monthCells.filter(c => c.isCurrentMonth).map(c => getLocalDateString(c.date));
+    const monthDays = monthCells
+      .filter((c) => c.isCurrentMonth)
+      .map((c) => getLocalDateString(c.date));
 
-    const habitBreakdown = habits.map(habit => {
-      const history = appActions.getHabitHistory(habit.id, monthDays);
-      const scheduledDays = history.filter(h => h.isScheduled);
-      const completedDaysCount = scheduledDays.filter(h => h.completed).length;
-      return {
-        habit,
-        scheduledCount: scheduledDays.length,
-        completedCount: completedDaysCount,
-        rate: scheduledDays.length > 0 ? completedDaysCount / scheduledDays.length : 0,
-      };
-    }).filter(b => !b.habit.archivedAt || b.scheduledCount > 0);
+    const habitBreakdown = habits
+      .map((habit) => {
+        const history = appActions.getHabitHistory(habit.id, monthDays);
+        const scheduledDays = history.filter((h) => h.isScheduled);
+        const completedDaysCount = scheduledDays.filter((h) => h.completed).length;
+        return {
+          habit,
+          scheduledCount: scheduledDays.length,
+          completedCount: completedDaysCount,
+          rate: scheduledDays.length > 0 ? completedDaysCount / scheduledDays.length : 0,
+        };
+      })
+      .filter((b) => !b.habit.archivedAt || b.scheduledCount > 0);
 
     return (
       <View style={styles.viewSection}>
@@ -303,12 +354,18 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.navHeader}>
           {/* @ts-ignore */}
           <PressableScale onPress={handlePrevMonth} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold" color={theme.colors.text}>◀</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>
+              ◀
+            </Typography>
           </PressableScale>
-          <Typography variant="bodyBold" style={styles.navLabel}>{monthLabel}</Typography>
+          <Typography variant="bodyBold" style={styles.navLabel}>
+            {monthLabel}
+          </Typography>
           {/* @ts-ignore */}
           <PressableScale onPress={handleNextMonth} style={styles.navButton} activeScale={0.9}>
-            <Typography variant="bodyBold" color={theme.colors.text}>▶</Typography>
+            <Typography variant="bodyBold" color={theme.colors.text}>
+              ▶
+            </Typography>
           </PressableScale>
         </View>
 
@@ -316,7 +373,9 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         <View style={styles.calendarHeaderRow}>
           {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, idx) => (
             <View key={idx} style={styles.calendarHeaderCell}>
-              <Typography variant="caption" style={styles.calendarHeaderCellText}>{day}</Typography>
+              <Typography variant="caption" style={styles.calendarHeaderCellText}>
+                {day}
+              </Typography>
             </View>
           ))}
         </View>
@@ -339,7 +398,9 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             return (
               <PressableScale
                 key={`${cell.dateString}-${idx}`}
-                onPress={() => { if (cell.isCurrentMonth) handleOpenDayHistory(cell.date); }}
+                onPress={() => {
+                  if (cell.isCurrentMonth) handleOpenDayHistory(cell.date);
+                }}
                 style={[
                   styles.calendarCell,
                   { backgroundColor: cellBg, opacity: cellOpacity },
@@ -348,30 +409,47 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                 // @ts-ignore
                 activeScale={0.9}
               >
-                <Typography variant="mono" style={styles.calendarCellText} color={theme.colors.text}>{cell.dayNumber}</Typography>
+                <Typography
+                  variant="mono"
+                  style={styles.calendarCellText}
+                  color={theme.colors.text}
+                >
+                  {cell.dayNumber}
+                </Typography>
               </PressableScale>
             );
           })}
         </View>
 
-        <Typography variant="caption" style={styles.infoText}>💡 Tap a cell to see its habit list.</Typography>
+        <Typography variant="caption" style={styles.infoText}>
+          💡 Tap a cell to see its habit list.
+        </Typography>
 
         {/* Monthly breakdown */}
         <View style={styles.breakdownContainer}>
-          <Typography variant="bodyBold" uppercase style={styles.chartTitle}>Habit Breakdown</Typography>
+          <Typography variant="bodyBold" uppercase style={styles.chartTitle}>
+            Habit Breakdown
+          </Typography>
           {habitBreakdown.map(({ habit, scheduledCount, completedCount, rate }) => {
             const percentage = Math.round(rate * 100);
             let barColor: string = theme.colors.paper;
             if (scheduledCount > 0) {
-              barColor = rate === 1
-                ? theme.colors.success
-                : rate > 0 ? theme.colors.warning : theme.colors.danger;
+              barColor =
+                rate === 1
+                  ? theme.colors.success
+                  : rate > 0
+                    ? theme.colors.warning
+                    : theme.colors.danger;
             }
             return (
               <View key={habit.id} style={styles.breakdownItem}>
                 <View style={styles.breakdownTextRow}>
                   <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
-                  <Typography variant="bodyBold" style={styles.breakdownHabitTitle} numberOfLines={1}>
+                  <Typography
+                    variant="bodyBold"
+                    style={styles.breakdownHabitTitle}
+                    numberOfLines={1}
+                  >
                     {habit.title}
                   </Typography>
                   <Typography variant="mono" style={styles.breakdownFraction}>
@@ -379,7 +457,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
                   </Typography>
                 </View>
                 <View style={styles.progressBarOuter}>
-                  <View style={[styles.progressBarInner, { width: `${percentage}%`, backgroundColor: barColor }]} />
+                  <View
+                    style={[
+                      styles.progressBarInner,
+                      { width: `${percentage}%`, backgroundColor: barColor },
+                    ]}
+                  />
                 </View>
               </View>
             );
@@ -401,7 +484,9 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
       )}
       {selectedDayStats.total === 0 ? (
         <BrutalistCard style={styles.emptyCard} backgroundColor={theme.colors.background}>
-          <Typography variant="bodyBold" style={styles.emptyText}>NO HABITS SCHEDULED</Typography>
+          <Typography variant="bodyBold" style={styles.emptyText}>
+            NO HABITS SCHEDULED
+          </Typography>
         </BrutalistCard>
       ) : (
         selectedDayStats.entries.map((entry) => (
@@ -414,8 +499,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Typography variant="h2" uppercase>ANALYTICS</Typography>
-        <Typography variant="mono" style={styles.subtitle}>YOUR HABIT PROGRESS</Typography>
+        <Typography variant="h2" uppercase>
+          ANALYTICS
+        </Typography>
+        <Typography variant="mono" style={styles.subtitle}>
+          YOUR HABIT PROGRESS
+        </Typography>
       </View>
 
       {renderSwitcher()}
@@ -431,7 +520,13 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
       <BrutalistBottomSheet
         visible={isSheetVisible}
         onClose={() => setIsSheetVisible(false)}
-        title={getDayName(selectedDate) + ', ' + getMonthShortName(selectedDate) + ' ' + selectedDate.getDate()}
+        title={
+          getDayName(selectedDate) +
+          ', ' +
+          getMonthShortName(selectedDate) +
+          ' ' +
+          selectedDate.getDate()
+        }
       >
         {renderSelectedDayDetails()}
       </BrutalistBottomSheet>
@@ -440,7 +535,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
 });
 
 const styles = StyleSheet.create((theme) => ({
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 12, backgroundColor: theme.colors.background },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    backgroundColor: theme.colors.background,
+  },
   header: { marginBottom: 16 },
   subtitle: { fontSize: 10, color: theme.colors.textMuted, marginTop: 4 },
   switcherContainer: {
@@ -452,7 +552,12 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: 16,
     overflow: 'hidden',
   },
-  switcherButton: { flex: 1, paddingVertical: 10, alignItems: 'center', backgroundColor: theme.colors.paper },
+  switcherButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: theme.colors.paper,
+  },
   switcherButtonActive: { backgroundColor: theme.colors.warning },
   switcherButtonSeparator: { borderLeftWidth: theme.borderWidth, borderColor: theme.colors.border },
   switcherText: { fontSize: 12, fontFamily: theme.fonts.heading, color: theme.colors.textMuted },
@@ -460,66 +565,128 @@ const styles = StyleSheet.create((theme) => ({
   scrollView: { flex: 1, marginTop: 8 },
   scrollViewContent: { paddingBottom: 120 },
   viewSection: { marginBottom: 20 },
-  navHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  navHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
   navButton: {
     borderWidth: theme.borderWidth,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius,
-    paddingHorizontal: 12, paddingVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     backgroundColor: theme.colors.paper,
   },
   navLabel: { fontSize: 13, fontFamily: theme.fonts.mono, textAlign: 'center' },
   weekStrip: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, overflow: 'hidden',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    overflow: 'hidden',
   },
   weekDayCell: {
-    flex: 1, aspectRatio: 0.8, alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 6, borderRightWidth: 1.5, borderColor: theme.colors.border, position: 'relative',
+    flex: 1,
+    aspectRatio: 0.8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+    borderRightWidth: 1.5,
+    borderColor: theme.colors.border,
+    position: 'relative',
   },
   weekDayCellToday: { backgroundColor: theme.colors.background },
   weekDayLabel: { fontSize: 9, fontFamily: theme.fonts.heading, color: theme.colors.textMuted },
   weekDateLabel: { fontSize: 15, fontFamily: theme.fonts.mono, fontWeight: 'bold', marginTop: 2 },
   weekStatusIndicator: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 4 },
-  infoText: { marginTop: 8, color: theme.colors.textMuted, fontSize: 10, textAlign: 'center', fontStyle: 'italic' },
-  chartContainer: {
-    marginTop: 20, padding: 14,
-    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper,
+  infoText: {
+    marginTop: 8,
+    color: theme.colors.textMuted,
+    fontSize: 10,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
-  chartTitle: { fontSize: 14, fontFamily: theme.fonts.heading, marginBottom: 14, textAlign: 'center' },
-  chartRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 120, paddingBottom: 4 },
+  chartContainer: {
+    marginTop: 20,
+    padding: 14,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+  },
+  chartTitle: {
+    fontSize: 14,
+    fontFamily: theme.fonts.heading,
+    marginBottom: 14,
+    textAlign: 'center',
+  },
+  chartRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 120,
+    paddingBottom: 4,
+  },
   chartBarWrapper: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
   chartPercentageText: { fontSize: 8, color: theme.colors.textMuted, marginBottom: 4 },
-  chartBar: { width: 20, borderWidth: 2, borderColor: theme.colors.border, borderRadius: 3, borderBottomWidth: 0 },
+  chartBar: {
+    width: 20,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: 3,
+    borderBottomWidth: 0,
+  },
   chartBarLabel: { fontSize: 10, marginTop: 6, fontWeight: 'bold' },
   calendarHeaderRow: { flexDirection: 'row', marginBottom: 6 },
   calendarHeaderCell: { width: '14.285%', alignItems: 'center', justifyContent: 'center' },
   calendarHeaderCellText: { fontSize: 11, fontWeight: 'bold', color: theme.colors.textMuted },
   calendarGrid: {
-    flexDirection: 'row', flexWrap: 'wrap',
-    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, overflow: 'hidden',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    overflow: 'hidden',
   },
   calendarCell: {
-    width: '14.285%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center',
-    borderWidth: 0.75, borderColor: theme.colors.border,
+    width: '14.285%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0.75,
+    borderColor: theme.colors.border,
   },
   calendarCellToday: { borderWidth: 2, borderColor: theme.colors.warning },
   calendarCellText: { fontSize: 13 },
   breakdownContainer: {
-    marginTop: 20, padding: 14,
-    borderWidth: theme.borderWidth, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper,
+    marginTop: 20,
+    padding: 14,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
   },
   breakdownItem: { marginBottom: 12 },
-  breakdownTextRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  breakdownTextRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
   breakdownHabitTitle: { fontSize: 12, flex: 1, marginRight: 8 },
   breakdownFraction: { fontSize: 10, color: theme.colors.textMuted },
   progressBarOuter: {
-    height: 12, borderWidth: 1.5, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, overflow: 'hidden', marginTop: 4,
+    height: 12,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    overflow: 'hidden',
+    marginTop: 4,
   },
   progressBarInner: { height: '100%' },
   detailsSection: { marginTop: 4, minHeight: 100 },
@@ -528,18 +695,37 @@ const styles = StyleSheet.create((theme) => ({
   cardSpacing: { marginVertical: 6 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   checkbox: {
-    width: 24, height: 24, borderWidth: 2.5, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, justifyContent: 'center', alignItems: 'center',
+    width: 24,
+    height: 24,
+    borderWidth: 2.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   checkboxChecked: { backgroundColor: theme.colors.border },
   checkboxTick: { fontSize: 14, lineHeight: 18 },
   emojiSquare: {
-    width: 28, height: 28, borderWidth: 2, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius, backgroundColor: theme.colors.paper, justifyContent: 'center', alignItems: 'center',
+    width: 28,
+    height: 28,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   emojiText: { fontSize: 14 },
   textContainer: { flex: 1, justifyContent: 'center' },
-  customStrike: { position: 'absolute', top: '50%', left: 0, height: 2, backgroundColor: theme.colors.text, marginTop: -1 },
+  customStrike: {
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    height: 2,
+    backgroundColor: theme.colors.text,
+    marginTop: -1,
+  },
   emptyCard: { paddingVertical: 20, alignItems: 'center', justifyContent: 'center' },
   emptyText: { color: theme.colors.textMuted, fontSize: 12, textAlign: 'center' },
 }));

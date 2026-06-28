@@ -14,7 +14,7 @@ import { stylesheet } from './styles';
 
 export const EngineEditor = observer(() => {
   const { theme } = useUnistyles();
-  const habits = habitTemplates$.get()?.filter(h => !h.archivedAt) || [];
+  const habits = habitTemplates$.get()?.filter((h) => !h.archivedAt) || [];
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -63,26 +63,49 @@ export const EngineEditor = observer(() => {
 
   return (
     <View style={{ flex: 1 }}>
-      <BrutalistButton onPress={handleAdd} backgroundColor={theme.colors.success} style={{ marginBottom: 16 }}>
+      <BrutalistButton
+        onPress={handleAdd}
+        backgroundColor={theme.colors.success}
+        style={{ marginBottom: 16 }}
+      >
         + NEW HABIT
       </BrutalistButton>
       {habits.map((habit) => (
-        <BrutalistCard key={habit.id} backgroundColor={theme.colors.background} style={{ marginBottom: 8 }}>
+        <BrutalistCard
+          key={habit.id}
+          backgroundColor={theme.colors.background}
+          style={{ marginBottom: 8 }}
+        >
           <View style={stylesheet.listItemRow}>
             <View style={stylesheet.listItemContent}>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 2 }}>
                 <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
-                <Typography variant="bodyBold" style={{ flex: 1, flexWrap: 'wrap' }}>{habit.title}</Typography>
+                <Typography variant="bodyBold" style={{ flex: 1, flexWrap: 'wrap' }}>
+                  {habit.title}
+                </Typography>
               </View>
               <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                HOW OFTEN: {habit.scheduleType === 'alternate_days' ? 'EVERY OTHER DAY' : habit.scheduleType === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY'}
+                HOW OFTEN:{' '}
+                {habit.scheduleType === 'alternate_days'
+                  ? 'EVERY OTHER DAY'
+                  : habit.scheduleType === 'specific_days'
+                    ? 'CHOOSE DAYS'
+                    : 'EVERY DAY'}
               </Typography>
             </View>
             <View style={stylesheet.listItemActions}>
-              <BrutalistButton onPress={() => handleEdit(habit.id)} size="sm" backgroundColor={theme.colors.warning}>
+              <BrutalistButton
+                onPress={() => handleEdit(habit.id)}
+                size="sm"
+                backgroundColor={theme.colors.warning}
+              >
                 EDIT
               </BrutalistButton>
-              <BrutalistButton onPress={() => setDeletingId(habit.id)} size="sm" backgroundColor={theme.colors.danger}>
+              <BrutalistButton
+                onPress={() => setDeletingId(habit.id)}
+                size="sm"
+                backgroundColor={theme.colors.danger}
+              >
                 DEL
               </BrutalistButton>
             </View>
@@ -92,7 +115,10 @@ export const EngineEditor = observer(() => {
 
       <BrutalistBottomSheet
         visible={isAdding || editingId !== null}
-        onClose={() => { setEditingId(null); setIsAdding(false); }}
+        onClose={() => {
+          setEditingId(null);
+          setIsAdding(false);
+        }}
         title={isAdding ? 'NEW HABIT' : 'EDIT HABIT'}
       >
         <View style={stylesheet.formContainer}>
@@ -102,7 +128,7 @@ export const EngineEditor = observer(() => {
             onChangeText={setTitle}
             placeholder="e.g. 100 PUSHUPS"
           />
-          
+
           <Typography variant="bodyBold" style={{ marginTop: 16, marginBottom: 8 }}>
             EMOJI ICON
           </Typography>
@@ -113,7 +139,12 @@ export const EngineEditor = observer(() => {
           </Typography>
           <View style={stylesheet.segmentedControl}>
             {(['daily', 'alternate_days', 'specific_days'] as ScheduleType[]).map((type) => {
-              const label = type === 'alternate_days' ? 'OTHER DAYS' : type === 'specific_days' ? 'CHOOSE DAYS' : 'EVERY DAY';
+              const label =
+                type === 'alternate_days'
+                  ? 'OTHER DAYS'
+                  : type === 'specific_days'
+                    ? 'CHOOSE DAYS'
+                    : 'EVERY DAY';
               const isActive = scheduleType === type;
               return (
                 <BrutalistButton
@@ -158,10 +189,18 @@ export const EngineEditor = observer(() => {
             Are you sure you want to delete this habit? This action cannot be undone.
           </Typography>
           <View style={stylesheet.formActions}>
-            <BrutalistButton onPress={() => setDeletingId(null)} backgroundColor={theme.colors.paper} style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => setDeletingId(null)}
+              backgroundColor={theme.colors.paper}
+              style={{ flex: 1 }}
+            >
               CANCEL
             </BrutalistButton>
-            <BrutalistButton onPress={() => deletingId && confirmDelete(deletingId)} backgroundColor={theme.colors.danger} style={{ flex: 1 }}>
+            <BrutalistButton
+              onPress={() => deletingId && confirmDelete(deletingId)}
+              backgroundColor={theme.colors.danger}
+              style={{ flex: 1 }}
+            >
               DELETE
             </BrutalistButton>
           </View>

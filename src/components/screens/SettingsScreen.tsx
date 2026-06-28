@@ -11,7 +11,6 @@ import { BrutalistInput } from '@/ui/BrutalistInput';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { CURRENCY_OPTIONS } from '@/constants/currency';
 
-
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -26,7 +25,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
   const user = userState$.get();
   const stats = statsState$.get();
   const { theme } = useUnistyles();
-  
+
   // Sheet visible state
   const [sheetType, setSheetType] = useState<'profile' | null>(null);
 
@@ -97,7 +96,9 @@ export const SettingsScreen = observer(function SettingsScreen() {
               <Typography variant="h2">[O]</Typography>
             </View>
             <View style={stylesheet.profileDetails}>
-              <Typography variant="h3" uppercase>{user.username}</Typography>
+              <Typography variant="h3" uppercase>
+                {user.username}
+              </Typography>
               <Typography variant="mono" style={stylesheet.profileRoleText}>
                 {user.role}
               </Typography>
@@ -161,32 +162,38 @@ export const SettingsScreen = observer(function SettingsScreen() {
             <Pressable onPress={toggleThemeAccordion} style={stylesheet.accordionHeader}>
               <View style={stylesheet.actionTextWrapper}>
                 <Typography variant="bodyBold">APPEARANCE</Typography>
-                <Typography variant="caption">Current: {THEME_OPTIONS.find(t => t.value === currentTheme)?.label || 'System'}</Typography>
+                <Typography variant="caption">
+                  Current: {THEME_OPTIONS.find((t) => t.value === currentTheme)?.label || 'System'}
+                </Typography>
               </View>
               <Typography variant="bodyBold" style={{ fontSize: 20 }}>
                 {themeAccordionOpen ? '[-]' : '[+]'}
               </Typography>
             </Pressable>
-            
+
             {themeAccordionOpen && (
               <View style={stylesheet.accordionContent}>
                 {THEME_OPTIONS.map((option) => (
-                  <Pressable 
+                  <Pressable
                     key={option.value}
                     style={[
-                      stylesheet.accordionOption, 
-                      currentTheme === option.value && stylesheet.accordionOptionSelected
+                      stylesheet.accordionOption,
+                      currentTheme === option.value && stylesheet.accordionOptionSelected,
                     ]}
                     onPress={() => selectTheme(option.value)}
                   >
-                    <Typography 
-                      variant="bodyBold" 
-                      color={currentTheme === option.value ? theme.colors.text : theme.colors.textMuted}
+                    <Typography
+                      variant="bodyBold"
+                      color={
+                        currentTheme === option.value ? theme.colors.text : theme.colors.textMuted
+                      }
                     >
                       {option.label}
                     </Typography>
                     {currentTheme === option.value && (
-                      <Typography variant="bodyBold" color={theme.colors.text}>✓</Typography>
+                      <Typography variant="bodyBold" color={theme.colors.text}>
+                        ✓
+                      </Typography>
                     )}
                   </Pressable>
                 ))}
@@ -198,32 +205,41 @@ export const SettingsScreen = observer(function SettingsScreen() {
             <Pressable onPress={toggleCurrencyAccordion} style={stylesheet.accordionHeader}>
               <View style={stylesheet.actionTextWrapper}>
                 <Typography variant="bodyBold">CURRENCY</Typography>
-                <Typography variant="caption">Current: {CURRENCY_OPTIONS.find(c => c.value === currentCurrency)?.label || 'Dollar ($)'}</Typography>
+                <Typography variant="caption">
+                  Current:{' '}
+                  {CURRENCY_OPTIONS.find((c) => c.value === currentCurrency)?.label || 'Dollar ($)'}
+                </Typography>
               </View>
               <Typography variant="bodyBold" style={{ fontSize: 20 }}>
                 {currencyAccordionOpen ? '[-]' : '[+]'}
               </Typography>
             </Pressable>
-            
+
             {currencyAccordionOpen && (
               <View style={stylesheet.accordionContent}>
                 {CURRENCY_OPTIONS.map((option) => (
-                  <Pressable 
+                  <Pressable
                     key={option.value}
                     style={[
-                      stylesheet.accordionOption, 
-                      currentCurrency === option.value && stylesheet.accordionOptionSelected
+                      stylesheet.accordionOption,
+                      currentCurrency === option.value && stylesheet.accordionOptionSelected,
                     ]}
                     onPress={() => selectCurrency(option.value)}
                   >
-                    <Typography 
-                      variant="bodyBold" 
-                      color={currentCurrency === option.value ? theme.colors.text : theme.colors.textMuted}
+                    <Typography
+                      variant="bodyBold"
+                      color={
+                        currentCurrency === option.value
+                          ? theme.colors.text
+                          : theme.colors.textMuted
+                      }
                     >
                       {option.label}
                     </Typography>
                     {currentCurrency === option.value && (
-                      <Typography variant="bodyBold" color={theme.colors.text}>✓</Typography>
+                      <Typography variant="bodyBold" color={theme.colors.text}>
+                        ✓
+                      </Typography>
                     )}
                   </Pressable>
                 ))}
@@ -270,7 +286,6 @@ export const SettingsScreen = observer(function SettingsScreen() {
           </BrutalistButton>
         </View>
       </BrutalistBottomSheet>
-
     </View>
   );
 });

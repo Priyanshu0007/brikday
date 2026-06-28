@@ -12,14 +12,20 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 const MilestoneItem = ({ m, projectId, neglected, theme }: any) => {
-  const animatedScale = useAnimatedStyle(() => ({
-    transform: [{ scale: withTiming(m.completed ? 1 : 0, { duration: 300 }) }],
-    opacity: withTiming(m.completed ? 1 : 0, { duration: 300 }),
-  }), [m.completed]);
+  const animatedScale = useAnimatedStyle(
+    () => ({
+      transform: [{ scale: withTiming(m.completed ? 1 : 0, { duration: 300 }) }],
+      opacity: withTiming(m.completed ? 1 : 0, { duration: 300 }),
+    }),
+    [m.completed],
+  );
 
-  const animatedTextOpacity = useAnimatedStyle(() => ({
-    opacity: withTiming(m.completed ? 0.4 : 1, { duration: 300 }),
-  }), [m.completed]);
+  const animatedTextOpacity = useAnimatedStyle(
+    () => ({
+      opacity: withTiming(m.completed ? 0.4 : 1, { duration: 300 }),
+    }),
+    [m.completed],
+  );
 
   return (
     <View style={stylesheet.milestoneItemContainer}>
@@ -42,7 +48,7 @@ const MilestoneItem = ({ m, projectId, neglected, theme }: any) => {
           style={[
             stylesheet.milestoneInput,
             m.completed && { textDecorationLine: 'line-through' },
-            { color: neglected ? '#FFFFFF' : theme.colors.text }
+            { color: neglected ? '#FFFFFF' : theme.colors.text },
           ]}
           editable={!m.completed}
           placeholderTextColor={theme.colors.textMuted}
@@ -147,7 +153,7 @@ const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: 
               style={[
                 stylesheet.progressLineFill,
                 animatedProgressStyle,
-                { backgroundColor: theme.colors.success }
+                { backgroundColor: theme.colors.success },
               ]}
             />
           </View>
@@ -157,7 +163,13 @@ const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: 
 
           <View style={stylesheet.milestonesList}>
             {milestones.map((m) => (
-              <MilestoneItem key={m.id} m={m} projectId={projectId} neglected={neglected} theme={theme} />
+              <MilestoneItem
+                key={m.id}
+                m={m}
+                projectId={projectId}
+                neglected={neglected}
+                theme={theme}
+              />
             ))}
           </View>
         </View>
@@ -206,8 +218,6 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
   const activeProjects = projects.filter((p) => !p.neglected);
   const neglectedProjects = projects.filter((p) => p.neglected);
 
-
-
   return (
     <ScrollView style={stylesheet.container} contentContainerStyle={stylesheet.scrollContent}>
       {/* Title */}
@@ -230,7 +240,9 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
                 IGNORED PROJECTS ({neglectedProjects.length})
               </Typography>
             </View>
-            {neglectedProjects.map(p => <ProjectCard key={p.id} projectId={p.id} theme={theme} />)}
+            {neglectedProjects.map((p) => (
+              <ProjectCard key={p.id} projectId={p.id} theme={theme} />
+            ))}
           </View>
         )}
 
@@ -241,7 +253,9 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
               ACTIVE PROJECTS ({activeProjects.length})
             </Typography>
           </View>
-          {activeProjects.map(p => <ProjectCard key={p.id} projectId={p.id} theme={theme} />)}
+          {activeProjects.map((p) => (
+            <ProjectCard key={p.id} projectId={p.id} theme={theme} />
+          ))}
         </View>
       </View>
     </ScrollView>
