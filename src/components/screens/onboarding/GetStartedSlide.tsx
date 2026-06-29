@@ -80,9 +80,9 @@ export const GetStartedSlide = observer(({ activeIndex }: GetStartedSlideProps) 
                 borderWidth: theme.borderWidth,
                 borderColor: theme.colors.border,
                 backgroundColor:
-                  currentCurrency === c.value ? theme.colors.primary : theme.colors.background,
+                  currentCurrency === c.value ? theme.colors.text : theme.colors.background,
                 borderRadius: theme.borderRadius,
-                shadowColor: theme.colors.shadow,
+                shadowColor: theme.colors.border,
                 shadowOffset:
                   currentCurrency === c.value ? { width: 0, height: 0 } : { width: 2, height: 2 },
                 shadowOpacity: 1,

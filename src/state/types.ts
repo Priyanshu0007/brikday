@@ -75,3 +75,9 @@ export interface UiState {
   activeTab: 'engine' | 'vault' | 'blueprint' | 'analytics';
   theme?: 'light' | 'dark' | 'system';
 }
+
+export interface NotificationPreferences {
+  morningReminder: { enabled: boolean; hour: number; minute: number };
+  eveningRecap: { enabled: boolean; hour: number; minute: number };
+  streakAlert: { enabled: boolean };
+}

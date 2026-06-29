@@ -4,6 +4,7 @@ import { habitTemplates$ } from './slices/habitsSlice';
 import { todayLog$, logIndex$, mmkvStorage } from './slices/dailyLogSlice';
 import { vaultState$ } from './slices/vaultSlice';
 import { blueprintState$ } from './slices/blueprintSlice';
+import { notificationState$ } from './slices/notificationSlice';
 import {
   HabitTemplate,
   ScheduleType,
@@ -14,6 +15,12 @@ import {
   DailyHabitEntry,
 } from './types';
 import { getLocalDateString, isHabitActiveOnDate } from '@/utils/date';
+import {
+  cancelAllScheduled,
+  scheduleMorningReminder,
+  scheduleEveningRecap,
+  scheduleStreakAlert,
+} from '@/utils/notifications';
 
 export const appActions = {
   completeOnboarding() {
@@ -382,5 +389,46 @@ export const appActions = {
   },
   updateCurrency(code: string) {
     userState$.currencyCode.set(code);
+  },
+  async updateNotificationSettings(
+    updates: Partial<{
+      morningReminder: { enabled: boolean; hour: number; minute: number };
+      eveningRecap: { enabled: boolean; hour: number; minute: number };
+      streakAlert: { enabled: boolean };
+    }>
+  ) {
+    if (updates.morningReminder) {
+      notificationState$.morningReminder.set(updates.morningReminder);
+    }
+    if (updates.eveningRecap) {
+      notificationState$.eveningRecap.set(updates.eveningRecap);
+    }
+    if (updates.streakAlert) {
+      notificationState$.streakAlert.set(updates.streakAlert);
+    }
+    await this.rescheduleNotifications();
+  },
+  async rescheduleNotifications() {
+    await cancelAllScheduled();
+
+    const prefs = notificationState$.get();
+
+    if (prefs.morningReminder.enabled) {
+      await scheduleMorningReminder(
+        prefs.morningReminder.hour,
+        prefs.morningReminder.minute
+      );
+    }
+
+    if (prefs.eveningRecap.enabled) {
+      await scheduleEveningRecap(
+        prefs.eveningRecap.hour,
+        prefs.eveningRecap.minute
+      );
+    }
+
+    if (prefs.streakAlert.enabled) {
+      await scheduleStreakAlert();
+    }
   },
 };

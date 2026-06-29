@@ -10,6 +10,7 @@ import { todayLog$, logIndex$, mmkvStorage } from './slices/dailyLogSlice';
 import { initialProjects } from './hardcoded-data/blueprint';
 import { initialVaultGoals } from './hardcoded-data/vault';
 import { getLocalDateString } from '@/utils/date';
+import * as Notifications from 'expo-notifications';
 
 /**
  * Resets all MMKV persistent storage and in-memory states to initial defaults,
@@ -26,6 +27,7 @@ export const resetAppAndStorage = () => {
       username: 'SDE-1, React Native',
       role: 'Core Architect',
       isLoggedIn: false,
+      currencyCode: 'USD',
     });
     statsState$.set({ streak: 12 });
     habitTemplates$.set([]);
@@ -59,6 +61,28 @@ export const resetCurrentDay = () => {
 };
 
 /**
+ * Schedules a test notification 10 seconds in the future.
+ */
+export const triggerTestNotification = () => {
+  try {
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Test Notification 🧪',
+        body: 'This is a test message from Brikday.',
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 10,
+      },
+    });
+    console.log('[DevTool] Test notification scheduled for 10s from now.');
+  } catch (error) {
+    console.error('[DevTool] Failed to schedule test notification:', error);
+  }
+};
+
+/**
  * Registers the "Reset App & Storage" button in the developer menus.
  */
 export const setupDevMenu = () => {
@@ -74,8 +98,11 @@ export const setupDevMenu = () => {
       DevSettings.addMenuItem('Reset Current Day', () => {
         resetCurrentDay();
       });
+      DevSettings.addMenuItem('Trigger Test Notification', () => {
+        triggerTestNotification();
+      });
       console.log(
-        '[DevTool] Registered "Reset App & Storage" and "Reset Current Day" in DevSettings.',
+        '[DevTool] Registered "Reset App & Storage", "Reset Current Day", and "Trigger Test Notification" in DevSettings.',
       );
     } catch {
       console.warn('[DevTool] Could not register with DevSettings.');
@@ -98,9 +125,15 @@ export const setupDevMenu = () => {
             resetCurrentDay();
           },
         },
+        {
+          name: 'Trigger Test Notification',
+          callback: () => {
+            triggerTestNotification();
+          },
+        },
       ]);
       console.log(
-        '[DevTool] Registered "Reset App & Storage" and "Reset Current Day" in expo-dev-menu.',
+        '[DevTool] Registered "Reset App & Storage", "Reset Current Day", and "Trigger Test Notification" in expo-dev-menu.',
       );
     } catch {
       // expo-dev-menu is not installed or available in this context

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Pressable } from 'react-native';
 import { Typography } from '@/ui/Typography';
-import { styles } from './styles';
+import { stylesheet as styles } from './styles';
 
 export const DayPicker = ({
   selectedDays,

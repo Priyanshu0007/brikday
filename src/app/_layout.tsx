@@ -17,6 +17,18 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { setupDevMenu } from '@/state/devtool';
 import { migrateToLogSystem } from '@/state/migration';
 import { appActions, uiState$ } from '@/state/store';
+import * as Notifications from 'expo-notifications';
+import { requestNotificationPermissions } from '@/utils/notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default observer(function TabLayout() {
   const colorScheme = useColorScheme();
@@ -41,6 +53,14 @@ export default observer(function TabLayout() {
     // Run one-time migration and init daily log
     migrateToLogSystem();
     appActions.loadTodayLog();
+
+    // Request notification permissions and reschedule
+    (async () => {
+      const granted = await requestNotificationPermissions();
+      if (granted) {
+        appActions.rescheduleNotifications();
+      }
+    })();
 
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {

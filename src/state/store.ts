@@ -10,6 +10,7 @@ export * from './slices/habitsSlice'; // Manages the list of habit templates
 export * from './slices/dailyLogSlice'; // Manages day-isolated habit logs
 export * from './slices/vaultSlice'; // Manages financial goals and saving transactions (Vault tab)
 export * from './slices/blueprintSlice'; // Manages active and neglected projects (Blueprint tab)
+export * from './slices/notificationSlice'; // Manages notification preferences
 
 // Re-export the centralized actions object used to mutate the state slices
 export * from './actions';

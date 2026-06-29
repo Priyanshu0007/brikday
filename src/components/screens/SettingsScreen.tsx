@@ -3,7 +3,7 @@ import { View, ScrollView, LayoutAnimation, UIManager, Platform, Pressable } fro
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { router } from 'expo-router';
 import { observer } from '@legendapp/state/react';
-import { userState$, statsState$, appActions, uiState$ } from '@/state/store';
+import { userState$, statsState$, appActions, uiState$, notificationState$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
@@ -75,6 +75,44 @@ export const SettingsScreen = observer(function SettingsScreen() {
 
   const currentTheme = uiState$.theme.get() || 'system';
   const currentCurrency = user.currencyCode || 'USD';
+  const notifPrefs = notificationState$.get();
+
+  const handleToggleMorning = () => {
+    appActions.updateNotificationSettings({
+      morningReminder: { ...notifPrefs.morningReminder, enabled: !notifPrefs.morningReminder.enabled },
+    });
+  };
+
+  const handleUpdateMorningTime = (field: 'hour' | 'minute', val: string) => {
+    const num = parseInt(val, 10);
+    if (!isNaN(num)) {
+      appActions.updateNotificationSettings({
+        morningReminder: { ...notifPrefs.morningReminder, [field]: num },
+      });
+    }
+  };
+
+  const handleToggleEvening = () => {
+    appActions.updateNotificationSettings({
+      eveningRecap: { ...notifPrefs.eveningRecap, enabled: !notifPrefs.eveningRecap.enabled },
+    });
+  };
+
+  const handleUpdateEveningTime = (field: 'hour' | 'minute', val: string) => {
+    const num = parseInt(val, 10);
+    if (!isNaN(num)) {
+      appActions.updateNotificationSettings({
+        eveningRecap: { ...notifPrefs.eveningRecap, [field]: num },
+      });
+    }
+  };
+
+  const handleToggleStreak = () => {
+    appActions.updateNotificationSettings({
+      streakAlert: { enabled: !notifPrefs.streakAlert.enabled },
+    });
+  };
+
 
   return (
     <View style={stylesheet.outerContainer}>
@@ -248,6 +286,96 @@ export const SettingsScreen = observer(function SettingsScreen() {
           </BrutalistCard>
         </View>
 
+        {/* Notifications */}
+        <Typography variant="bodyBold" style={stylesheet.sectionTitle} uppercase>
+          NOTIFICATIONS
+        </Typography>
+
+        <View style={stylesheet.actionList}>
+          {/* Morning Reminder */}
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <Pressable onPress={handleToggleMorning} style={stylesheet.accordionHeader}>
+              <View style={stylesheet.actionTextWrapper}>
+                <Typography variant="bodyBold">MORNING REMINDER</Typography>
+                <Typography variant="caption">Time to build.</Typography>
+              </View>
+              <Typography variant="bodyBold" style={{ fontSize: 20 }}>
+                {notifPrefs.morningReminder.enabled ? '[ON]' : '[OFF]'}
+              </Typography>
+            </Pressable>
+            {notifPrefs.morningReminder.enabled && (
+              <View style={stylesheet.timePickerRow}>
+                <View style={stylesheet.timeInputWrapper}>
+                  <BrutalistInput
+                    label="HOUR (0-23)"
+                    value={String(notifPrefs.morningReminder.hour)}
+                    onChangeText={(val) => handleUpdateMorningTime('hour', val)}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+                <View style={stylesheet.timeInputWrapper}>
+                  <BrutalistInput
+                    label="MINUTE (0-59)"
+                    value={String(notifPrefs.morningReminder.minute).padStart(2, '0')}
+                    onChangeText={(val) => handleUpdateMorningTime('minute', val)}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+              </View>
+            )}
+          </BrutalistCard>
+
+          {/* Evening Recap */}
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <Pressable onPress={handleToggleEvening} style={stylesheet.accordionHeader}>
+              <View style={stylesheet.actionTextWrapper}>
+                <Typography variant="bodyBold">EVENING RECAP</Typography>
+                <Typography variant="caption">Did you finish your habits?</Typography>
+              </View>
+              <Typography variant="bodyBold" style={{ fontSize: 20 }}>
+                {notifPrefs.eveningRecap.enabled ? '[ON]' : '[OFF]'}
+              </Typography>
+            </Pressable>
+            {notifPrefs.eveningRecap.enabled && (
+              <View style={stylesheet.timePickerRow}>
+                <View style={stylesheet.timeInputWrapper}>
+                  <BrutalistInput
+                    label="HOUR (0-23)"
+                    value={String(notifPrefs.eveningRecap.hour)}
+                    onChangeText={(val) => handleUpdateEveningTime('hour', val)}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+                <View style={stylesheet.timeInputWrapper}>
+                  <BrutalistInput
+                    label="MINUTE (0-59)"
+                    value={String(notifPrefs.eveningRecap.minute).padStart(2, '0')}
+                    onChangeText={(val) => handleUpdateEveningTime('minute', val)}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+              </View>
+            )}
+          </BrutalistCard>
+
+          {/* Streak Alert */}
+          <BrutalistCard backgroundColor={theme.colors.background}>
+            <Pressable onPress={handleToggleStreak} style={stylesheet.accordionHeader}>
+              <View style={stylesheet.actionTextWrapper}>
+                <Typography variant="bodyBold">STREAK ALERT</Typography>
+                <Typography variant="caption">Warn if streak is at risk at 21:30</Typography>
+              </View>
+              <Typography variant="bodyBold" style={{ fontSize: 20 }}>
+                {notifPrefs.streakAlert.enabled ? '[ON]' : '[OFF]'}
+              </Typography>
+            </Pressable>
+          </BrutalistCard>
+        </View>
+
         {/* Emergency Logout */}
         <BrutalistButton
           onPress={() => appActions.logout()}
@@ -391,5 +519,16 @@ const stylesheet = StyleSheet.create((theme) => ({
   accordionOptionSelected: {
     backgroundColor: theme.colors.paper,
     borderRadius: theme.borderRadius,
+  },
+  timePickerRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+    borderTopWidth: 2,
+    borderColor: theme.colors.border,
+    paddingTop: 16,
+  },
+  timeInputWrapper: {
+    flex: 1,
   },
 }));
