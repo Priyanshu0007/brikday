@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { observer } from '@legendapp/state/react';
 import { vaultState$, appActions, userState$ } from '@/state/store';
 import { getCurrencySymbol } from '@/constants/currency';
@@ -67,37 +68,45 @@ export const VaultEditor = observer(() => {
         + NEW SAVINGS GOAL
       </BrutalistButton>
       {goals.map((goal) => (
-        <BrutalistCard
+        <Swipeable
           key={goal.id}
-          backgroundColor={theme.colors.background}
-          style={{ marginBottom: 8 }}
-        >
-          <View style={stylesheet.listItemRow}>
-            <View style={stylesheet.listItemContent}>
-              <Typography variant="bodyBold">{goal.title}</Typography>
-              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                TARGET: {currencySymbol}
-                {goal.target.toLocaleString()}
-              </Typography>
-            </View>
-            <View style={stylesheet.listItemActions}>
-              <BrutalistButton
+          containerStyle={{ marginBottom: 8 }}
+          renderRightActions={() => (
+            <View style={stylesheet.swipeActionContainer}>
+              <TouchableOpacity
+                style={[stylesheet.swipeActionButton, { backgroundColor: theme.colors.warning }]}
                 onPress={() => handleEdit(goal.id)}
-                size="sm"
-                backgroundColor={theme.colors.warning}
               >
-                EDIT
-              </BrutalistButton>
-              <BrutalistButton
+                <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+                  EDIT
+                </Typography>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[stylesheet.swipeActionButton, { backgroundColor: theme.colors.danger }]}
                 onPress={() => setDeletingId(goal.id)}
-                size="sm"
-                backgroundColor={theme.colors.danger}
               >
-                DEL
-              </BrutalistButton>
+                <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+                  DEL
+                </Typography>
+              </TouchableOpacity>
             </View>
-          </View>
-        </BrutalistCard>
+          )}
+        >
+          <BrutalistCard
+            backgroundColor={theme.colors.background}
+            style={{ marginVertical: 0 }}
+          >
+            <View style={stylesheet.listItemRow}>
+              <View style={stylesheet.listItemContent}>
+                <Typography variant="bodyBold">{goal.title}</Typography>
+                <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
+                  TARGET: {currencySymbol}
+                  {goal.target.toLocaleString()}
+                </Typography>
+              </View>
+            </View>
+          </BrutalistCard>
+        </Swipeable>
       ))}
 
       <BrutalistBottomSheet

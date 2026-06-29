@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { observer } from '@legendapp/state/react';
 import { blueprintState$, appActions } from '@/state/store';
 import { useUnistyles } from 'react-native-unistyles';
@@ -62,36 +63,44 @@ export const BlueprintEditor = observer(() => {
         + NEW PROJECT
       </BrutalistButton>
       {projects.map((project) => (
-        <BrutalistCard
+        <Swipeable
           key={project.id}
-          backgroundColor={theme.colors.background}
-          style={{ marginBottom: 8 }}
-        >
-          <View style={stylesheet.listItemRow}>
-            <View style={stylesheet.listItemContent}>
-              <Typography variant="bodyBold">{project.title}</Typography>
-              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                CATEGORY: {project.category}
-              </Typography>
-            </View>
-            <View style={stylesheet.listItemActions}>
-              <BrutalistButton
+          containerStyle={{ marginBottom: 8 }}
+          renderRightActions={() => (
+            <View style={stylesheet.swipeActionContainer}>
+              <TouchableOpacity
+                style={[stylesheet.swipeActionButton, { backgroundColor: theme.colors.warning }]}
                 onPress={() => handleEdit(project.id)}
-                size="sm"
-                backgroundColor={theme.colors.warning}
               >
-                EDIT
-              </BrutalistButton>
-              <BrutalistButton
+                <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+                  EDIT
+                </Typography>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[stylesheet.swipeActionButton, { backgroundColor: theme.colors.danger }]}
                 onPress={() => setDeletingId(project.id)}
-                size="sm"
-                backgroundColor={theme.colors.danger}
               >
-                DEL
-              </BrutalistButton>
+                <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+                  DEL
+                </Typography>
+              </TouchableOpacity>
             </View>
-          </View>
-        </BrutalistCard>
+          )}
+        >
+          <BrutalistCard
+            backgroundColor={theme.colors.background}
+            style={{ marginVertical: 0 }}
+          >
+            <View style={stylesheet.listItemRow}>
+              <View style={stylesheet.listItemContent}>
+                <Typography variant="bodyBold">{project.title}</Typography>
+                <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
+                  CATEGORY: {project.category}
+                </Typography>
+              </View>
+            </View>
+          </BrutalistCard>
+        </Swipeable>
       ))}
 
       <BrutalistBottomSheet

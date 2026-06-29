@@ -92,4 +92,19 @@ export const stylesheet = StyleSheet.create((theme) => ({
   dayTextSelected: {
     color: theme.colors.background,
   },
+  swipeActionContainer: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    paddingLeft: 8,
+    paddingBottom: 4, // Align with card shadow offset
+    gap: 8,
+  },
+  swipeActionButton: {
+    aspectRatio: 1, // Make it perfectly square based on its height
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: theme.borderRadius,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+  },
 }));

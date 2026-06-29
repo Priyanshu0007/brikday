@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { observer } from '@legendapp/state/react';
 import { habitTemplates$, appActions, ScheduleType } from '@/state/store';
 import { useUnistyles } from 'react-native-unistyles';
@@ -71,46 +72,54 @@ export const EngineEditor = observer(() => {
         + NEW HABIT
       </BrutalistButton>
       {habits.map((habit) => (
-        <BrutalistCard
+        <Swipeable
           key={habit.id}
-          backgroundColor={theme.colors.background}
-          style={{ marginBottom: 8 }}
+          containerStyle={{ marginBottom: 8 }}
+          renderRightActions={() => (
+            <View style={stylesheet.swipeActionContainer}>
+              <TouchableOpacity
+                style={[stylesheet.swipeActionButton, { backgroundColor: theme.colors.warning }]}
+                onPress={() => handleEdit(habit.id)}
+              >
+                <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+                  EDIT
+                </Typography>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[stylesheet.swipeActionButton, { backgroundColor: theme.colors.danger }]}
+                onPress={() => setDeletingId(habit.id)}
+              >
+                <Typography variant="caption" style={{ color: theme.colors.background, fontWeight: 'bold' }}>
+                  DEL
+                </Typography>
+              </TouchableOpacity>
+            </View>
+          )}
         >
-          <View style={stylesheet.listItemRow}>
-            <View style={stylesheet.listItemContent}>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 2 }}>
-                <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
-                <Typography variant="bodyBold" style={{ flex: 1, flexWrap: 'wrap' }}>
-                  {habit.title}
+          <BrutalistCard
+            backgroundColor={theme.colors.background}
+            style={{ marginVertical: 0 }}
+          >
+            <View style={stylesheet.listItemRow}>
+              <View style={stylesheet.listItemContent}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 2 }}>
+                  <Typography style={{ marginRight: 6 }}>{habit.emoji || '⚡'}</Typography>
+                  <Typography variant="bodyBold" style={{ flex: 1, flexWrap: 'wrap' }}>
+                    {habit.title}
+                  </Typography>
+                </View>
+                <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
+                  HOW OFTEN:{' '}
+                  {habit.scheduleType === 'alternate_days'
+                    ? 'EVERY OTHER DAY'
+                    : habit.scheduleType === 'specific_days'
+                      ? 'CHOOSE DAYS'
+                      : 'EVERY DAY'}
                 </Typography>
               </View>
-              <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-                HOW OFTEN:{' '}
-                {habit.scheduleType === 'alternate_days'
-                  ? 'EVERY OTHER DAY'
-                  : habit.scheduleType === 'specific_days'
-                    ? 'CHOOSE DAYS'
-                    : 'EVERY DAY'}
-              </Typography>
             </View>
-            <View style={stylesheet.listItemActions}>
-              <BrutalistButton
-                onPress={() => handleEdit(habit.id)}
-                size="sm"
-                backgroundColor={theme.colors.warning}
-              >
-                EDIT
-              </BrutalistButton>
-              <BrutalistButton
-                onPress={() => setDeletingId(habit.id)}
-                size="sm"
-                backgroundColor={theme.colors.danger}
-              >
-                DEL
-              </BrutalistButton>
-            </View>
-          </View>
-        </BrutalistCard>
+          </BrutalistCard>
+        </Swipeable>
       ))}
 
       <BrutalistBottomSheet

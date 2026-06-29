@@ -14,7 +14,7 @@ import { ScrollView, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-const AnimatedTypography = Animated.createAnimatedComponent(Typography);
+
 
 const HabitItem = observer(
   ({
@@ -132,9 +132,14 @@ const HabitItem = observer(
 
             <View style={styles.textContainer}>
               <View style={{ alignSelf: 'flex-start' }}>
-                <AnimatedTypography variant="bodyBold" style={[textAnimatedStyle]}>
+                <Animated.Text
+                  style={[
+                    styles.habitTitleText,
+                    textAnimatedStyle,
+                  ]}
+                >
                   {title}
-                </AnimatedTypography>
+                </Animated.Text>
                 {/* Custom Animated Strikethrough Line */}
                 <Animated.View style={[styles.customStrike, strikeAnimatedStyle]} />
               </View>
@@ -407,6 +412,12 @@ const styles = StyleSheet.create((theme) => ({
   textContainer: {
     flex: 1,
     justifyContent: 'center',
+  },
+  habitTitleText: {
+    fontFamily: theme.fonts.bodyBold,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: 'bold',
   },
   customStrike: {
     position: 'absolute',
