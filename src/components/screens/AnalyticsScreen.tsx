@@ -12,6 +12,8 @@ import {
   getMonthShortName,
   getWeekDates,
   isSameDay,
+  getYearGrid,
+  YearGridCell,
 } from '@/utils/date';
 import { observer } from '@legendapp/state/react';
 import { PressableScale } from 'pressto';
@@ -113,8 +115,8 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const habits = habitTemplates$.get() || [];
   const { theme } = useUnistyles();
 
-  // View modes: 'week' | 'month'
-  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+  // View modes: 'week' | 'month' | 'year'
+  const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
 
   // Bottom Sheet
   const [isSheetVisible, setIsSheetVisible] = useState(false);
@@ -123,6 +125,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // Navigation anchors
   const [weekAnchorDate, setWeekAnchorDate] = useState<Date>(new Date());
   const [monthAnchorDate, setMonthAnchorDate] = useState<Date>(new Date());
+  const [yearAnchorDate, setYearAnchorDate] = useState<Date>(new Date());
 
   // Week cells
   const weekCells = React.useMemo(() => {
@@ -136,6 +139,30 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
 
   // Month cells
   const monthCells = React.useMemo(() => getMonthGrid(monthAnchorDate), [monthAnchorDate]);
+
+  // Year cells
+  const yearCells = React.useMemo(() => getYearGrid(yearAnchorDate.getFullYear()), [yearAnchorDate]);
+
+  const yearScrollRef = React.useRef<ScrollView>(null);
+
+  React.useEffect(() => {
+    if (viewMode === 'year' && yearScrollRef.current) {
+      const today = new Date();
+      if (yearAnchorDate.getFullYear() === today.getFullYear()) {
+        const todayCell = yearCells.find(c => isSameDay(c.date, today));
+        if (todayCell) {
+          const xOffset = Math.max(0, todayCell.weekIndex * 16 - 150); 
+          setTimeout(() => {
+            yearScrollRef.current?.scrollTo({ x: xOffset, animated: true });
+          }, 100);
+        }
+      } else {
+        setTimeout(() => {
+          yearScrollRef.current?.scrollTo({ x: 0, animated: false });
+        }, 100);
+      }
+    }
+  }, [viewMode, yearAnchorDate, yearCells]);
 
   const handlePrevWeek = () => {
     triggerHaptic('light');
@@ -161,6 +188,18 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
     d.setMonth(d.getMonth() + 1);
     setMonthAnchorDate(d);
   };
+  const handlePrevYear = () => {
+    triggerHaptic('light');
+    const d = new Date(yearAnchorDate);
+    d.setFullYear(d.getFullYear() - 1);
+    setYearAnchorDate(d);
+  };
+  const handleNextYear = () => {
+    triggerHaptic('light');
+    const d = new Date(yearAnchorDate);
+    d.setFullYear(d.getFullYear() + 1);
+    setYearAnchorDate(d);
+  };
 
   const handleOpenDayHistory = (date: Date) => {
     setSelectedDate(date);
@@ -177,7 +216,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // ── Switcher ──
   const renderSwitcher = () => (
     <View style={styles.switcherContainer}>
-      {(['week', 'month'] as const).map((mode) => {
+      {(['week', 'month', 'year'] as const).map((mode) => {
         const isActive = viewMode === mode;
         return (
           <PressableScale
@@ -189,7 +228,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             style={[
               styles.switcherButton,
               isActive && styles.switcherButtonActive,
-              mode === 'month' && styles.switcherButtonSeparator,
+              mode !== 'week' && styles.switcherButtonSeparator,
             ]}
           >
             <Typography
@@ -464,6 +503,125 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
     );
   };
 
+  // ── Year View ──
+  const renderYearView = () => {
+    const yearLabel = yearAnchorDate.getFullYear().toString();
+    
+    const weeks: YearGridCell[][] = [];
+    yearCells.forEach(cell => {
+      if (!weeks[cell.weekIndex]) weeks[cell.weekIndex] = [];
+      weeks[cell.weekIndex].push(cell);
+    });
+
+    const monthLabels: { month: string, weekIndex: number }[] = [];
+    let currentMonth = -1;
+    yearCells.forEach(cell => {
+      if (cell.isCurrentYear && cell.date.getMonth() !== currentMonth) {
+        currentMonth = cell.date.getMonth();
+        monthLabels.push({ month: getMonthShortName(cell.date), weekIndex: cell.weekIndex });
+      }
+    });
+
+    return (
+      <View style={styles.viewSection}>
+        {/* Nav */}
+        <View style={styles.navHeader}>
+          {/* @ts-ignore */}
+          <PressableScale onPress={handlePrevYear} style={styles.navButton}>
+            <Typography variant="bodyBold" color={theme.colors.text}>
+              ◀
+            </Typography>
+          </PressableScale>
+          <Typography variant="bodyBold" style={styles.navLabel}>
+            {yearLabel}
+          </Typography>
+          {/* @ts-ignore */}
+          <PressableScale onPress={handleNextYear} style={styles.navButton}>
+            <Typography variant="bodyBold" color={theme.colors.text}>
+              ▶
+            </Typography>
+          </PressableScale>
+        </View>
+
+        <ScrollView 
+          ref={yearScrollRef}
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.yearScrollContent}
+        >
+          <View>
+            <View style={styles.yearMonthsHeader}>
+              {monthLabels.map((lbl, idx) => (
+                <View key={idx} style={[styles.yearMonthLabelContainer, { left: lbl.weekIndex * 16 }]}>
+                  <Typography variant="caption" style={styles.yearMonthLabel}>{lbl.month}</Typography>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.yearGridContainer}>
+              <View style={styles.yearDayLabels}>
+                {['M', '', 'W', '', 'F', '', ''].map((day, idx) => (
+                  <View key={idx} style={styles.yearDayLabelCell}>
+                    <Typography variant="caption" style={styles.yearDayLabelText}>{day}</Typography>
+                  </View>
+                ))}
+              </View>
+
+              <View style={styles.yearGrid}>
+                {weeks.map((week, wIdx) => (
+                  <View key={wIdx} style={styles.yearWeekCol}>
+                    {week.map((cell, dIdx) => {
+                      const isToday = isSameDay(cell.date, new Date());
+                      const { total, rate } = appActions.getDayStats(cell.dateString);
+                      
+                      let cellBg: string = theme.colors.paper;
+                      let cellOpacity = 1;
+                      
+                      if (!cell.isCurrentYear) {
+                        cellBg = theme.colors.background;
+                        cellOpacity = 0.3;
+                      } else if (total > 0) {
+                        if (rate === 0) {
+                          cellBg = theme.colors.danger;
+                          cellOpacity = 0.4;
+                        } else if (rate < 0.5) {
+                          cellBg = theme.colors.warning;
+                          cellOpacity = 0.6;
+                        } else if (rate < 1) {
+                          cellBg = theme.colors.warning;
+                          cellOpacity = 1;
+                        } else {
+                          cellBg = theme.colors.success;
+                          cellOpacity = 1;
+                        }
+                      }
+                      
+                      return (
+                        <PressableScale
+                          key={cell.dateString}
+                          onPress={() => handleOpenDayHistory(cell.date)}
+                          style={[
+                            styles.yearCell,
+                            { backgroundColor: cellBg, opacity: cellOpacity },
+                            isToday && styles.yearCellToday,
+                          ]}
+                        />
+                      );
+                    })}
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+
+        <Typography variant="caption" style={styles.infoText}>
+          💡 Tap a cell to see its habit list.
+        </Typography>
+      </View>
+    );
+  };
+
   // ── Bottom Sheet Details ──
   const renderSelectedDayDetails = () => (
     <View style={styles.detailsSection}>
@@ -506,7 +664,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
-        {viewMode === 'week' ? renderWeekView() : renderMonthView()}
+        {viewMode === 'week' ? renderWeekView() : viewMode === 'month' ? renderMonthView() : renderYearView()}
       </ScrollView>
 
       <BrutalistBottomSheet
@@ -720,4 +878,25 @@ const styles = StyleSheet.create((theme) => ({
   },
   emptyCard: { paddingVertical: 20, alignItems: 'center', justifyContent: 'center' },
   emptyText: { color: theme.colors.textMuted, fontSize: 12, textAlign: 'center' },
+  yearScrollContent: { paddingBottom: 8, paddingHorizontal: 4 },
+  yearMonthsHeader: { height: 20, position: 'relative', marginLeft: 20 },
+  yearMonthLabelContainer: { position: 'absolute', top: 0 },
+  yearMonthLabel: { fontSize: 10, color: theme.colors.textMuted },
+  yearGridContainer: { flexDirection: 'row' },
+  yearDayLabels: { width: 16, marginRight: 4 },
+  yearDayLabelCell: { height: 12, marginBottom: 4, justifyContent: 'center', alignItems: 'center' },
+  yearDayLabelText: { fontSize: 9, color: theme.colors.textMuted },
+  yearGrid: { flexDirection: 'row', gap: 4 },
+  yearWeekCol: { flexDirection: 'column', gap: 4 },
+  yearCell: {
+    width: 12,
+    height: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 2,
+  },
+  yearCellToday: {
+    borderWidth: 2,
+    borderColor: theme.colors.text,
+  },
 }));

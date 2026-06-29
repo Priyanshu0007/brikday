@@ -142,7 +142,47 @@ export const getMonthGrid = (anchorDate: Date): CalendarCell[] => {
       });
     }
   }
+  return cells;
+};
 
+/**
+ * Information for a single cell in the year heatmap grid.
+ */
+export interface YearGridCell {
+  date: Date;
+  dateString: string;
+  weekIndex: number;
+  dayIndex: number; // 0 for Monday, 6 for Sunday
+  isCurrentYear: boolean;
+}
+
+/**
+ * Generates a full year heatmap grid, returning weeks that cover the year.
+ */
+export const getYearGrid = (year: number): YearGridCell[] => {
+  const cells: YearGridCell[] = [];
+  const firstDay = new Date(year, 0, 1);
+  
+  let startOffset = firstDay.getDay() - 1;
+  if (startOffset < 0) startOffset = 6; // Monday is 0, Sunday is 6
+  
+  const d = new Date(year, 0, 1 - startOffset);
+  let weekIndex = 0;
+  
+  while (d.getFullYear() < year + 1) {
+    for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+      cells.push({
+        date: new Date(d),
+        dateString: getLocalDateString(d),
+        weekIndex,
+        dayIndex,
+        isCurrentYear: d.getFullYear() === year,
+      });
+      d.setDate(d.getDate() + 1);
+    }
+    weekIndex++;
+  }
+  
   return cells;
 };
 
