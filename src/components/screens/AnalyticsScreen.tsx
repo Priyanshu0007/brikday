@@ -3,7 +3,7 @@ import { DailyHabitEntry } from '@/state/types';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
-import ViewShot from 'react-native-view-shot';
+import ViewShot, { ViewShotRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import { WeeklySummaryCard } from './WeeklySummaryCard';
 import { triggerHaptic } from '@/ui/haptics';
@@ -127,7 +127,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // View modes: 'week' | 'month' | 'year'
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
 
-  const shareRef = useRef<ViewShot>(null);
+  const shareRef = useRef<ViewShotRef>(null);
 
   const handleShare = async () => {
     try {
