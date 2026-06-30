@@ -14,7 +14,7 @@ import {
   DailyLog,
   DailyHabitEntry,
 } from './types';
-import { getLocalDateString, isHabitActiveOnDate } from '@/utils/date';
+import { getLocalDateString, isHabitActiveOnDate, getWeekDates } from '@/utils/date';
 import {
   cancelAllScheduled,
   scheduleMorningReminder,
@@ -430,5 +430,66 @@ export const appActions = {
     if (prefs.streakAlert.enabled) {
       await scheduleStreakAlert();
     }
+  },
+  getWeekSummary(weekAnchorDate: Date) {
+    const cells = getWeekDates(weekAnchorDate);
+    let totalScheduled = 0;
+    let totalCompleted = 0;
+    
+    let bestDay = { rate: -1, name: '', dateStr: '' };
+    let worstDay = { rate: 2, name: '', dateStr: '' };
+
+    const habitMap: Record<string, { title: string, scheduled: number, completed: number }> = {};
+    const templates = habitTemplates$.get() || [];
+    templates.forEach(t => {
+      if (!t.archivedAt) {
+        habitMap[t.id] = { title: t.title, scheduled: 0, completed: 0 };
+      }
+    });
+
+    const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+    for (const cell of cells) {
+      const stats = this.getDayStats(cell.dateString);
+      totalScheduled += stats.total;
+      totalCompleted += stats.completed;
+
+      if (stats.total > 0) {
+        if (stats.rate > bestDay.rate) {
+          bestDay = { rate: stats.rate, name: dayNames[cell.date.getDay()], dateStr: cell.dateString };
+        }
+        if (stats.rate < worstDay.rate) {
+          worstDay = { rate: stats.rate, name: dayNames[cell.date.getDay()], dateStr: cell.dateString };
+        }
+      }
+
+      stats.entries.forEach(e => {
+        if (habitMap[e.habitId]) {
+          habitMap[e.habitId].scheduled++;
+          if (e.completed) {
+            habitMap[e.habitId].completed++;
+          }
+        }
+      });
+    }
+
+    const perHabitRates = Object.values(habitMap)
+      .filter(h => h.scheduled > 0)
+      .map(h => ({
+        title: h.title,
+        scheduledCount: h.scheduled,
+        completedCount: h.completed,
+        rate: h.scheduled > 0 ? h.completed / h.scheduled : 0,
+      }))
+      .sort((a, b) => b.rate - a.rate); // highest rate first
+
+    const totalRate = totalScheduled > 0 ? totalCompleted / totalScheduled : 0;
+
+    return {
+      totalRate,
+      bestDay: bestDay.rate >= 0 ? `${bestDay.name} (${Math.round(bestDay.rate * 100)}%)` : 'NONE',
+      worstDay: worstDay.rate <= 1 ? `${worstDay.name} (${Math.round(worstDay.rate * 100)}%)` : 'NONE',
+      perHabitRates,
+    };
   },
 };

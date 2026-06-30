@@ -2,6 +2,10 @@ import { appActions, habitTemplates$ } from '@/state/store';
 import { DailyHabitEntry } from '@/state/types';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistCard } from '@/ui/BrutalistCard';
+import { BrutalistButton } from '@/ui/BrutalistButton';
+import ViewShot from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
+import { WeeklySummaryCard } from './WeeklySummaryCard';
 import { triggerHaptic } from '@/ui/haptics';
 import { Typography } from '@/ui/Typography';
 import {
@@ -17,7 +21,7 @@ import {
 } from '@/utils/date';
 import { observer } from '@legendapp/state/react';
 import { PressableScale } from 'pressto';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -117,6 +121,19 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
 
   // View modes: 'week' | 'month' | 'year'
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
+
+  const shareRef = useRef<any>(null);
+
+  const handleShare = async () => {
+    try {
+      if (shareRef.current?.capture) {
+        const uri = await shareRef.current.capture();
+        await Sharing.shareAsync(uri);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // Bottom Sheet
   const [isSheetVisible, setIsSheetVisible] = useState(false);
@@ -356,6 +373,13 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             })}
           </View>
         </View>
+
+        <BrutalistButton
+          onPress={handleShare}
+          style={{ marginTop: 24 }}
+        >
+          SHARE WEEK
+        </BrutalistButton>
       </View>
     );
   };
@@ -680,6 +704,12 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
       >
         {renderSelectedDayDetails()}
       </BrutalistBottomSheet>
+
+      <View style={styles.hiddenCaptureContainer} pointerEvents="none">
+        <ViewShot ref={shareRef} options={{ format: 'png', quality: 1 }}>
+          <WeeklySummaryCard weekAnchorDate={weekAnchorDate} />
+        </ViewShot>
+      </View>
     </View>
   );
 });
@@ -898,5 +928,11 @@ const styles = StyleSheet.create((theme) => ({
   yearCellToday: {
     borderWidth: 2,
     borderColor: theme.colors.text,
+  },
+  hiddenCaptureContainer: {
+    position: 'absolute',
+    top: -10000,
+    left: 0,
+    opacity: 0,
   },
 }));
