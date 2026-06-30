@@ -13,6 +13,7 @@ import {
   Project,
   DailyLog,
   DailyHabitEntry,
+  Insight,
 } from './types';
 import { getLocalDateString, isHabitActiveOnDate, getWeekDates } from '@/utils/date';
 import {
@@ -491,5 +492,174 @@ export const appActions = {
       worstDay: worstDay.rate <= 1 ? `${worstDay.name} (${Math.round(worstDay.rate * 100)}%)` : 'NONE',
       perHabitRates,
     };
+  },
+  generateInsights(): Insight[] {
+    const insights: Insight[] = [];
+    const date = new Date();
+    const last30Days: string[] = [];
+    for (let i = 0; i < 30; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      last30Days.push(getLocalDateString(d));
+    }
+    
+    // gather data
+    const dayStats = [0, 0, 0, 0, 0, 0, 0]; // 0-6 (Sun-Sat)
+    const dayCounts = [0, 0, 0, 0, 0, 0, 0];
+    const completionHours: number[] = [];
+    const habitTitles: Record<string, string> = {};
+    const habitStatsThisWeek: Record<string, { comp: number, sched: number }> = {};
+    const habitStatsLastWeek: Record<string, { comp: number, sched: number }> = {};
+
+    last30Days.forEach((dateStr, index) => {
+      const logStr = mmkvStorage.getString(`log:${dateStr}`);
+      if (!logStr) return;
+      const log: DailyLog = JSON.parse(logStr);
+      
+      // parse local date string correctly to get day of week
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const d = new Date(year, month - 1, day);
+      const dayOfWeek = d.getDay();
+      
+      let dayComp = 0;
+      let daySched = log.entries.length;
+      
+      log.entries.forEach(e => {
+        habitTitles[e.habitId] = e.title;
+        
+        // This week (0-6)
+        if (index < 7) {
+          if (!habitStatsThisWeek[e.habitId]) habitStatsThisWeek[e.habitId] = { comp: 0, sched: 0 };
+          habitStatsThisWeek[e.habitId].sched++;
+          if (e.completed) habitStatsThisWeek[e.habitId].comp++;
+        } 
+        // Last week (7-13)
+        else if (index >= 7 && index < 14) {
+          if (!habitStatsLastWeek[e.habitId]) habitStatsLastWeek[e.habitId] = { comp: 0, sched: 0 };
+          habitStatsLastWeek[e.habitId].sched++;
+          if (e.completed) habitStatsLastWeek[e.habitId].comp++;
+        }
+        
+        if (e.completed) {
+          dayComp++;
+          if (e.completedAt) {
+            const compDate = new Date(e.completedAt);
+            completionHours.push(compDate.getHours());
+          }
+        }
+      });
+      
+      if (daySched > 0) {
+        dayStats[dayOfWeek] += (dayComp / daySched);
+        dayCounts[dayOfWeek]++;
+      }
+    });
+    
+    // 1. Best Day
+    let bestDayIdx = -1;
+    let bestDayAvg = -1;
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    for(let i=0; i<7; i++) {
+      if (dayCounts[i] > 0) {
+        const avg = dayStats[i] / dayCounts[i];
+        if (avg > bestDayAvg) {
+          bestDayAvg = avg;
+          bestDayIdx = i;
+        }
+      }
+    }
+    if (bestDayIdx !== -1 && bestDayAvg > 0) {
+      insights.push({
+        emoji: '📅',
+        title: 'BEST DAY',
+        description: `${dayNames[bestDayIdx]} is your strongest day (${Math.round(bestDayAvg * 100)}% avg)`,
+        type: 'positive'
+      });
+    }
+    
+    // 2. Declining
+    for (const [habitId, thisWeek] of Object.entries(habitStatsThisWeek)) {
+      const lastWeek = habitStatsLastWeek[habitId];
+      if (lastWeek && thisWeek.sched > 0 && lastWeek.sched > 0) {
+        const thisRate = thisWeek.comp / thisWeek.sched;
+        const lastRate = lastWeek.comp / lastWeek.sched;
+        if (lastRate - thisRate >= 0.2) {
+          const dropPct = Math.round((lastRate - thisRate) * 100);
+          insights.push({
+            emoji: '📉',
+            title: 'DECLINING',
+            description: `${habitTitles[habitId]} has dropped ${dropPct}% this week vs last`,
+            type: 'warning'
+          });
+          break; // Only show one declining warning
+        }
+      }
+    }
+    
+    // 3. Early Bird / Night Owl
+    if (completionHours.length > 5) {
+      const morning = completionHours.filter(h => h >= 5 && h < 12).length;
+      const evening = completionHours.filter(h => h >= 18 || h < 5).length;
+      
+      if (morning / completionHours.length > 0.5) {
+        insights.push({
+          emoji: '⏰',
+          title: 'EARLY BIRD',
+          description: 'You complete most habits before 12 PM',
+          type: 'positive'
+        });
+      } else if (evening / completionHours.length > 0.5) {
+        insights.push({
+          emoji: '🌙',
+          title: 'NIGHT OWL',
+          description: 'You complete most habits in the evening',
+          type: 'neutral'
+        });
+      }
+    }
+    
+    // 4. Streaks
+    const currentStreaks: Record<string, number> = {};
+    const templates = habitTemplates$.get() || [];
+    templates.forEach(t => {
+      if (t.archivedAt) return;
+      let streak = 0;
+      
+      const todayStr = last30Days[0];
+      const todayLogStr = mmkvStorage.getString(`log:${todayStr}`);
+      if (todayLogStr) {
+         const log = JSON.parse(todayLogStr);
+         const entry = log.entries.find(e => e.habitId === t.id);
+         if (entry && entry.completed) streak++;
+      }
+      
+      for (let i = 1; i < 30; i++) {
+        const dStr = last30Days[i];
+        const logStr = mmkvStorage.getString(`log:${dStr}`);
+        if (!logStr) break;
+        const log: DailyLog = JSON.parse(logStr);
+        const entry = log.entries.find(e => e.habitId === t.id);
+        if (!entry) break; 
+        
+        if (entry.completed) {
+          streak++;
+        } else {
+          break; 
+        }
+      }
+      currentStreaks[t.id] = streak;
+    });
+
+    const highestStreakHabit = Object.entries(currentStreaks).sort((a,b) => b[1] - a[1])[0];
+    if (highestStreakHabit && highestStreakHabit[1] >= 3) {
+      insights.push({
+        emoji: '🔥',
+        title: 'ON FIRE',
+        description: `${habitTitles[highestStreakHabit[0]]} is on a ${highestStreakHabit[1]}-day streak!`,
+        type: 'positive'
+      });
+    }
+
+    return insights;
   },
 };

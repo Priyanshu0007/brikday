@@ -1,4 +1,4 @@
-import { appActions, habitTemplates$ } from '@/state/store';
+import { appActions, habitTemplates$, todayLog$ } from '@/state/store';
 import { DailyHabitEntry } from '@/state/types';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -117,7 +117,12 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
 
 export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const habits = habitTemplates$.get() || [];
+  const todayLog = todayLog$.get();
   const { theme } = useUnistyles();
+
+  const insights = React.useMemo(() => {
+    return appActions.generateInsights();
+  }, [habits, todayLog]);
 
   // View modes: 'week' | 'month' | 'year'
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
@@ -260,6 +265,37 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
     </View>
   );
 
+  // ── Insights Section ──
+  const renderInsights = () => {
+    if (insights.length === 0) return null;
+    return (
+      <View style={styles.insightsContainer}>
+        <Typography variant="bodyBold" uppercase style={styles.chartTitle}>
+          Insights
+        </Typography>
+        {insights.map((insight, idx) => (
+          <BrutalistCard 
+            key={idx} 
+            style={styles.insightCard}
+            accentColor={insight.type === 'positive' ? theme.colors.success : insight.type === 'warning' ? theme.colors.warning : undefined}
+          >
+            <View style={styles.insightRow}>
+              <View style={styles.insightEmojiBox}>
+                <Typography style={styles.insightEmoji}>{insight.emoji}</Typography>
+              </View>
+              <View style={styles.insightTextContent}>
+                <Typography variant="bodyBold">{insight.title}</Typography>
+                <Typography variant="mono" style={styles.insightDescription}>
+                  {insight.description}
+                </Typography>
+              </View>
+            </View>
+          </BrutalistCard>
+        ))}
+      </View>
+    );
+  };
+
   // ── Week View ──
   const renderWeekView = () => {
     const firstDay = weekCells[0]?.date;
@@ -380,6 +416,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         >
           SHARE WEEK
         </BrutalistButton>
+        {renderInsights()}
       </View>
     );
   };
@@ -523,6 +560,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
             );
           })}
         </View>
+        {renderInsights()}
       </View>
     );
   };
@@ -934,5 +972,41 @@ const styles = StyleSheet.create((theme) => ({
     top: -10000,
     left: 0,
     opacity: 0,
+  },
+  insightsContainer: {
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+  },
+  insightCard: {
+    marginBottom: 12,
+  },
+  insightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  insightEmojiBox: {
+    width: 36,
+    height: 36,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  insightEmoji: {
+    fontSize: 18,
+  },
+  insightTextContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  insightDescription: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    marginTop: 2,
   },
 }));

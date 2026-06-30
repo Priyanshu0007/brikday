@@ -26,6 +26,13 @@ export interface DailyLog {
   generatedAt: number; // timestamp
 }
 
+export type Insight = {
+  emoji: string;
+  title: string;
+  description: string;
+  type: 'positive' | 'warning' | 'neutral';
+};
+
 export interface SavingTransaction {
   id: string;
   amount: number;
