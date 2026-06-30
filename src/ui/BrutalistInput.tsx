@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TextInputProps, StyleProp, ViewStyle } from 'react-native';
+import { View, TextInput, TextInputProps, StyleProp, ViewStyle, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Typography } from './Typography';
 
@@ -19,12 +19,12 @@ export function BrutalistInput({
   const [focused, setFocused] = useState(false);
   const { theme } = useUnistyles();
 
-  const handleFocus = (e: any) => {
+  const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocused(true);
     if (onFocus) onFocus(e);
   };
 
-  const handleBlur = (e: any) => {
+  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocused(false);
     if (onBlur) onBlur(e);
   };

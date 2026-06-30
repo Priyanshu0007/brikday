@@ -628,7 +628,7 @@ export const appActions = {
       const todayStr = last30Days[0];
       const todayLogStr = mmkvStorage.getString(`log:${todayStr}`);
       if (todayLogStr) {
-         const log = JSON.parse(todayLogStr);
+         const log: DailyLog = JSON.parse(todayLogStr);
          const entry = log.entries.find(e => e.habitId === t.id);
          if (entry && entry.completed) streak++;
       }

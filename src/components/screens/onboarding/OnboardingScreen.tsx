@@ -3,7 +3,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import PagerView from 'react-native-pager-view';
+import PagerView, { PagerViewOnPageScrollEvent, PagerViewOnPageSelectedEvent } from 'react-native-pager-view';
 import { appActions } from '@/state/store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUnistyles } from 'react-native-unistyles';
@@ -23,12 +23,12 @@ export function OnboardingScreen() {
   const [currentPage, setCurrentPage] = useState(0);
   const activeIndex = useSharedValue(0);
 
-  const onPageScroll = useCallback((e: any) => {
+  const onPageScroll = useCallback((e: PagerViewOnPageScrollEvent) => {
     const { position, offset } = e.nativeEvent;
     activeIndex.value = position + offset;
   }, []);
 
-  const onPageSelected = useCallback((e: any) => {
+  const onPageSelected = useCallback((e: PagerViewOnPageSelectedEvent) => {
     setCurrentPage(e.nativeEvent.position);
   }, []);
 

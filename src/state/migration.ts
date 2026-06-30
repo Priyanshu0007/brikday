@@ -2,6 +2,8 @@ import { mmkvStorage } from './slices/dailyLogSlice';
 import { HabitTemplate, DailyLog } from './types';
 import { getLocalDateString, isHabitActiveOnDate, parseLocalDateString } from '@/utils/date';
 
+type OldHabit = HabitTemplate & { completedDates?: string[] };
+
 export function migrateToLogSystem() {
   const version = mmkvStorage.getString('migrationVersion');
   if (version === '2') return;
@@ -13,14 +15,14 @@ export function migrateToLogSystem() {
   }
 
   try {
-    const oldHabits = JSON.parse(oldHabitsStr);
+    const oldHabits = JSON.parse(oldHabitsStr) as OldHabit[];
     if (!Array.isArray(oldHabits) || oldHabits.length === 0) {
       mmkvStorage.set('migrationVersion', '2');
       return;
     }
 
     // 1. Create HabitTemplates from old habits
-    const templates: HabitTemplate[] = oldHabits.map((h: any) => ({
+    const templates: HabitTemplate[] = oldHabits.map((h) => ({
       id: h.id,
       title: h.title,
       scheduleType: h.scheduleType,
@@ -34,7 +36,7 @@ export function migrateToLogSystem() {
     const allDates = new Set<string>();
 
     // Find earliest start date across all habits
-    const earliestStart = Math.min(...oldHabits.map((h: any) => h.startDate || Date.now()));
+    const earliestStart = Math.min(...oldHabits.map((h) => h.startDate || Date.now()));
     const todayStr = getLocalDateString();
 
     // Walk from earliest start to today, collecting dates where any habit was active
@@ -58,8 +60,8 @@ export function migrateToLogSystem() {
       const log: DailyLog = {
         date: dateStr,
         entries: oldHabits
-          .filter((h: any) => isHabitActiveOnDate(h as any, date))
-          .map((h: any) => ({
+          .filter((h) => isHabitActiveOnDate(h, date))
+          .map((h) => ({
             habitId: h.id,
             title: h.title,
             completed: h.completedDates?.includes(dateStr) ?? false,

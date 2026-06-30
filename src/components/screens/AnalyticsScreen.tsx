@@ -127,7 +127,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   // View modes: 'week' | 'month' | 'year'
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
 
-  const shareRef = useRef<any>(null);
+  const shareRef = useRef<ViewShot>(null);
 
   const handleShare = async () => {
     try {

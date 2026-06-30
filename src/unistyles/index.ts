@@ -44,6 +44,7 @@ export const darkTheme = {
 } as const;
 
 // ─── TypeScript declaration merging ──────────────────────
+export type AppTheme = typeof lightTheme | typeof darkTheme;
 type AppBreakpoints = typeof breakpoints;
 type AppThemes = {
   light: typeof lightTheme;

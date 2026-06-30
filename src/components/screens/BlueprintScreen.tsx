@@ -10,8 +10,10 @@ import { useState } from 'react';
 import { ScrollView, TextInput, View } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Milestone } from '@/state/types';
+import { AppTheme } from '@/unistyles';
 
-const MilestoneItem = ({ m, projectId, neglected, theme }: any) => {
+const MilestoneItem = ({ m, projectId, neglected, theme }: { m: Milestone; projectId: string; neglected: boolean; theme: AppTheme }) => {
   const animatedScale = useAnimatedStyle(
     () => ({
       transform: [{ scale: withTiming(m.completed ? 1 : 0, { duration: 300 }) }],
@@ -70,7 +72,7 @@ const MilestoneItem = ({ m, projectId, neglected, theme }: any) => {
   );
 };
 
-const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: any }) => {
+const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: AppTheme }) => {
   const [newMilestoneTitle, setNewMilestoneTitle] = useState('');
   const project$ = blueprintState$.find((p) => p.id.get() === projectId);
   if (!project$) return null;
@@ -79,7 +81,7 @@ const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: 
   const category = project$.category.get();
   const title = project$.title.get();
   const rawMilestones = project$.milestones?.get() || [];
-  const milestones = rawMilestones.filter((m: any) => m !== null && m !== undefined);
+  const milestones = rawMilestones.filter((m) => m !== null && m !== undefined);
 
   const completedCount = milestones.filter((m) => m.completed).length;
   const totalCount = milestones.length;
