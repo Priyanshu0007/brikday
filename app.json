@@ -8,7 +8,10 @@
     "scheme": "brikday",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.priyanshu0007.brikday"
+      "bundleIdentifier": "com.priyanshu0007.brikday",
+      "infoPlist": {
+        "UIDesignRequiresCompatibility": true
+      }
     },
     "android": {
       "adaptiveIcon": {
