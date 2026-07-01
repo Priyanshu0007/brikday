@@ -4,6 +4,7 @@ import { Typography } from '@/ui/Typography';
 import { observer } from '@legendapp/state/react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,7 +96,16 @@ const AppDashboard = observer(() => {
       <DashboardHeader />
 
       {/* Screen Area */}
-      <View style={styles.screenArea}>{renderActiveScreen()}</View>
+      <View style={styles.screenArea}>
+        <Animated.View
+          key={activeTab}
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(100)}
+          style={styles.animatedScreen}
+        >
+          {renderActiveScreen()}
+        </Animated.View>
+      </View>
 
       {/* Stark Neo-Brutalist Tab Bar */}
       <View
@@ -225,6 +235,9 @@ const styles = StyleSheet.create((theme) => ({
   screenArea: {
     flex: 1,
     backgroundColor: theme.colors.paper,
+  },
+  animatedScreen: {
+    flex: 1,
   },
   tabBar: {
     flexDirection: 'row',
