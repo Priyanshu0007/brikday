@@ -10,6 +10,7 @@
     "@legendapp/state": "^3.0.0-beta.47",
     "@lodev09/react-native-true-sheet": "^3.10.1",
     "expo": "~56.0.8",
+    "expo-build-properties": "~56.0.19",
     "expo-constants": "~56.0.16",
     "expo-dev-client": "~56.0.18",
     "expo-device": "~56.0.4",
