@@ -76,7 +76,7 @@ export const VaultSlide = observer(({ activeIndex }: VaultSlideProps) => {
 
       <View style={styles.tipBox}>
         <Typography variant="mono" style={styles.tipText}>
-          TIP: Tap "+ Add Money" to add savings
+          {"TIP: Tap \"+ Add Money\" to add savings"}
         </Typography>
       </View>
     </SlideContent>

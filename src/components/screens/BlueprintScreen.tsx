@@ -192,7 +192,7 @@ const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: 
 
       {neglected ? (
         <Typography variant="caption" style={{ color: '#FFD2D2', marginBottom: 12 }}>
-          ⚠️ You haven't worked on this recently.
+          {"⚠️ You haven't worked on this recently."}
         </Typography>
       ) : (
         <Typography variant="caption" style={{ color: theme.colors.textMuted, marginBottom: 12 }}>

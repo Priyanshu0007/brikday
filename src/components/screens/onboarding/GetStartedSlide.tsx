@@ -106,7 +106,7 @@ export const GetStartedSlide = observer(({ activeIndex }: GetStartedSlideProps) 
 
       <View style={styles.motivationBox}>
         <Typography variant="mono" style={styles.motivationText}>
-          "DISCIPLINE IS THE BRIDGE BETWEEN{'\n'}GOALS AND ACCOMPLISHMENT"
+          {"\"DISCIPLINE IS THE BRIDGE BETWEEN\nGOALS AND ACCOMPLISHMENT\""}
         </Typography>
       </View>
     </SlideContent>

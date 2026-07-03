@@ -58,8 +58,8 @@ const CustomSlider = ({
   const [internalValue, setInternalValue] = useState(value);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!isDragging.value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInternalValue(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

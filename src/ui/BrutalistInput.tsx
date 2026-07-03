@@ -19,12 +19,12 @@ export function BrutalistInput({
   const [focused, setFocused] = useState(false);
   const { theme } = useUnistyles();
 
-  const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  const handleFocus = (e: any) => {
     setFocused(true);
     if (onFocus) onFocus(e);
   };
 
-  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  const handleBlur = (e: any) => {
     setFocused(false);
     if (onBlur) onBlur(e);
   };

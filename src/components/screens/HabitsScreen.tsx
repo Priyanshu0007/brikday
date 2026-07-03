@@ -278,8 +278,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
                   </View>
                 ) : (
                   <Typography variant="body" style={styles.noHabitsText}>
-                    You don't have any habits scheduled for today. Add templates in settings or
-                    manage them!
+                    {"You don't have any habits scheduled for today. Add templates in settings or manage them!"}
                   </Typography>
                 )}
               </View>
