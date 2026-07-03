@@ -5,12 +5,12 @@
 
 ---
 
-## ⚠️ Critical: Expo SDK 56
+## ⚠️ Critical: Expo SDK 57
 
-This project runs **Expo SDK 56** with **React Native 0.85** and **React 19**.
+This project runs **Expo SDK 57** with **React Native 0.86** and **React 19**.
 
 **Always read the versioned docs before writing any code:**
-<https://docs.expo.dev/versions/v56.0.0/>
+<https://docs.expo.dev/versions/v57.0.0/>
 
 Do **NOT** reference Expo SDK 51/52/53 patterns — many APIs have changed.
 
@@ -20,9 +20,9 @@ Do **NOT** reference Expo SDK 51/52/53 patterns — many APIs have changed.
 
 | Layer            | Technology                                                            |
 | ---------------- | --------------------------------------------------------------------- |
-| Framework        | Expo SDK 56 (Managed → CNG prebuild)                                  |
+| Framework        | Expo SDK 57 (Managed → CNG prebuild)                                  |
 | Language         | TypeScript 6 (strict mode)                                            |
-| Navigation       | `expo-router` v56 (file-based routing)                                |
+| Navigation       | `expo-router` v57 (file-based routing)                                |
 | State Management | `@legendapp/state` v3 (observables + `observer` HOC)                  |
 | Lists            | `@legendapp/list` v3 (optimized list rendering)                       |
 | Persistence      | `react-native-mmkv` v4 (via Legend State sync plugin + raw MMKV)      |
@@ -374,7 +374,7 @@ bun expo install <package>      # Install Expo-compatible package version
 - ❌ Use `AsyncStorage` — use MMKV via Legend State plugin or raw `mmkvStorage`
 - ❌ Use generic/plain colors — use the curated palette from `theme.ts`
 - ❌ Skip haptic feedback on interactive elements
-- ❌ Reference outdated Expo SDK docs — always use the v56 versioned docs
+- ❌ Reference outdated Expo SDK docs — always use the v57 versioned docs
 
 ---
 
