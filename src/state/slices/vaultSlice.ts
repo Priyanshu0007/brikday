@@ -6,3 +6,6 @@ import { initialVaultGoals } from '../hardcoded-data/vault';
 
 export const vaultState$ = observable<VaultGoal[]>(initialVaultGoals);
 syncObservable(vaultState$, { persist: { name: 'vaultState', plugin: mmkvPlugin } });
+
+export const vaultCelebration$ = observable<{ goalId: string; title: string } | null>(null);
+

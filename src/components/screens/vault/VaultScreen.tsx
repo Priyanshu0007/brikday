@@ -3,14 +3,16 @@ import React from 'react';
 import { View } from 'react-native';
 import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
-import { vaultState$ } from '@/state/store';
+import { vaultState$, vaultCelebration$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
 import { GoalCard } from './GoalCard';
 import { stylesheet } from './styles';
 import { router } from 'expo-router';
+import { ConfettiOverlay } from '@/ui/ConfettiOverlay';
 
 export const VaultScreen = observer(function VaultScreen() {
   const goals = vaultState$.get();
+  const celebration = vaultCelebration$.get();
 
   // Stable ID array — only recomputes when goals are added/removed, NOT on saved changes
   const goalIds = React.useMemo(
@@ -48,6 +50,12 @@ export const VaultScreen = observer(function VaultScreen() {
         recycleItems={false}
         contentContainerStyle={stylesheet.listContent}
         style={stylesheet.list}
+      />
+
+      <ConfettiOverlay
+        isActive={!!celebration}
+        onComplete={() => vaultCelebration$.set(null)}
+        text={`🎉 GOAL REACHED: ${celebration?.title || ''}`}
       />
     </View>
   );

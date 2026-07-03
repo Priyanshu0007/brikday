@@ -4,7 +4,7 @@ import { observer } from '@legendapp/state/react';
 import { useUnistyles } from 'react-native-unistyles';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appActions, vaultState$, userState$ } from '@/state/store';
+import { appActions, vaultState$, userState$, vaultCelebration$ } from '@/state/store';
 import { getCurrencySymbol } from '@/constants/currency';
 import { Typography } from '@/ui/Typography';
 import { BrutalistButton } from '@/ui/BrutalistButton';
@@ -13,12 +13,14 @@ import { BrutalistInput } from '@/ui/BrutalistInput';
 import { GoalHistoryList } from './GoalHistoryList';
 import { VaultSimulator } from './VaultSimulator';
 import { stylesheet } from './styles';
+import { ConfettiOverlay } from '@/ui/ConfettiOverlay';
 import { PressableScale } from 'pressto';
 import PagerView from 'react-native-pager-view';
 
 export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
   const { theme } = useUnistyles();
   const goal$ = vaultState$.find((g) => g.id.get() === goalId);
+  const celebration = vaultCelebration$.get();
 
   const pagerRef = useRef<PagerView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -181,6 +183,12 @@ export const GoalDetailScreen = observer(({ goalId }: { goalId: string }) => {
           </BrutalistButton>
         </ScrollView>
       </BrutalistBottomSheet>
+
+      <ConfettiOverlay
+        isActive={celebration?.goalId === goalId}
+        onComplete={() => vaultCelebration$.set(null)}
+        text={`🎉 GOAL REACHED: ${celebration?.title || ''}`}
+      />
     </SafeAreaView>
   );
 });

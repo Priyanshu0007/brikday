@@ -2,7 +2,7 @@ import { authState$ } from './slices/authSlice';
 import { userState$ } from './slices/userSlice';
 import { habitTemplates$ } from './slices/habitsSlice';
 import { todayLog$, logIndex$, mmkvStorage } from './slices/dailyLogSlice';
-import { vaultState$ } from './slices/vaultSlice';
+import { vaultState$, vaultCelebration$ } from './slices/vaultSlice';
 import { blueprintState$ } from './slices/blueprintSlice';
 import { notificationState$ } from './slices/notificationSlice';
 import {
@@ -271,7 +271,15 @@ export const appActions = {
 
       goal.transactions.set([...currentTxns, newTransaction]);
 
-      goal.saved.set(goal.saved.get() + amount);
+      const currentSaved = goal.saved.get();
+      const target = goal.target.get();
+      const newSaved = currentSaved + amount;
+
+      goal.saved.set(newSaved);
+
+      if (newSaved >= target && currentSaved < target) {
+        vaultCelebration$.set({ goalId, title: goal.title.get() });
+      }
     }
   },
   addVaultGoal(title: string, target: number) {

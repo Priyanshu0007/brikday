@@ -98,9 +98,13 @@ const Particle = ({ color, isActive }: { color: string; isActive: boolean }) => 
 export const ConfettiOverlay = ({
   isActive,
   onComplete,
+  text = 'ALL HABITS COMPLETE 🎉',
+  bannerColor,
 }: {
   isActive: boolean;
   onComplete?: () => void;
+  text?: string;
+  bannerColor?: string;
 }) => {
   const { theme } = useUnistyles();
   const [particles, setParticles] = useState<string[]>([]);
@@ -164,9 +168,9 @@ export const ConfettiOverlay = ({
         <Particle key={index} color={color} isActive={isActive} />
       ))}
       <Animated.View style={[styles.bannerWrapper, bannerStyle]}>
-        <View style={styles.banner}>
+        <View style={[styles.banner, bannerColor ? { backgroundColor: bannerColor } : null]}>
           <Typography variant="h3" uppercase style={styles.bannerText}>
-            ALL HABITS COMPLETE 🎉
+            {text}
           </Typography>
         </View>
       </Animated.View>
