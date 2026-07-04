@@ -81,6 +81,7 @@ export interface AuthState {
 export interface UiState {
   activeTab: 'engine' | 'vault' | 'blueprint' | 'analytics';
   theme?: 'light' | 'dark' | 'system';
+  dismissedStartDayPromptForDate?: string;
 }
 
 export interface NotificationPreferences {

@@ -5,6 +5,7 @@ import { todayLog$, logIndex$, mmkvStorage } from './slices/dailyLogSlice';
 import { vaultState$, vaultCelebration$ } from './slices/vaultSlice';
 import { blueprintState$ } from './slices/blueprintSlice';
 import { notificationState$ } from './slices/notificationSlice';
+import { uiState$ } from './slices/uiSlice';
 import {
   HabitTemplate,
   ScheduleType,
@@ -80,6 +81,9 @@ export const appActions = {
         logIndex$.set([...index, todayStr]);
       }
     }
+  },
+  dismissStartDayPrompt() {
+    uiState$.dismissedStartDayPromptForDate.set(getLocalDateString());
   },
   toggleHabit(id: string) {
     const todayStr = getLocalDateString();

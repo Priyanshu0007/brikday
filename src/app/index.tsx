@@ -1,5 +1,6 @@
+import React, { useEffect } from 'react';
 import { OnboardingScreen } from '@/components/screens/onboarding';
-import { authState$, statsState$, uiState$, userState$ } from '@/state/store';
+import { appActions, authState$, statsState$, todayLog$, uiState$, userState$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
 import { observer } from '@legendapp/state/react';
 import { router } from 'expo-router';
@@ -7,6 +8,8 @@ import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { StartDayPromptSheet } from '@/components/screens/StartDayPromptSheet';
+import { getLocalDateString } from '@/utils/date';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AnalyticsScreen } from '@/components/screens/AnalyticsScreen';
 import { BlueprintScreen } from '@/components/screens/BlueprintScreen';
@@ -62,6 +65,28 @@ const AppDashboard = observer(() => {
   const activeTab = uiState$.activeTab.get();
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
+
+  const log = todayLog$.get();
+  const dismissedDate = uiState$.dismissedStartDayPromptForDate.get();
+  const todayStr = getLocalDateString();
+  const showPrompt = !log && dismissedDate !== todayStr;
+
+  useEffect(() => {
+    // Check if the current log's date is older than today
+    const checkRollover = () => {
+      const currentLog = todayLog$.get();
+      const currentTodayStr = getLocalDateString();
+      if (currentLog && currentLog.date !== currentTodayStr) {
+        appActions.loadTodayLog();
+      }
+    };
+
+    // Run immediately on render
+    checkRollover();
+
+    const interval = setInterval(checkRollover, 15000); // check every 15s
+    return () => clearInterval(interval);
+  }, []);
 
   const renderActiveScreen = () => {
     switch (activeTab) {
@@ -145,6 +170,17 @@ const AppDashboard = observer(() => {
           );
         })}
       </View>
+
+      <StartDayPromptSheet
+        visible={showPrompt}
+        onClose={() => {
+          appActions.dismissStartDayPrompt();
+        }}
+        onStartDay={() => {
+          appActions.generateDailyLogIfMissing();
+          uiState$.activeTab.set('engine');
+        }}
+      />
     </SafeAreaView>
   );
 });
