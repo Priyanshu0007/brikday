@@ -10,7 +10,7 @@ import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date
 import { LegendList } from '@legendapp/list/react-native';
 import { observer } from '@legendapp/state/react';
 import React from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -174,6 +174,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
   const [showConfetti, setShowConfetti] = React.useState(false);
   const [selectedHabitForNote, setSelectedHabitForNote] = React.useState<string | null>(null);
   const [draftNote, setDraftNote] = React.useState('');
+  const [refreshing, setRefreshing] = React.useState(false);
   const log = todayLog$.get();
   const habitIds = log?.entries.map((e) => e.habitId) || [];
 
@@ -213,6 +214,13 @@ export const HabitsScreen = observer(function HabitsScreen() {
   );
 
   const { theme } = useUnistyles();
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    appActions.loadTodayLog();
+    appActions.generateDailyLogIfMissing();
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -303,6 +311,14 @@ export const HabitsScreen = observer(function HabitsScreen() {
           recycleItems={false}
           contentContainerStyle={styles.listContent}
           style={styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.text}
+              colors={[theme.colors.text]}
+            />
+          }
         />
       )}
 
