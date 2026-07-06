@@ -22,6 +22,8 @@ export const parseLocalDateString = (str: string): Date => {
  * Checks if a habit is active on a given local Date.
  */
 export const isHabitActiveOnDate = (habit: HabitTemplate, date: Date): boolean => {
+  if (!habit) return false;
+
   const startOf = (d: Date) => {
     const copy = new Date(d);
     copy.setHours(0, 0, 0, 0);

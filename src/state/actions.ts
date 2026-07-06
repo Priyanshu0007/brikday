@@ -127,12 +127,16 @@ export const appActions = {
     scheduleType: ScheduleType = 'daily',
     specificDays: number[] = [],
     startDate: number = Date.now(),
+    category?: string,
+    categoryColor?: string,
   ) {
     if (!title.trim()) return;
     const newHabit: HabitTemplate = {
       id: `h_${Date.now()}`,
       title: title.toUpperCase(),
       emoji,
+      category,
+      categoryColor,
       scheduleType,
       specificDays,
       startDate,
@@ -164,6 +168,8 @@ export const appActions = {
       if (updates.scheduleType !== undefined) habit.scheduleType.set(updates.scheduleType);
       if (updates.specificDays !== undefined) habit.specificDays.set(updates.specificDays);
       if (updates.startDate !== undefined) habit.startDate.set(updates.startDate);
+      if (updates.category !== undefined) habit.category.set(updates.category);
+      if (updates.categoryColor !== undefined) habit.categoryColor.set(updates.categoryColor);
 
       const todayStr = getLocalDateString();
       const currentLog = todayLog$.get();

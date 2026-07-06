@@ -4,6 +4,8 @@ export interface HabitTemplate {
   id: string;
   title: string;
   emoji?: string;
+  category?: string;      // e.g. "HEALTH", "WORK", "LEARNING"
+  categoryColor?: string;  // hex color for category badge
   scheduleType: ScheduleType;
   specificDays: number[]; // 0 for Sunday, 1 for Monday, etc.
   startDate: number; // timestamp

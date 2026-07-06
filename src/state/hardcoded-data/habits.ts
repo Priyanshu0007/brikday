@@ -7,6 +7,8 @@ export const initialHabits: HabitTemplate[] = [
   {
     id: 'h1',
     title: 'LOG DAILY SPENDING',
+    category: 'FINANCE',
+    categoryColor: '#F472B6',
     scheduleType: 'daily',
     specificDays: [],
     startDate: thirtyDaysAgo,
@@ -15,6 +17,8 @@ export const initialHabits: HabitTemplate[] = [
   {
     id: 'h2',
     title: '6AM CLUB WAKEUP',
+    category: 'HEALTH',
+    categoryColor: '#4ADE80',
     scheduleType: 'daily',
     specificDays: [],
     startDate: thirtyDaysAgo,
@@ -23,6 +27,8 @@ export const initialHabits: HabitTemplate[] = [
   {
     id: 'h3',
     title: 'NO COFFEE BEFORE 10AM',
+    category: 'HEALTH',
+    categoryColor: '#4ADE80',
     scheduleType: 'daily',
     specificDays: [],
     startDate: thirtyDaysAgo,
@@ -31,6 +37,8 @@ export const initialHabits: HabitTemplate[] = [
   {
     id: 'h4',
     title: '1 HOUR LEETCODE / SHADERS',
+    category: 'LEARNING',
+    categoryColor: '#38BDF8',
     scheduleType: 'alternate_days',
     specificDays: [],
     startDate: thirtyDaysAgo,

@@ -7,7 +7,6 @@ import { BrutalistInput } from '@/ui/BrutalistInput';
 import { ConfettiOverlay } from '@/ui/ConfettiOverlay';
 import { Typography } from '@/ui/Typography';
 import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
-import { LegendList } from '@legendapp/list/react-native';
 import { observer } from '@legendapp/state/react';
 import React from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -15,6 +14,21 @@ import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
+const PREDEFINED_CATEGORIES = [
+  { name: 'HEALTH', emoji: '💪', color: '#4ADE80' },
+  { name: 'WORK', emoji: '💼', color: '#FB923C' },
+  { name: 'LEARNING', emoji: '📚', color: '#38BDF8' },
+  { name: 'MINDFULNESS', emoji: '🧘', color: '#E879F9' },
+  { name: 'FITNESS', emoji: '🏃', color: '#FBBF24' },
+  { name: 'CREATIVE', emoji: '🎨', color: '#A78BFA' },
+  { name: 'FINANCE', emoji: '💰', color: '#F472B6' },
+  { name: 'OTHER', emoji: '⚡', color: '#94A3B8' },
+];
+
+const getCategoryDisplay = (name: string) => {
+  const predefined = PREDEFINED_CATEGORIES.find(c => c.name === name.toUpperCase());
+  return predefined ? `${predefined.emoji} ${name.toUpperCase()}` : name.toUpperCase();
+};
 
 const HabitItem = observer(
   ({
@@ -175,13 +189,45 @@ export const HabitsScreen = observer(function HabitsScreen() {
   const [selectedHabitForNote, setSelectedHabitForNote] = React.useState<string | null>(null);
   const [draftNote, setDraftNote] = React.useState('');
   const [refreshing, setRefreshing] = React.useState(false);
+  const [collapsedCategories, setCollapsedCategories] = React.useState<Record<string, boolean>>({});
   const log = todayLog$.get();
-  const habitIds = log?.entries.map((e) => e.habitId) || [];
 
-  const templates = habitTemplates$.get() || [];
+  const rawTemplates = habitTemplates$.get();
+  const templates = React.useMemo(() => rawTemplates || [], [rawTemplates]);
   const activeToday = React.useMemo(() => {
-    return templates.filter((t) => isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
+    return templates.filter((t) => t && isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
   }, [templates]);
+
+  const groupedEntries = React.useMemo(() => {
+    if (!log) return [];
+    
+    const groups: Record<string, {
+      category: string;
+      color: string;
+      entries: typeof log.entries;
+    }> = {};
+    
+    log.entries.forEach((entry) => {
+      const template = templates.find((t) => t && t.id === entry.habitId);
+      const category = template?.category || 'UNCATEGORIZED';
+      const color = template?.categoryColor || '#94A3B8';
+      
+      if (!groups[category]) {
+        groups[category] = {
+          category,
+          color,
+          entries: [],
+        };
+      }
+      groups[category].entries.push(entry);
+    });
+    
+    return Object.values(groups).sort((a, b) => {
+      if (a.category === 'UNCATEGORIZED') return 1;
+      if (b.category === 'UNCATEGORIZED') return -1;
+      return a.category.localeCompare(b.category);
+    });
+  }, [log, templates]);
 
   const todayStr = React.useMemo(() => {
     const today = new Date();
@@ -201,17 +247,6 @@ export const HabitsScreen = observer(function HabitsScreen() {
       setSelectedHabitForNote(null);
     }
   };
-
-  const renderItem = React.useCallback(
-    ({ item }: { item: string }) => (
-      <HabitItem
-        habitId={item}
-        onComplete={() => setShowConfetti(true)}
-        onAddNote={handleOpenNoteSheet}
-      />
-    ),
-    [handleOpenNoteSheet],
-  );
 
   const { theme } = useUnistyles();
 
@@ -303,14 +338,10 @@ export const HabitsScreen = observer(function HabitsScreen() {
           </BrutalistCard>
         </ScrollView>
       ) : (
-        /* High performance LegendList */
-        <LegendList
-          data={habitIds}
-          renderItem={renderItem}
-          keyExtractor={(item) => item}
-          recycleItems={false}
-          contentContainerStyle={styles.listContent}
+        <ScrollView
           style={styles.list}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -319,7 +350,55 @@ export const HabitsScreen = observer(function HabitsScreen() {
               colors={[theme.colors.text]}
             />
           }
-        />
+        >
+          {groupedEntries.map((group) => {
+            const isCollapsed = !!collapsedCategories[group.category];
+            const completedCount = group.entries.filter((e) => e.completed).length;
+            const totalCount = group.entries.length;
+
+            return (
+              <View key={group.category} style={styles.categorySection}>
+                <BrutalistCard
+                  backgroundColor={group.color}
+                  style={styles.categoryHeaderCard}
+                  onPress={() => {
+                    setCollapsedCategories((prev) => ({
+                      ...prev,
+                      [group.category]: !prev[group.category],
+                    }));
+                  }}
+                >
+                  <View style={styles.categoryHeaderRow}>
+                    <Typography variant="bodyBold" style={styles.categoryHeaderText}>
+                      {getCategoryDisplay(group.category)}
+                    </Typography>
+                    <View style={styles.categoryHeaderRight}>
+                      <Typography variant="mono" style={styles.categoryCount}>
+                        {completedCount}/{totalCount} DONE
+                      </Typography>
+                      <Typography variant="mono" style={styles.collapseIcon}>
+                        {isCollapsed ? '[ + ]' : '[ - ]'}
+                      </Typography>
+                    </View>
+                  </View>
+                </BrutalistCard>
+
+                {!isCollapsed && (
+                  <View style={styles.categoryHabitsContainer}>
+                    {group.entries.map((entry) => (
+                      <HabitItem
+                        key={entry.habitId}
+                        habitId={entry.habitId}
+                        onComplete={() => setShowConfetti(true)}
+                        onAddNote={handleOpenNoteSheet}
+                      />
+                    ))}
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
       )}
 
       <BrutalistBottomSheet
@@ -557,5 +636,41 @@ const styles = StyleSheet.create((theme) => ({
   startBtn: {
     marginTop: 8,
     minWidth: 220,
+  },
+  categorySection: {
+    marginBottom: 16,
+  },
+  categoryHeaderCard: {
+    marginVertical: 4,
+  },
+  categoryHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categoryHeaderText: {
+    fontSize: 15,
+    color: '#000000',
+    fontWeight: 'bold',
+  },
+  categoryHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  categoryCount: {
+    fontSize: 11,
+    color: '#000000',
+    fontWeight: 'bold',
+    fontFamily: theme.fonts.mono,
+  },
+  collapseIcon: {
+    fontSize: 11,
+    color: '#000000',
+    fontWeight: 'bold',
+    fontFamily: theme.fonts.mono,
+  },
+  categoryHabitsContainer: {
+    marginTop: 4,
   },
 }));
