@@ -5,6 +5,7 @@ import { observer } from '@legendapp/state/react';
 import { LegendList } from '@legendapp/list/react-native';
 import { vaultState$, vaultCelebration$ } from '@/state/store';
 import { Typography } from '@/ui/Typography';
+import { EmptyState } from '@/ui/EmptyState';
 import { GoalCard } from './GoalCard';
 import { stylesheet } from './styles';
 import { router } from 'expo-router';
@@ -42,15 +43,24 @@ export const VaultScreen = observer(function VaultScreen() {
         </Typography>
       </View>
 
-      {/* Goal Cards List */}
-      <LegendList
-        data={goalIds}
-        renderItem={renderGoalItem}
-        keyExtractor={(item) => item}
-        recycleItems={false}
-        contentContainerStyle={stylesheet.listContent}
-        style={stylesheet.list}
-      />
+      {goals.length === 0 ? (
+        <EmptyState
+          emoji="🪙"
+          title="No Savings Goals Yet"
+          description="Start saving towards something you want. Set a target amount and track your progress brick by brick."
+          ctaLabel="ADD A GOAL ➔"
+          onCtaPress={() => router.push('/editor')}
+        />
+      ) : (
+        <LegendList
+          data={goalIds}
+          renderItem={renderGoalItem}
+          keyExtractor={(item) => item}
+          recycleItems={false}
+          contentContainerStyle={stylesheet.listContent}
+          style={stylesheet.list}
+        />
+      )}
 
       <ConfettiOverlay
         isActive={!!celebration}

@@ -3,6 +3,7 @@ import { DailyHabitEntry } from '@/state/types';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistButton } from '@/ui/BrutalistButton';
+import { EmptyState } from '@/ui/EmptyState';
 import ViewShot, { ViewShotRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import { WeeklySummaryCard } from './WeeklySummaryCard';
@@ -20,6 +21,7 @@ import {
   YearGridCell,
 } from '@/utils/date';
 import { observer } from '@legendapp/state/react';
+import { router } from 'expo-router';
 import { PressableScale } from 'pressto';
 import React, { useState, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -719,15 +721,27 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
         </Typography>
       </View>
 
-      {renderSwitcher()}
+      {habits.length === 0 ? (
+        <EmptyState
+          emoji="📊"
+          title="No Data Yet"
+          description="Start tracking your daily habits to see analytics, streaks, and progress charts here."
+          ctaLabel="SET UP HABITS ➔"
+          onCtaPress={() => router.push('/editor')}
+        />
+      ) : (
+        <>
+          {renderSwitcher()}
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {viewMode === 'week' ? renderWeekView() : viewMode === 'month' ? renderMonthView() : renderYearView()}
-      </ScrollView>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {viewMode === 'week' ? renderWeekView() : viewMode === 'month' ? renderMonthView() : renderYearView()}
+          </ScrollView>
+        </>
+      )}
 
       <BrutalistBottomSheet
         visible={isSheetVisible}

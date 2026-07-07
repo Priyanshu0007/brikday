@@ -2,9 +2,11 @@ import { appActions, blueprintState$ } from '@/state/store';
 import { BrutalistButton } from '@/ui/BrutalistButton';
 import { BrutalistCard } from '@/ui/BrutalistCard';
 import { BrutalistInput } from '@/ui/BrutalistInput';
+import { EmptyState } from '@/ui/EmptyState';
 import { triggerHaptic } from '@/ui/haptics';
 import { Typography } from '@/ui/Typography';
 import { observer } from '@legendapp/state/react';
+import { router } from 'expo-router';
 import { PressableScale } from 'pressto';
 import { useState } from 'react';
 import { ScrollView, TextInput, View } from 'react-native';
@@ -232,34 +234,43 @@ export const BlueprintScreen = observer(function BlueprintScreen() {
         </Typography>
       </View>
 
-      {/* Kanban Layout columns */}
-      <View style={stylesheet.kanbanLayout}>
-        {/* Column 1: Neglected / Decaying */}
-        {neglectedProjects.length > 0 && (
+      {projects.length === 0 ? (
+        <EmptyState
+          emoji="🧱"
+          title="No Projects Yet"
+          description="Track your side-projects, set milestones, and stay accountable. Every big thing starts with a single brick."
+          ctaLabel="CREATE A PROJECT ➔"
+          onCtaPress={() => router.push('/editor')}
+        />
+      ) : (
+        <View style={stylesheet.kanbanLayout}>
+          {/* Column 1: Neglected / Decaying */}
+          {neglectedProjects.length > 0 && (
+            <View style={stylesheet.column}>
+              <View style={[stylesheet.columnHeader, { backgroundColor: theme.colors.danger }]}>
+                <Typography variant="bodyBold" color="#FFFFFF" uppercase>
+                  IGNORED PROJECTS ({neglectedProjects.length})
+                </Typography>
+              </View>
+              {neglectedProjects.map((p) => (
+                <ProjectCard key={p.id} projectId={p.id} theme={theme} />
+              ))}
+            </View>
+          )}
+
+          {/* Column 2: Operational */}
           <View style={stylesheet.column}>
-            <View style={[stylesheet.columnHeader, { backgroundColor: theme.colors.danger }]}>
-              <Typography variant="bodyBold" color="#FFFFFF" uppercase>
-                IGNORED PROJECTS ({neglectedProjects.length})
+            <View style={[stylesheet.columnHeader, { backgroundColor: theme.colors.success }]}>
+              <Typography variant="bodyBold" color={theme.colors.background} uppercase>
+                ACTIVE PROJECTS ({activeProjects.length})
               </Typography>
             </View>
-            {neglectedProjects.map((p) => (
+            {activeProjects.map((p) => (
               <ProjectCard key={p.id} projectId={p.id} theme={theme} />
             ))}
           </View>
-        )}
-
-        {/* Column 2: Operational */}
-        <View style={stylesheet.column}>
-          <View style={[stylesheet.columnHeader, { backgroundColor: theme.colors.success }]}>
-            <Typography variant="bodyBold" color={theme.colors.background} uppercase>
-              ACTIVE PROJECTS ({activeProjects.length})
-            </Typography>
-          </View>
-          {activeProjects.map((p) => (
-            <ProjectCard key={p.id} projectId={p.id} theme={theme} />
-          ))}
         </View>
-      </View>
+      )}
     </ScrollView>
   );
 });

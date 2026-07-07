@@ -59,7 +59,7 @@ export const appActions = {
       todayLog$.set(existing);
     } else {
       const templates = habitTemplates$.get() || [];
-      const activeHabits = templates.filter((t) => isHabitActiveOnDate(t, new Date()));
+      const activeHabits = templates.filter((t) => t && isHabitActiveOnDate(t, new Date()));
 
       const newLog: DailyLog = {
         date: todayStr,
@@ -461,6 +461,7 @@ export const appActions = {
     const habitMap: Record<string, { title: string, scheduled: number, completed: number }> = {};
     const templates = habitTemplates$.get() || [];
     templates.forEach(t => {
+      if (!t) return;
       if (!t.archivedAt) {
         habitMap[t.id] = { title: t.title, scheduled: 0, completed: 0 };
       }
@@ -640,6 +641,7 @@ export const appActions = {
     const currentStreaks: Record<string, number> = {};
     const templates = habitTemplates$.get() || [];
     templates.forEach(t => {
+      if (!t) return;
       if (t.archivedAt) return;
       let streak = 0;
       
