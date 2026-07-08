@@ -584,7 +584,7 @@ export const appActions = {
   },
   generateInsights(): Insight[] {
     const insights: Insight[] = [];
-    const date = new Date();
+
     const last30Days: string[] = [];
     for (let i = 0; i < 30; i++) {
       const d = new Date();

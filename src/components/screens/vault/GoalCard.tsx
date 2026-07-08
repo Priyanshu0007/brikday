@@ -6,7 +6,7 @@ import { vaultState$, userState$ } from '@/state/store';
 import { getCurrencySymbol } from '@/constants/currency';
 import { Typography } from '@/ui/Typography';
 import { BrutalistCard } from '@/ui/BrutalistCard';
-import { BrutalistButton } from '@/ui/BrutalistButton';
+
 import { stylesheet } from './styles';
 
 export const GoalCard = observer(

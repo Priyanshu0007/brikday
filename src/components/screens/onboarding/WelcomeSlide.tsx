@@ -26,7 +26,7 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
       </Typography>
       <Typography variant="body" style={[styles.slideDescription, { textAlign: 'center' }]}>
         Track habits, save without debt, and ship your side projects.
-        Let's set you up in under 2 minutes.
+        Let&apos;s set you up in under 2 minutes.
       </Typography>
 
       <BrutalistCard>

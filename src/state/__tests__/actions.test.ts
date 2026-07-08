@@ -11,6 +11,15 @@
 
 import { mockStorage, mmkvInstance } from '../__mocks__/mmkvMock';
 
+// ─── Imports under test ───────────────────────────────────────────────────
+
+import { isHabitActiveOnDate, getLocalDateString } from '@/utils/date';
+import { HabitTemplate, DailyLog } from '../types';
+import { appActions } from '../actions';
+import { todayLog$, logIndex$ } from '../slices/dailyLogSlice';
+import { habitTemplates$ } from '../slices/habitsSlice';
+import { vaultState$, vaultCelebration$ } from '../slices/vaultSlice';
+
 // ─── Module mocks (must come before imports that depend on them) ──────────
 
 // Mock react-native-mmkv so dailyLogSlice.ts resolves without native binaries
@@ -30,15 +39,6 @@ jest.mock('@/utils/notifications', () => ({
   scheduleEveningRecap: jest.fn(),
   scheduleStreakAlert: jest.fn(),
 }));
-
-// ─── Imports under test ───────────────────────────────────────────────────
-
-import { isHabitActiveOnDate, getLocalDateString } from '@/utils/date';
-import { HabitTemplate, DailyLog } from '../types';
-import { appActions } from '../actions';
-import { todayLog$, logIndex$ } from '../slices/dailyLogSlice';
-import { habitTemplates$ } from '../slices/habitsSlice';
-import { vaultState$, vaultCelebration$ } from '../slices/vaultSlice';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Pressable } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
 import { Typography } from '@/ui/Typography';
-import { useUnistyles, UnistylesRuntime } from 'react-native-unistyles';
+import { UnistylesRuntime } from 'react-native-unistyles';
 import { Colors } from '@/constants/theme';
 import { triggerHaptic } from '@/ui/haptics';
 import { SlideContent } from './SlideContent';
@@ -15,7 +15,7 @@ interface ThemeSlideProps {
 }
 
 export function ThemeSlide({ activeIndex, selectedTheme, onThemeChange }: ThemeSlideProps) {
-  const { theme } = useUnistyles();
+
 
   const handleThemeSelect = (selected: 'light' | 'dark') => {
     triggerHaptic('selection');

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { StyleSheet } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
 import { appActions } from '@/state/store';
 import { getWeekDates, getMonthShortName } from '@/utils/date';
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const WeeklySummaryCard = ({ weekAnchorDate }: Props) => {
-  const { theme } = useUnistyles();
+
   
   const cells = getWeekDates(weekAnchorDate);
   const firstDay = cells[0]?.date;

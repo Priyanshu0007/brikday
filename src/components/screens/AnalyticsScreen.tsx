@@ -1,4 +1,4 @@
-import { appActions, habitTemplates$, todayLog$ } from '@/state/store';
+import { appActions, habitTemplates$ } from '@/state/store';
 import { DailyHabitEntry } from '@/state/types';
 import { BrutalistBottomSheet } from '@/ui/BrutalistBottomSheet';
 import { BrutalistCard } from '@/ui/BrutalistCard';
@@ -119,12 +119,12 @@ const ReadOnlyHabitItem = ({ entry, dateStr }: { entry: DailyHabitEntry; dateStr
 
 export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const habits = habitTemplates$.get() || [];
-  const todayLog = todayLog$.get();
+
   const { theme } = useUnistyles();
 
   const insights = React.useMemo(() => {
     return appActions.generateInsights();
-  }, [habits, todayLog]);
+  }, []);
 
   // View modes: 'week' | 'month' | 'year'
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
@@ -234,7 +234,7 @@ export const AnalyticsScreen = observer(function AnalyticsScreen() {
   const selectedDateString = getLocalDateString(selectedDate);
   const selectedDayStats = React.useMemo(
     () => appActions.getDayStats(selectedDateString),
-    [selectedDateString, isSheetVisible],
+    [selectedDateString],
   );
 
   // ── Switcher ──

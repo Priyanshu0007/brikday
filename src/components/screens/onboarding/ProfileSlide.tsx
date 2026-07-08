@@ -34,7 +34,7 @@ export function ProfileSlide({
   return (
     <SlideContent index={1} activeIndex={activeIndex}>
       <Typography variant="h2" style={styles.slideTitle}>
-        WHO'S BUILDING?
+        WHO&apos;S BUILDING?
       </Typography>
       <Typography variant="body" style={styles.slideDescription}>
         Set up your profile. Pick a name and an avatar.

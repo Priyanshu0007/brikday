@@ -88,26 +88,12 @@ const ProjectCard = observer(({ projectId, theme }: { projectId: string; theme: 
   const completedCount = milestones.filter((m) => m.completed).length;
   const totalCount = milestones.length;
 
-  const handleToggleMilestone = (milestoneId: string) => {
-    triggerHaptic('light');
-    appActions.toggleMilestone(projectId, milestoneId);
-  };
-
   const handleAddMilestone = () => {
     if (newMilestoneTitle.trim()) {
       triggerHaptic('success');
       appActions.addMilestone(projectId, newMilestoneTitle);
       setNewMilestoneTitle('');
     }
-  };
-
-  const handleDeleteMilestone = (milestoneId: string) => {
-    triggerHaptic('heavy');
-    appActions.deleteMilestone(projectId, milestoneId);
-  };
-
-  const handleEditMilestone = (milestoneId: string, newTitle: string) => {
-    appActions.editMilestone(projectId, milestoneId, newTitle);
   };
 
   const progressPercent = totalCount === 0 ? 0 : completedCount / totalCount;

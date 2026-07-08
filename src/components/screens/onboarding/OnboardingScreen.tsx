@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/immutability */
+ 
 'use no memo';
 import React, { useRef, useState, useCallback } from 'react';
 import { View } from 'react-native';
@@ -39,8 +39,9 @@ export function OnboardingScreen() {
   // ── Callbacks ───────────────────────────
   const onPageScroll = useCallback((e: PagerViewOnPageScrollEvent) => {
     const { position, offset } = e.nativeEvent;
+    // eslint-disable-next-line react-hooks/immutability
     activeIndex.value = position + offset;
-  }, []);
+  }, [activeIndex]);
 
   const onPageSelected = useCallback((e: PagerViewOnPageSelectedEvent) => {
     setCurrentPage(e.nativeEvent.position);

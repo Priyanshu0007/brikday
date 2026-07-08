@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TextInputProps, StyleProp, ViewStyle, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
+import { View, TextInput, TextInputProps, StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Typography } from './Typography';
 

@@ -70,7 +70,7 @@ const CustomSlider = ({
       const percentage = (value - min) / (max - min);
       translateX.value = percentage * (trackWidth - thumbSize);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [value, min, max, trackWidth, translateX, isDragging.value]);
 
   const updateInternalValue = (pos: number) => {

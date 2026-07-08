@@ -9,7 +9,7 @@ import { Typography } from '@/ui/Typography';
 import { getDayName, getMonthShortName, isHabitActiveOnDate } from '@/utils/date';
 import { observer } from '@legendapp/state/react';
 import React from 'react';
-import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, FlatList, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -40,18 +40,14 @@ const HabitItem = observer(
     onComplete?: () => void;
     onAddNote?: (id: string) => void;
   }) => {
-    const log = todayLog$.get();
     const swipeableRef = React.useRef<Swipeable>(null);
+    const entry = todayLog$.entries.find((e) => e.habitId.peek() === habitId);
+    if (!entry) return null;
 
-    if (!log) return null;
-
-    const entryIndex = log.entries.findIndex((e) => e.habitId === habitId);
-    if (entryIndex === -1) return null;
-
-    const title = todayLog$.entries[entryIndex].title.get();
-    const emoji = todayLog$.entries[entryIndex].emoji.get();
-    const isCompleted = todayLog$.entries[entryIndex].completed.get();
-    const note = todayLog$.entries[entryIndex].note.get();
+    const title = entry.title.get();
+    const emoji = entry.emoji.get();
+    const isCompleted = entry.completed.get();
+    const note = entry.note.get();
 
     // neglected status only depends on yesterday, and is cleared when completed today
     const isNeglected = React.useMemo(
@@ -338,10 +334,12 @@ export const HabitsScreen = observer(function HabitsScreen() {
           </BrutalistCard>
         </ScrollView>
       ) : (
-        <ScrollView
+        <FlatList
           style={styles.list}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          data={groupedEntries}
+          keyExtractor={(group) => group.category}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -350,14 +348,13 @@ export const HabitsScreen = observer(function HabitsScreen() {
               colors={[theme.colors.text]}
             />
           }
-        >
-          {groupedEntries.map((group) => {
+          renderItem={({ item: group }) => {
             const isCollapsed = !!collapsedCategories[group.category];
             const completedCount = group.entries.filter((e) => e.completed).length;
             const totalCount = group.entries.length;
 
             return (
-              <View key={group.category} style={styles.categorySection}>
+              <View style={styles.categorySection}>
                 <BrutalistCard
                   backgroundColor={group.color}
                   style={styles.categoryHeaderCard}
@@ -397,8 +394,8 @@ export const HabitsScreen = observer(function HabitsScreen() {
                 )}
               </View>
             );
-          })}
-        </ScrollView>
+          }}
+        />
       )}
 
       <BrutalistBottomSheet

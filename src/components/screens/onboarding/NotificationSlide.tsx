@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Pressable } from 'react-native';
 import { type SharedValue } from 'react-native-reanimated';
 import { Typography } from '@/ui/Typography';
-import { useUnistyles } from 'react-native-unistyles';
 import { triggerHaptic } from '@/ui/haptics';
 import { SlideContent } from './SlideContent';
 import { styles } from './styles';
@@ -24,7 +23,7 @@ export function NotificationSlide({
   reminderMinute,
   onTimeChange,
 }: NotificationSlideProps) {
-  const { theme } = useUnistyles();
+
 
   const formatTime = (h: number, m: number) => {
     const period = h >= 12 ? 'PM' : 'AM';

@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/immutability */
+ 
 'use no memo';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import React, { useEffect, useRef } from 'react';
@@ -41,7 +41,7 @@ export function BrutalistBottomSheet({
   }, [visible]);
 
   // 'auto' detent is not supported with scrollable — use fractional detents
-  const detents = scrollable ? [0.9] : ['auto'] as const;
+  const detents: any[] = scrollable ? [0.9] : ['auto'];
 
   const headerElement = (
     <View style={stylesheet.header}>

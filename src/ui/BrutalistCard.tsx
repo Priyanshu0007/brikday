@@ -12,12 +12,6 @@ const PressableBrutalist4 = createAnimatedPressable((progress) => {
   };
 });
 
-const PressableBrutalist8 = createAnimatedPressable((progress) => {
-  'worklet';
-  return {
-    transform: [{ translateX: progress * 8 }, { translateY: progress * 8 }],
-  };
-});
 
 interface BrutalistCardProps {
   children: React.ReactNode;
