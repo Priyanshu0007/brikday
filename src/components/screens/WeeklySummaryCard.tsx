@@ -62,7 +62,7 @@ export const WeeklySummaryCard = ({ weekAnchorDate }: Props) => {
           {summary.perHabitRates.map((habit, idx) => (
             <View key={idx} style={styles.habitRow}>
               <Typography variant="mono" style={styles.habitTitle} numberOfLines={1}>
-                {habit.title.substring(0, 12).padEnd(12, ' ')}
+                {(habit.title ?? '').substring(0, 12).padEnd(12, ' ')}
               </Typography>
               <Typography variant="mono" style={styles.habitBar}>
                 {renderProgressBar(habit.rate)}  {Math.round(habit.rate * 100).toString().padStart(3, ' ')}%

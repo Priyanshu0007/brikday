@@ -31,7 +31,7 @@ const getCategoryDisplay = (name: string) => {
 
 export const EngineEditor = observer(() => {
   const { theme } = useUnistyles();
-  const habits = habitTemplates$.get()?.filter((h) => h && !h.archivedAt) || [];
+  const habits = habitTemplates$.get()?.filter((h) => h && h.id && h.title && !h.archivedAt) || [];
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);

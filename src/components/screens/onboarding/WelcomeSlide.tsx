@@ -21,12 +21,12 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
         </Typography>
       </View>
 
-      <Typography variant="h2" style={styles.slideTitle}>
-        What is Brickday?
+      <Typography variant="h2" style={[styles.slideTitle, { textAlign: 'center' }]}>
+        BUILD YOUR LIFE,{'\n'}BRICK BY BRICK
       </Typography>
-      <Typography variant="body" style={styles.slideDescription}>
-        Brickday is a tool to help you stay on track. It helps you build good habits, save money
-        without debt, and complete your projects.
+      <Typography variant="body" style={[styles.slideDescription, { textAlign: 'center' }]}>
+        Track habits, save without debt, and ship your side projects.
+        Let's set you up in under 2 minutes.
       </Typography>
 
       <BrutalistCard>
@@ -35,8 +35,8 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
             ⚡
           </Typography>
           <View style={styles.conceptText}>
-            <Typography variant="bodyBold">HABITS</Typography>
-            <Typography variant="caption">Daily habits & streaks</Typography>
+            <Typography variant="bodyBold">DAILY HABITS</Typography>
+            <Typography variant="caption">Build streaks & stay consistent</Typography>
           </View>
         </View>
       </BrutalistCard>
@@ -47,8 +47,8 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
             🪙
           </Typography>
           <View style={styles.conceptText}>
-            <Typography variant="bodyBold">SAVINGS</Typography>
-            <Typography variant="caption">Save & pay in full — zero EMI</Typography>
+            <Typography variant="bodyBold">SAVINGS VAULT</Typography>
+            <Typography variant="caption">Save first, buy later — zero debt</Typography>
           </View>
         </View>
       </BrutalistCard>
@@ -59,8 +59,8 @@ export function WelcomeSlide({ activeIndex }: WelcomeSlideProps) {
             🧱
           </Typography>
           <View style={styles.conceptText}>
-            <Typography variant="bodyBold">PROJECTS</Typography>
-            <Typography variant="caption">Projects & goals tracker</Typography>
+            <Typography variant="bodyBold">SIDE PROJECTS</Typography>
+            <Typography variant="caption">Track & ship what matters</Typography>
           </View>
         </View>
       </BrutalistCard>

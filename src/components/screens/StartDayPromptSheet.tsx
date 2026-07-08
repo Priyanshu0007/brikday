@@ -24,7 +24,7 @@ export const StartDayPromptSheet = observer(function StartDayPromptSheet({
   const templates = habitTemplates$.get();
   const activeToday = React.useMemo(() => {
     const list = templates || [];
-    return list.filter((t) => t && isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
+    return list.filter((t) => t && t.id && t.title && isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
   }, [templates]);
 
   return (

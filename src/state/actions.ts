@@ -16,6 +16,7 @@ import {
   DailyHabitEntry,
   Insight,
 } from './types';
+import { OnboardingHabitOption } from './hardcoded-data/onboarding-habits';
 import { getLocalDateString, isHabitActiveOnDate, getWeekDates } from '@/utils/date';
 import {
   cancelAllScheduled,
@@ -24,9 +25,78 @@ import {
   scheduleStreakAlert,
 } from '@/utils/notifications';
 
+export interface OnboardingV2Config {
+  username: string;
+  avatarEmoji: string;
+  currencyCode: string;
+  selectedHabits: OnboardingHabitOption[];
+  customHabits: { title: string; emoji: string }[];
+  theme: 'light' | 'dark';
+  notificationsEnabled: boolean;
+  morningReminderHour: number;
+  morningReminderMinute: number;
+}
+
 export const appActions = {
   completeOnboarding() {
     authState$.status.set('login');
+  },
+  async completeOnboardingV2(config: OnboardingV2Config) {
+    // 1. Set user profile
+    userState$.username.set(config.username.trim() || 'Builder');
+    userState$.avatarEmoji.set(config.avatarEmoji);
+    userState$.currencyCode.set(config.currencyCode);
+    userState$.isLoggedIn.set(true);
+
+    // 2. Set theme
+    uiState$.theme.set(config.theme);
+
+    // 3. Push selected habits as HabitTemplates
+    const now = Date.now();
+    const allHabits = [
+      ...config.selectedHabits.map((h, i) => ({
+        id: `h_ob_${now}_${i}`,
+        title: h.title,
+        emoji: h.emoji,
+        category: h.category,
+        categoryColor: h.categoryColor,
+        scheduleType: h.scheduleType,
+        specificDays: [] as number[],
+        startDate: now,
+        createdAt: now,
+      })),
+      ...config.customHabits.map((h, i) => ({
+        id: `h_custom_${now}_${i}`,
+        title: h.title.toUpperCase(),
+        emoji: h.emoji,
+        category: 'CUSTOM',
+        categoryColor: '#94A3B8',
+        scheduleType: 'daily' as const,
+        specificDays: [] as number[],
+        startDate: now,
+        createdAt: now,
+      })),
+    ];
+    habitTemplates$.set(allHabits);
+
+    // 4. Configure notifications
+    if (config.notificationsEnabled) {
+      notificationState$.morningReminder.set({
+        enabled: true,
+        hour: config.morningReminderHour,
+        minute: config.morningReminderMinute,
+      });
+      await this.rescheduleNotifications();
+    }
+
+    // 5. Transition to authenticated (skip login)
+    authState$.status.set('authenticated');
+
+    // 6. Generate first daily log immediately
+    this.generateDailyLogIfMissing();
+  },
+  updateAvatarEmoji(emoji: string) {
+    userState$.avatarEmoji.set(emoji);
   },
   login(username: string) {
     if (username.trim()) {
@@ -59,7 +129,7 @@ export const appActions = {
       todayLog$.set(existing);
     } else {
       const templates = habitTemplates$.get() || [];
-      const activeHabits = templates.filter((t) => t && isHabitActiveOnDate(t, new Date()));
+      const activeHabits = templates.filter((t) => t && t.id && t.title && isHabitActiveOnDate(t, new Date()));
 
       const newLog: DailyLog = {
         date: todayStr,
@@ -461,7 +531,7 @@ export const appActions = {
     const habitMap: Record<string, { title: string, scheduled: number, completed: number }> = {};
     const templates = habitTemplates$.get() || [];
     templates.forEach(t => {
-      if (!t) return;
+      if (!t || !t.id || !t.title) return;
       if (!t.archivedAt) {
         habitMap[t.id] = { title: t.title, scheduled: 0, completed: 0 };
       }
@@ -641,7 +711,7 @@ export const appActions = {
     const currentStreaks: Record<string, number> = {};
     const templates = habitTemplates$.get() || [];
     templates.forEach(t => {
-      if (!t) return;
+      if (!t || !t.id) return;
       if (t.archivedAt) return;
       let streak = 0;
       

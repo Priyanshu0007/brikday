@@ -195,7 +195,7 @@ export const HabitsScreen = observer(function HabitsScreen() {
   const rawTemplates = habitTemplates$.get();
   const templates = React.useMemo(() => rawTemplates || [], [rawTemplates]);
   const activeToday = React.useMemo(() => {
-    return templates.filter((t) => t && isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
+    return templates.filter((t) => t && t.id && t.title && isHabitActiveOnDate(t, new Date()) && !t.archivedAt);
   }, [templates]);
 
   const groupedEntries = React.useMemo(() => {

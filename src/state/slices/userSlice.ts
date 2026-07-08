@@ -4,8 +4,9 @@ import { mmkvPlugin } from '../plugin';
 import { UserProfile } from '../types';
 
 export const userState$ = observable<UserProfile>({
-  username: 'SDE-1, React Native',
-  role: 'Core Architect',
+  username: '',
+  avatarEmoji: '🧱',
+  role: 'Builder',
   isLoggedIn: false,
   currencyCode: 'USD',
 });

@@ -82,126 +82,6 @@ export const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
 
-  // Habit Preview (Slide 1)
-  previewContainer: {
-    gap: 4,
-  },
-  habitPreviewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  habitPreviewText: {
-    flex: 1,
-    gap: 2,
-  },
-  checkboxDone: {
-    width: 26,
-    height: 26,
-    borderWidth: 2.5,
-    borderColor: theme.colors.border,
-    borderRadius: 3,
-    backgroundColor: theme.colors.success,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmark: {
-    fontSize: 14,
-    lineHeight: 16,
-    color: '#000',
-  },
-  checkboxPending: {
-    width: 26,
-    height: 26,
-    borderWidth: 2.5,
-    borderColor: theme.colors.border,
-    borderRadius: 3,
-    backgroundColor: theme.colors.background,
-  },
-  doneText: {
-    textDecorationLine: 'line-through',
-    textDecorationStyle: 'solid',
-    color: theme.colors.textMuted,
-  },
-
-  // Progress bar (Slide 2)
-  progressBarBg: {
-    height: 14,
-    backgroundColor: theme.colors.background,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderRadius: 2,
-    marginTop: 8,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-  },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  progressRight: {
-    fontWeight: 'bold',
-  },
-
-  // Project Preview (Slide 3)
-  projectPreviewRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  activeTag: {
-    backgroundColor: theme.colors.success + '30',
-    borderRadius: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border,
-  },
-  activeTagText: {
-    fontSize: 9,
-    fontWeight: 'bold',
-  },
-
-  // Final Slide
-  finalEmoji: {
-    alignSelf: 'center',
-    marginBottom: 4,
-  },
-  emojiTextLarge: {
-    fontSize: 56,
-    lineHeight: 72,
-  },
-  summaryContainer: {
-    gap: 4,
-    marginTop: 4,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  summaryEmoji: {
-    fontSize: 20,
-    width: 28,
-    textAlign: 'center',
-  },
-  motivationBox: {
-    marginTop: 16,
-    borderTopWidth: 2,
-    borderTopColor: theme.colors.border,
-    paddingTop: 12,
-  },
-  motivationText: {
-    textAlign: 'center',
-    fontSize: 10,
-    lineHeight: 16,
-    color: theme.colors.textMuted,
-    letterSpacing: 0.8,
-  },
-
   // Tip box
   tipBox: {
     marginTop: 12,
@@ -258,14 +138,313 @@ export const styles = StyleSheet.create((theme) => ({
     fontSize: 10,
     color: theme.colors.textMuted,
   },
-  skipButton: {
-    alignSelf: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+
+  // ── Profile Slide ──────────────────────
+  profileSection: {
+    marginBottom: 20,
   },
-  skipText: {
-    fontSize: 13,
-    color: '#999',
-    textDecorationLine: 'underline',
+  sectionLabel: {
+    fontSize: 12,
+    letterSpacing: 1.2,
+    color: theme.colors.textMuted,
+    marginBottom: 8,
+  },
+  avatarPickerContainer: {
+    marginTop: 4,
+  },
+  avatarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  avatarChip: {
+    width: 48,
+    height: 48,
+    borderWidth: 2.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarChipSelected: {
+    backgroundColor: theme.colors.success,
+    borderColor: theme.colors.border,
+  },
+  avatarChipEmoji: {
+    fontSize: 22,
+  },
+  currencyRow: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+    marginTop: 4,
+  },
+  currencyChip: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.paper,
+    borderRadius: theme.borderRadius,
+  },
+  currencyChipSelected: {
+    backgroundColor: theme.colors.text,
+  },
+
+  // ── Habit Picker Slide ─────────────────
+  habitPickerScroll: {
+    flex: 1,
+  },
+  habitPickerContent: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
+  },
+  habitCounterContainer: {
+    alignSelf: 'center',
+    marginBottom: 12,
+    backgroundColor: theme.colors.paper,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  habitCounterReady: {
+    backgroundColor: theme.colors.success,
+  },
+  categorySection: {
+    marginBottom: 16,
+  },
+  categoryLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+    color: theme.colors.textMuted,
+    marginBottom: 8,
+  },
+  habitChipsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  habitChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 2.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+  },
+  habitChipSelected: {
+    backgroundColor: theme.colors.success,
+  },
+  habitChipEmoji: {
+    fontSize: 16,
+  },
+  habitChipTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+    color: theme.colors.text,
+  },
+  habitChipCheck: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 2,
+  },
+  customHabitSection: {
+    marginTop: 8,
+    paddingTop: 16,
+    borderTopWidth: 2,
+    borderTopColor: theme.colors.border,
+    borderStyle: 'dashed',
+  },
+  customHabitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  customHabitInput: {
+    flex: 1,
+  },
+  addedCustomChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 2.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.success,
+    marginTop: 8,
+  },
+
+  // ── Theme Slide ────────────────────────
+  themeOptionsContainer: {
+    gap: 12,
+  },
+  themeCard: {
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    overflow: 'hidden',
+  },
+  themeCardSelected: {
+    borderWidth: 4,
+    borderColor: theme.colors.success,
+  },
+  themeCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  themeCardTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  themeCheckBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: theme.colors.success,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themePreview: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 6,
+  },
+  themePreviewBar: {
+    height: 12,
+    borderRadius: 2,
+    borderWidth: 1.5,
+  },
+
+  // ── Notification Slide ─────────────────
+  notifContainer: {
+    gap: 16,
+  },
+  notifToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+  },
+  notifToggleLabel: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  notifToggleEmoji: {
+    fontSize: 20,
+  },
+  timePickerContainer: {
+    marginTop: 4,
+  },
+  timePickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  timeButton: {
+    width: 40,
+    height: 40,
+    borderWidth: 2.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius,
+    backgroundColor: theme.colors.paper,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timeDisplay: {
+    minWidth: 80,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+    color: theme.colors.text,
+  },
+  timeLabel: {
+    textAlign: 'center',
+    marginTop: 6,
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    letterSpacing: 1,
+  },
+  motivationBox: {
+    marginTop: 16,
+    borderTopWidth: 2,
+    borderTopColor: theme.colors.border,
+    paddingTop: 12,
+  },
+  motivationText: {
+    textAlign: 'center',
+    fontSize: 10,
+    lineHeight: 16,
+    color: theme.colors.textMuted,
+    letterSpacing: 0.8,
+  },
+
+  // ── Final Slide ────────────────────────
+  finalEmoji: {
+    alignSelf: 'center',
+    marginBottom: 4,
+  },
+  emojiTextLarge: {
+    fontSize: 56,
+    lineHeight: 72,
+  },
+
+  // ── Toggle switch (brutalist) ──────────
+  toggleTrack: {
+    width: 52,
+    height: 30,
+    borderWidth: 2.5,
+    borderColor: theme.colors.border,
+    borderRadius: 3,
+    backgroundColor: theme.colors.background,
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  toggleTrackActive: {
+    backgroundColor: theme.colors.success,
+  },
+  toggleThumb: {
+    width: 20,
+    height: 20,
+    borderRadius: 2,
+    backgroundColor: theme.colors.border,
+  },
+  toggleThumbActive: {
+    alignSelf: 'flex-end',
+    backgroundColor: theme.colors.border,
+  },
+
+  // Validation error
+  validationError: {
+    textAlign: 'center',
+    color: theme.colors.danger,
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 4,
   },
 }));

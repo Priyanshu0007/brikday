@@ -67,6 +67,7 @@ export interface Project {
 
 export interface UserProfile {
   username: string;
+  avatarEmoji?: string;
   role: string;
   isLoggedIn: boolean;
   currencyCode: string;
