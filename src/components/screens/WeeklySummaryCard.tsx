@@ -2,14 +2,15 @@ import React from 'react';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { Typography } from '@/ui/Typography';
-import { appActions } from '@/state/store';
+import { appActions, streak$ } from '@/state/store';
+import { observer } from '@legendapp/state/react';
 import { getWeekDates, getMonthShortName } from '@/utils/date';
 
 interface Props {
   weekAnchorDate: Date;
 }
 
-export const WeeklySummaryCard = ({ weekAnchorDate }: Props) => {
+export const WeeklySummaryCard = observer(({ weekAnchorDate }: Props) => {
 
   
   const cells = getWeekDates(weekAnchorDate);
@@ -21,7 +22,7 @@ export const WeeklySummaryCard = ({ weekAnchorDate }: Props) => {
 
   const summary = appActions.getWeekSummary(weekAnchorDate);
   const totalPercentage = Math.round(summary.totalRate * 100);
-  const streak = appActions.calculateStreak();
+  const streak = streak$.get();
   
   const renderProgressBar = (rate: number, length: number = 10) => {
     const filled = Math.round(rate * length);
@@ -81,7 +82,7 @@ export const WeeklySummaryCard = ({ weekAnchorDate }: Props) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create((theme) => ({
   card: {

@@ -1,7 +1,7 @@
 import '@/unistyles';
 import { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
-import { useColorScheme, AppState, StatusBar } from 'react-native';
+import { useColorScheme, AppState, StatusBar, InteractionManager } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import {
@@ -50,17 +50,19 @@ export default observer(function TabLayout() {
       setupDevMenu();
     }
 
-    // Run one-time migration and init daily log
-    migrateToLogSystem();
-    appActions.loadTodayLog();
+    InteractionManager.runAfterInteractions(() => {
+      // Run one-time migration and init daily log
+      migrateToLogSystem();
+      appActions.loadTodayLog();
 
-    // Request notification permissions and reschedule
-    (async () => {
-      const granted = await requestNotificationPermissions();
-      if (granted) {
-        appActions.rescheduleNotifications();
-      }
-    })();
+      // Request notification permissions and reschedule
+      (async () => {
+        const granted = await requestNotificationPermissions();
+        if (granted) {
+          appActions.rescheduleNotifications();
+        }
+      })();
+    });
 
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {

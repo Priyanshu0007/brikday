@@ -1,3 +1,6 @@
+import { computed } from '@legendapp/state';
+import { appActions } from './actions';
+
 // Re-export shared TypeScript interfaces and types for the application state
 export * from './types';
 
@@ -14,3 +17,6 @@ export * from './slices/notificationSlice'; // Manages notification preferences
 
 // Re-export the centralized actions object used to mutate the state slices
 export * from './actions';
+
+export const streak$ = computed(() => appActions.calculateStreak());
+export const insights$ = computed(() => appActions.generateInsights());
